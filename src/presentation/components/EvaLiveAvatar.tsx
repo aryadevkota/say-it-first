@@ -45,6 +45,7 @@ export const EvaLiveAvatar: React.FC<EvaLiveAvatarProps> = ({
   // Initialize or negotiate avatar live session
   useEffect(() => {
     let isMounted = true;
+    const controller = new AbortController();
 
     async function initSession() {
       try {
@@ -52,6 +53,7 @@ export const EvaLiveAvatar: React.FC<EvaLiveAvatarProps> = ({
         const res = await fetch('/api/v1/avatar/session', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
           body: JSON.stringify({
             scenarioId: presentation.scenarioId,
             outfit: presentation.outfit,
@@ -65,15 +67,13 @@ export const EvaLiveAvatar: React.FC<EvaLiveAvatarProps> = ({
           const data = await res.json();
           setSessionId(data.session_id);
           setSessionStatus(data.mode === 'live' ? 'connected' : 'connected');
-          // In real WebRTC LiveKit environments, incoming stream is attached to videoRef
         } else {
           setSessionStatus('connected'); // Graceful fallback
         }
       } catch (err) {
-        if (isMounted) {
-          console.warn('[EvaLiveAvatar] Session negotiation fallback:', err);
-          setSessionStatus('connected'); // Fallback continues without blocking UI
-        }
+        if (!isMounted || controller.signal.aborted) return;
+        console.warn('[EvaLiveAvatar] Session negotiation fallback:', err);
+        setSessionStatus('connected'); // Fallback continues without blocking UI
       }
     }
 
@@ -81,6 +81,7 @@ export const EvaLiveAvatar: React.FC<EvaLiveAvatarProps> = ({
 
     return () => {
       isMounted = false;
+      controller.abort();
     };
   }, [presentation.scenarioId, presentation.outfit, presentation.background]);
 
@@ -118,8 +119,8 @@ export const EvaLiveAvatar: React.FC<EvaLiveAvatarProps> = ({
           muted={isMuted}
           data-testid="eva-live-video"
           aria-label="Eva Live Stream Video"
-          className={`w-full h-full object-cover transition-opacity duration-500 ${
-            hasWebRtcStream ? 'opacity-100' : 'opacity-0'
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
+            hasWebRtcStream ? 'opacity-100 z-10' : 'opacity-0 pointer-events-none'
           }`}
         />
 
@@ -127,12 +128,18 @@ export const EvaLiveAvatar: React.FC<EvaLiveAvatarProps> = ({
         {!hasWebRtcStream && (
           <div
             data-testid="realistic-avatar-canvas"
-            className="w-full h-full relative overflow-hidden"
+            className="absolute inset-0 w-full h-full overflow-hidden"
             style={{
               // Natural breathing rhythm kinematics
               animation: 'evaBreathingRhythm 4s ease-in-out infinite',
             }}
           >
+            <style>{`
+              @keyframes evaBreathingRhythm {
+                0%, 100% { transform: scale(1) translateY(0); }
+                50% { transform: scale(1.005) translateY(-1.5px); }
+              }
+            `}</style>
             <svg
               className="w-full h-full object-cover"
               viewBox="0 0 600 450"

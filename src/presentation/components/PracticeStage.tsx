@@ -566,7 +566,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
       </div>
 
       {/* Main Practice Stage */}
-      <main className="max-w-4xl mx-auto w-full flex-1 p-4 sm:p-6 flex flex-col justify-center items-center gap-6">
+      <main className="max-w-4xl mx-auto w-full flex-1 p-4 sm:p-6 pb-28 sm:pb-36 flex flex-col items-center gap-6">
         {/* Full Dialogue Drawer (if expanded) */}
         {showHistoryDrawer && (
           <div className="w-full max-w-2xl bg-canvas-surface border border-canvas-border rounded-2xl p-4 max-h-60 overflow-y-auto space-y-3 mb-2 shadow-xs">

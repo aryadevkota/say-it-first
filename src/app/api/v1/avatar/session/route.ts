@@ -89,17 +89,19 @@ export async function POST(request: Request): Promise<Response> {
       },
     };
 
-    // If neither key is configured, return graceful local fallback without throwing
-    if (!hasLiveAvatarKey && !hasElevenLabsKey) {
+    // LiveAvatar real-time video streaming requires a valid LiveAvatar API key.
+    // If LiveAvatar is not configured (even if ElevenLabs is configured for audio),
+    // immediately return graceful local fallback without making an unauthenticated external call.
+    if (!hasLiveAvatarKey) {
       return NextResponse.json(fallbackResponse, { status: 200 });
     }
 
-    // When API key is available, negotiate real-time session credentials
+    // When LiveAvatar API key is available, negotiate real-time session credentials with 3.5s timeout
     const sessionApiUrl =
       process.env.LIVEAVATAR_API_URL || 'https://api.liveavatar.com/v1/sessions';
 
     try {
-      const activeKey = (liveAvatarKey || elevenLabsKey || '').trim().replace(/^["']|["']$/g, '');
+      const activeKey = (liveAvatarKey || '').trim().replace(/^["']|["']$/g, '');
       const upstreamRes = await fetch(sessionApiUrl, {
         method: 'POST',
         headers: {
@@ -107,6 +109,7 @@ export async function POST(request: Request): Promise<Response> {
           'X-Api-Key': activeKey,
           'xi-api-key': elevenLabsKey ? elevenLabsKey.trim().replace(/^["']|["']$/g, '') : '',
         },
+        signal: AbortSignal.timeout(3500),
         body: JSON.stringify({
           mode: 'LITE',
           avatar_id: process.env.LIVEAVATAR_AVATAR_ID || 'eva',

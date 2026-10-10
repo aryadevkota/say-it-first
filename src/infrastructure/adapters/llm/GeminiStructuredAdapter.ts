@@ -111,13 +111,15 @@ export class GeminiStructuredAdapter implements LLMInferencePort {
         // If a real GEMINI_API_KEY is available in environment and not a dummy placeholder, execute real API inference
         const rawApiKey = process.env.GEMINI_API_KEY;
         const apiKey = rawApiKey ? rawApiKey.replace(/^["'\s]+|["'\s]+$/g, '') : '';
-        if (
-          apiKey &&
-          apiKey.length > 10 &&
+        const isValidGeminiKey =
+          Boolean(apiKey) &&
+          apiKey.length > 20 &&
           !apiKey.includes('...') &&
           apiKey !== 'test-ci-key' &&
-          apiKey !== 'AIzaSy_PLACEHOLDER'
-        ) {
+          apiKey !== 'AIzaSy_PLACEHOLDER' &&
+          (apiKey.startsWith('AIzaSy') || !apiKey.startsWith('AQ.'));
+
+        if (isValidGeminiKey) {
           try {
             const liveResult = await this.callGeminiLiveApi(apiKey, userContentPrompt, systemPrompt);
             if (liveResult) return liveResult;
@@ -158,17 +160,8 @@ export class GeminiStructuredAdapter implements LLMInferencePort {
     }
   }
 
-  private resolvePersonaName(scenarioId: string): string {
-    switch (scenarioId) {
-      case 'friendship-quiet-place':
-        return 'Maya';
-      case 'boundary-saying-no':
-        return 'Jordan';
-      case 'everyday-smalltalk':
-        return 'Sam';
-      default:
-        return 'Alex';
-    }
+  private resolvePersonaName(_scenarioId: string): string {
+    return 'Eva';
   }
 
   private resolveSystemContext(scenarioId: string): string {
@@ -596,8 +589,7 @@ export class GeminiStructuredAdapter implements LLMInferencePort {
     systemPrompt: string,
   ): Promise<LLMInferenceResult | null> {
     const candidateModels = [
-      process.env.GEMINI_MODEL || 'gemini-3.8-flash',
-      'gemini-2.5-flash',
+      process.env.GEMINI_MODEL || 'gemini-2.0-flash',
       'gemini-1.5-flash',
     ].filter(Boolean);
 
@@ -618,11 +610,16 @@ export class GeminiStructuredAdapter implements LLMInferencePort {
         const res = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          signal: AbortSignal.timeout(3000),
           body: JSON.stringify(payload),
         });
 
         if (!res.ok) {
           console.warn(`[GeminiStructuredAdapter] Gemini API model ${model} HTTP ${res.status}`);
+          // If auth or key is invalid, break immediately rather than wasting time on next model
+          if (res.status === 400 || res.status === 401 || res.status === 403) {
+            break;
+          }
           continue;
         }
 
