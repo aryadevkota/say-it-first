@@ -1,0 +1,46 @@
+{
+  "name": "say-it-first",
+  "version": "1.0.0",
+  "description": "Say It First — Neurodiversity-Affirming Conversational Sandbox",
+  "private": true,
+  "contributors": [
+    {
+      "name": "Arya Devkota",
+      "url": "https://github.com/aryadevkota"
+    },
+    {
+      "name": "Sarah Howington",
+      "url": "https://github.com/showington1"
+    },
+    {
+      "name": "Alpesh Patel",
+      "url": "https://github.com/AlpeshPatel1004"
+    }
+  ],
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "next": "^14.2.0",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0",
+    "tailwindcss": "^3.4.0",
+    "postcss": "^8.4.0",
+    "autoprefixer": "^10.4.0",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^14.2.0"
+  }
+}

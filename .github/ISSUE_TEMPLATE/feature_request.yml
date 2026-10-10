@@ -1,0 +1,47 @@
+name: Feature Proposal
+description: Propose a new conversation scenario, accessibility affordance, or clinical framework.
+title: "[FEAT]: "
+labels: ["enhancement", "discussion"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Propose a neurodiversity-affirming feature, new social scenario, or sensory enhancement for **Say It First**.
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Proposal Category
+      options:
+        - "New Scenario Archetype (e.g. Healthcare Advocacy, Performance Review)"
+        - "Sensory Accessibility (WCAG, Font, Contrast, Motion)"
+        - "Clinical & Phrasing Framework (DBT DEAR MAN, NVC, SBI)"
+        - "Kinematic Avatar Rig Morphing"
+        - "Affective DSP Feature Extraction"
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Space & User Need
+      description: Describe the friction autistic or neurodivergent individuals face in this context.
+      placeholder: Autistic patients frequently experience dismissive medical interactions...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution & Experience
+      placeholder: Add a medical self-advocacy scenario with baseline VAD parameters...
+    validations:
+      required: true
+
+  - type: textarea
+    id: clinical_grounding
+    attributes:
+      label: Clinical / Double Empathy Grounding
+      description: How does this empower self-advocacy without forcing masking?
+    validations:
+      required: false

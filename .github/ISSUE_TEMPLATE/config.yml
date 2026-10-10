@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Technical Specification & ADRs
+    url: https://github.com/say-it-first/say-it-first#architectural-decision-records-adrs
+    about: Read the system architecture manual and architectural decisions before opening issues.

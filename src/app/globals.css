@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-slate: #0F141C;
+  --card-navy: #1A2232;
+  --accent-violet: #8B5CF6;
+  --accent-sage: #10B981;
+}
+
+body {
+  background-color: var(--bg-slate);
+  color: #F8FAFC;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+}
+
+@keyframes breathe {
+  0%, 100% {
+    transform: scale(1.0);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+}

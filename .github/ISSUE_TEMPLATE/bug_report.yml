@@ -1,0 +1,60 @@
+name: Bug Report
+description: Report a defect, audio DSP anomaly, or unexpected VAD state transition.
+title: "[BUG]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping improve **Say It First**! Please provide technical context so we can reproduce and verify the issue with deterministic unit tests.
+
+  - type: input
+    id: environment
+    attributes:
+      label: Browser & OS Environment
+      description: e.g. Chrome 128 (macOS Sonoma), Safari 17.5 (iOS 17)
+      placeholder: Chrome 128 / macOS 14.5
+    validations:
+      required: true
+
+  - type: dropdown
+    id: subsystem
+    attributes:
+      label: Subsystem Affected
+      options:
+        - "Audio DSP / Prosody Extraction (AnalyserNode F0 / RMS)"
+        - "Affect Dynamics / Exponential Damping (VAD calculation)"
+        - "Avatar SVG Rig / Bezier Kinematics"
+        - "Tension Index / Safety Soft-Brake Modal"
+        - "Timeline DAG / Rewind & Branching"
+        - "API Route / Gemini Structured Adapter"
+        - "UI / Scaffolding Dial / Two-Way Bridge"
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Detail the input mode (voice vs. text) and sequence of turns.
+      placeholder: |
+        1. Select Scenario 'workplace_written_specs'.
+        2. Toggle voice mode and speak for 5 seconds.
+        3. Observe VAD coordinate shift on Affect Radar.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior vs. Actual Behavior
+      placeholder: Expected tension to stay in Tier 1, but triggered Curtain Drop modal.
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Browser Console Logs / VAD Payload
+      description: Attach relevant JSON payloads or console stack traces.
+      render: shell
