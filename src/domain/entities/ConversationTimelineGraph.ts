@@ -24,11 +24,17 @@ export class ConversationTimelineGraph {
     this.activeHeadId = activeHeadId ?? (initialNodes && initialNodes.length > 0 ? initialNodes[initialNodes.length - 1].turnId : null);
   }
 
-  public appendTurn(node: Omit<ConversationNode, 'turnId'> & { turnId?: string }): string {
+  public appendTurn(
+    node: Omit<ConversationNode, 'turnId' | 'timestamp'> & {
+      turnId?: string;
+      timestamp?: number;
+    },
+  ): string {
     const turnId = node.turnId ?? `turn_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
     const fullNode: ConversationNode = Object.freeze({
       ...node,
       turnId,
+      timestamp: node.timestamp ?? Date.now(),
     });
     this.nodes.set(turnId, fullNode);
     this.activeHeadId = turnId;

@@ -58,7 +58,7 @@ describe('useTimelineBranching state logic', () => {
   });
 
   it('verifies default ScaffoldingLevel initialization and transitions', () => {
-    let currentLevel = ScaffoldingLevel.LEVEL_2_XRAY;
+    let currentLevel: ScaffoldingLevel = ScaffoldingLevel.LEVEL_2_XRAY;
     expect(currentLevel).toBe(100);
 
     currentLevel = ScaffoldingLevel.LEVEL_0_REALITY;
