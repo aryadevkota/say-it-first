@@ -1,0 +1,774 @@
+'use client';
+
+/**
+ * PracticeStage.tsx — Focused Conversational Practice Stage
+ *
+ * Implements:
+ * - Prominent 3D Conversation Partner (Avatar3DRig) with dynamic states
+ * - Readable spoken dialogue captions
+ * - Accessible user goal summary & scenario context
+ * - Clean response dock (typing + optional voice input)
+ * - Secondary, user-controlled guidance levels (Just practice / Show cues / Explore subtext)
+ * - Two-Way Bridge ("What you meant" vs "How it might land") framed with "May..." and "Might..."
+ * - Non-destructive "Try another version" attempt switching without scoring
+ * - Calm pause modal & optional co-regulation
+ * - "Words to take with you" takeaways screen with editable 2-sentence pocket script
+ * - Zero radars, emotion charts, VAD meters, or clinical readouts
+ */
+
+import React, { useState, useEffect, useRef } from 'react';
+import type { ScenarioDefinition } from '../../domain/scenarios/topics';
+import type { UserPreferences } from './WelcomeOnboarding';
+import { Avatar3DRig, type AvatarState } from './Avatar3DRig';
+import type { SavedTakeaway } from './MyProgress';
+
+interface TurnMessage {
+  id: string;
+  role: 'partner' | 'user';
+  text: string;
+  subtext?: string;
+  twoWayBridge?: {
+    userIntent: string;
+    receivedImpact: string;
+  };
+  postureCue?: string;
+  suggestedWording?: string;
+}
+
+interface AttemptBranch {
+  id: string;
+  label: string;
+  turns: TurnMessage[];
+}
+
+interface PracticeStageProps {
+  topic: ScenarioDefinition;
+  preferences: UserPreferences;
+  onExit: () => void;
+  onSaveTakeaway: (takeaway: SavedTakeaway) => void;
+  onCompleteTopic: (topicId: string) => void;
+}
+
+export const PracticeStage: React.FC<PracticeStageProps> = ({
+  topic,
+  preferences,
+  onExit,
+  onSaveTakeaway,
+  onCompleteTopic,
+}) => {
+  // Current active attempt branch (for non-destructive retries)
+  const [attempts, setAttempts] = useState<AttemptBranch[]>([
+    {
+      id: 'version-1',
+      label: 'Version 1',
+      turns: [
+        {
+          id: 'turn-0',
+          role: 'partner',
+          text: topic.partner.initialDialogue,
+          subtext: 'Starting conversation.',
+          postureCue: 'Attentive, friendly posture',
+        },
+      ],
+    },
+  ]);
+  const [activeAttemptIndex, setActiveAttemptIndex] = useState<number>(0);
+
+  // Character state
+  const [partnerState, setPartnerState] = useState<AvatarState>('listening');
+  const [hideAvatar, setHideAvatar] = useState<boolean>(preferences.hideAvatar);
+
+  // Response input draft & state
+  const [userDraft, setUserDraft] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Guidance drawer & level
+  const [guidanceLevel, setGuidanceLevel] = useState<'independent' | 'cues' | 'subtext'>(
+    preferences.guidanceLevel,
+  );
+  const [isGuidanceDrawerOpen, setIsGuidanceDrawerOpen] = useState<boolean>(
+    preferences.guidanceLevel !== 'independent',
+  );
+
+  // Modals
+  const [isPaused, setIsPaused] = useState<boolean>(false);
+  const [isTakeawayOpen, setIsTakeawayOpen] = useState<boolean>(false);
+  const [showHistoryDrawer, setShowHistoryDrawer] = useState<boolean>(false);
+
+  // Takeaway script draft
+  const [editableTakeaway, setEditableTakeaway] = useState<string>(
+    topic.defaultTakeawayScript,
+  );
+  const [takeawaySaved, setTakeawaySaved] = useState<boolean>(false);
+
+  // Voice recording simulation / browser speech
+  const [isRecording, setIsRecording] = useState<boolean>(false);
+
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const activeBranch = attempts[activeAttemptIndex] || attempts[0];
+  const latestPartnerTurn = [...activeBranch.turns]
+    .reverse()
+    .find((t) => t.role === 'partner');
+
+  // Partner speech synthesis if enabled in preferences
+  useEffect(() => {
+    if (preferences.spokenPartnerAudio && latestPartnerTurn && typeof window !== 'undefined') {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(latestPartnerTurn.text);
+        utterance.rate = 0.95;
+        utterance.pitch = 1.0;
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+  }, [latestPartnerTurn, preferences.spokenPartnerAudio]);
+
+  // Handle submitting a turn to API
+  const handleSubmitTurn = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const trimmedInput = userDraft.trim();
+    if (!trimmedInput || isLoading) return;
+
+    const userTurnId = `user-${Date.now()}`;
+    const newUserTurn: TurnMessage = {
+      id: userTurnId,
+      role: 'user',
+      text: trimmedInput,
+    };
+
+    // Optimistically append user turn and clear draft
+    const updatedTurns = [...activeBranch.turns, newUserTurn];
+    const updatedAttempts = [...attempts];
+    updatedAttempts[activeAttemptIndex] = {
+      ...activeBranch,
+      turns: updatedTurns,
+    };
+    setAttempts(updatedAttempts);
+    setUserDraft('');
+    setIsLoading(true);
+    setErrorMessage(null);
+    setPartnerState('thinking');
+
+    try {
+      const response = await fetch('/api/v1/conversation/turn', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          scenario_id: topic.id,
+          active_branch_id: activeBranch.id,
+          parent_turn_id: activeBranch.turns[activeBranch.turns.length - 1]?.id || null,
+          user_input: {
+            text: trimmedInput,
+            input_mode: 'text',
+            prosody: {
+              words_per_minute: 135,
+              volume_rms: 0.28,
+              pitch_variance_hz: 18.5,
+            },
+          },
+          current_vad: {
+            valence: 0.1,
+            arousal: 0.05,
+            dominance: 0.0,
+          },
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Inference returned status ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      // Partner response
+      const partnerTurn: TurnMessage = {
+        id: data.turn_id || `partner-${Date.now()}`,
+        role: 'partner',
+        text: data.spoken_response || "I hear where you're coming from.",
+        subtext: data.unspoken_subtext || '',
+        twoWayBridge: {
+          userIntent: data.two_way_bridge?.user_intent || 'Expressing functional need clearly.',
+          receivedImpact: data.two_way_bridge?.received_as || 'Received and understood.',
+        },
+        postureCue: data.posture_cue || 'Open relaxed posture',
+        suggestedWording: data.pivot_recommendation?.suggested_wording || '',
+      };
+
+      // Set partner state to speaking
+      setPartnerState('speaking');
+      setTimeout(() => {
+        setPartnerState('receptive');
+      }, 3500);
+
+      // Append partner turn
+      const finalTurns = [...updatedTurns, partnerTurn];
+      const finalAttempts = [...attempts];
+      finalAttempts[activeAttemptIndex] = {
+        ...activeBranch,
+        turns: finalTurns,
+      };
+      setAttempts(finalAttempts);
+
+      // Auto update takeaway suggestion if provided
+      if (data.pivot_recommendation?.suggested_wording) {
+        setEditableTakeaway(data.pivot_recommendation.suggested_wording);
+      }
+    } catch (err: unknown) {
+      // Preserve draft on failure so user never loses their work
+      setUserDraft(trimmedInput);
+      setPartnerState('neutral');
+      setErrorMessage(
+        'Could not reach the conversational partner right now. Your draft has been preserved.',
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Branch a non-destructive new version ("Try another version")
+  const handleTryAnotherVersion = () => {
+    const nextVersionNumber = attempts.length + 1;
+    const newAttempt: AttemptBranch = {
+      id: `version-${nextVersionNumber}`,
+      label: `Version ${nextVersionNumber}`,
+      turns: [
+        {
+          id: `turn-init-${nextVersionNumber}`,
+          role: 'partner',
+          text: topic.partner.initialDialogue,
+          subtext: 'Starting fresh attempt.',
+          postureCue: 'Attentive, friendly posture',
+        },
+      ],
+    };
+
+    setAttempts([...attempts, newAttempt]);
+    setActiveAttemptIndex(attempts.length);
+    setUserDraft('');
+    setPartnerState('listening');
+    setErrorMessage(null);
+  };
+
+  // Speech to text toggle (Web Speech API)
+  const toggleVoiceRecording = () => {
+    if (typeof window === 'undefined') return;
+
+    const SpeechRecognition =
+      (window as unknown as { SpeechRecognition?: any }).SpeechRecognition ||
+      (window as unknown as { webkitSpeechRecognition?: any }).webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      setErrorMessage('Speech recognition is not supported in this browser. You can type freely.');
+      return;
+    }
+
+    if (isRecording) {
+      setIsRecording(false);
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'en-US';
+      recognition.interimResults = false;
+      recognition.continuous = false;
+
+      recognition.onstart = () => setIsRecording(true);
+      recognition.onend = () => setIsRecording(false);
+      recognition.onerror = () => {
+        setIsRecording(false);
+        setErrorMessage('Microphone access paused. Feel free to type your response.');
+      };
+
+      recognition.onresult = (event: any) => {
+        const transcript = event.results?.[0]?.[0]?.transcript;
+        if (transcript) {
+          setUserDraft((prev) => (prev ? `${prev} ${transcript}` : transcript));
+        }
+      };
+
+      recognition.start();
+    } catch {
+      setIsRecording(false);
+    }
+  };
+
+  // Insert suggested phrasing into draft (editable, never auto-submits)
+  const handleUseSuggestedWording = (phrase: string) => {
+    setUserDraft(phrase);
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  };
+
+  // Finish practice session and show takeaways
+  const handleFinishPractice = () => {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+    onCompleteTopic(topic.id);
+    setIsTakeawayOpen(true);
+  };
+
+  // Save takeaway script
+  const handleSaveTakeawayToProgress = () => {
+    const newTakeaway: SavedTakeaway = {
+      id: `takeaway-${Date.now()}`,
+      topicId: topic.id,
+      topicTitle: topic.title,
+      script: editableTakeaway.trim(),
+      savedAt: new Date().toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+      }),
+    };
+    onSaveTakeaway(newTakeaway);
+    setTakeawaySaved(true);
+  };
+
+  return (
+    <div className="min-h-screen bg-canvas-light text-ink-primary flex flex-col justify-between">
+      {/* Top Stage Bar */}
+      <header className="border-b border-canvas-borderSubtle bg-canvas-surface/80 backdrop-blur-xs px-4 sm:px-6 py-3 sticky top-0 z-20">
+        <div className="max-w-5xl mx-auto flex items-center justify-between gap-4">
+          {/* Back & Title */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={onExit}
+              className="text-xs font-medium text-ink-muted hover:text-ink-primary px-2.5 py-1.5 rounded-lg hover:bg-canvas-subtle transition"
+            >
+              ← Back to dashboard
+            </button>
+            <span className="text-canvas-border hidden sm:inline">|</span>
+            <div>
+              <span className="text-xs font-semibold text-teal-brand uppercase tracking-wider block">
+                {topic.categoryLabel}
+              </span>
+              <h1 className="text-sm sm:text-base font-semibold text-ink-primary leading-tight">
+                {topic.title}
+              </h1>
+            </div>
+          </div>
+
+          {/* Version Switcher & Actions */}
+          <div className="flex items-center gap-2">
+            {/* Version Attempt Selector */}
+            {attempts.length > 1 && (
+              <div className="flex items-center gap-1 bg-canvas-subtle p-1 rounded-xl border border-canvas-border">
+                {attempts.map((att, idx) => (
+                  <button
+                    key={att.id}
+                    onClick={() => setActiveAttemptIndex(idx)}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-medium transition ${
+                      activeAttemptIndex === idx
+                        ? 'bg-canvas-surface text-ink-primary shadow-2xs font-semibold'
+                        : 'text-ink-muted hover:text-ink-primary'
+                    }`}
+                  >
+                    {att.label}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Pause Button */}
+            <button
+              onClick={() => {
+                if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+                  window.speechSynthesis.cancel();
+                }
+                setIsPaused(true);
+              }}
+              className="px-3 py-1.5 rounded-xl text-xs font-medium bg-canvas-surface border border-canvas-border text-ink-secondary hover:bg-canvas-subtle transition"
+            >
+              Pause
+            </button>
+
+            {/* Finish Practice */}
+            <button
+              onClick={handleFinishPractice}
+              className="px-3.5 py-1.5 rounded-xl text-xs font-medium bg-teal-brand hover:bg-teal-hover text-canvas-surface transition shadow-2xs"
+            >
+              Finish
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Accessible Goal Banner */}
+      <div className="bg-canvas-subtle border-b border-canvas-borderSubtle px-4 py-2">
+        <div className="max-w-5xl mx-auto flex items-center justify-between text-xs text-ink-secondary">
+          <div className="flex items-center gap-2">
+            <span className="font-semibold text-teal-brand">Your goal:</span>
+            <span>{topic.userGoal}</span>
+          </div>
+
+          <button
+            onClick={() => setShowHistoryDrawer(!showHistoryDrawer)}
+            className="text-xs text-ink-muted hover:text-ink-primary underline ml-4 shrink-0"
+          >
+            {showHistoryDrawer ? 'Hide full history' : `View full dialogue (${activeBranch.turns.length})`}
+          </button>
+        </div>
+      </div>
+
+      {/* Main Practice Stage */}
+      <main className="max-w-4xl mx-auto w-full flex-1 p-4 sm:p-6 flex flex-col justify-center items-center gap-6">
+        {/* Full Dialogue Drawer (if expanded) */}
+        {showHistoryDrawer && (
+          <div className="w-full max-w-2xl bg-canvas-surface border border-canvas-border rounded-2xl p-4 max-h-60 overflow-y-auto space-y-3 mb-2 shadow-xs">
+            <span className="text-xs font-semibold uppercase text-ink-muted block">Conversation History</span>
+            {activeBranch.turns.map((turn) => (
+              <div
+                key={turn.id}
+                className={`p-3 rounded-xl text-xs ${
+                  turn.role === 'partner'
+                    ? 'bg-canvas-subtle text-ink-primary'
+                    : 'bg-teal-subtle text-ink-primary ml-6'
+                }`}
+              >
+                <span className="font-semibold block mb-0.5">
+                  {turn.role === 'partner' ? topic.partner.name : 'You'}
+                </span>
+                <p className="leading-relaxed">{turn.text}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Prominent 3D Character Partner */}
+        <div className="w-full max-w-md flex flex-col items-center">
+          <Avatar3DRig
+            state={partnerState}
+            partnerVariant={topic.partner.avatarVariant}
+            partnerName={topic.partner.name}
+            partnerRole={topic.partner.role}
+            isHidden={hideAvatar}
+            onToggleHidden={() => setHideAvatar(!hideAvatar)}
+            className="w-full"
+          />
+        </div>
+
+        {/* Latest Spoken Dialogue Card */}
+        {latestPartnerTurn && (
+          <div className="w-full max-w-xl bg-canvas-surface border border-canvas-border rounded-3xl p-5 sm:p-6 shadow-xs relative text-left transition">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-sm text-ink-primary">{topic.partner.name}</span>
+                <span className="text-xs text-ink-muted">({topic.partner.role})</span>
+              </div>
+              {latestPartnerTurn.postureCue && (
+                <span className="text-[11px] text-ink-muted italic bg-canvas-subtle px-2 py-0.5 rounded-full border border-canvas-borderSubtle">
+                  {latestPartnerTurn.postureCue}
+                </span>
+              )}
+            </div>
+
+            <p className="text-base sm:text-lg font-medium text-ink-primary leading-relaxed">
+              “{latestPartnerTurn.text}”
+            </p>
+          </div>
+        )}
+
+        {/* Error Feedback (with preserved draft notice) */}
+        {errorMessage && (
+          <div className="w-full max-w-xl p-3.5 rounded-2xl bg-canvas-surface border border-topic-apricot text-xs text-topic-apricot flex items-center justify-between">
+            <span>{errorMessage}</span>
+            <button
+              onClick={() => setErrorMessage(null)}
+              className="text-ink-muted hover:text-ink-primary ml-2"
+            >
+              ✕
+            </button>
+          </div>
+        )}
+
+        {/* Secondary User-Controlled Guidance Section */}
+        <div className="w-full max-w-xl">
+          <div className="flex items-center justify-between text-xs text-ink-muted mb-2 px-1">
+            <div className="flex items-center gap-2">
+              <span>Guidance:</span>
+              <div className="flex items-center gap-1 bg-canvas-subtle p-0.5 rounded-lg border border-canvas-borderSubtle">
+                {(['independent', 'cues', 'subtext'] as const).map((lvl) => (
+                  <button
+                    key={lvl}
+                    onClick={() => {
+                      setGuidanceLevel(lvl);
+                      setIsGuidanceDrawerOpen(lvl !== 'independent');
+                    }}
+                    className={`px-2 py-0.5 rounded text-[11px] font-medium transition ${
+                      guidanceLevel === lvl
+                        ? 'bg-canvas-surface text-ink-primary shadow-2xs font-semibold'
+                        : 'text-ink-muted hover:text-ink-primary'
+                    }`}
+                  >
+                    {lvl === 'independent' ? 'Just practice' : lvl === 'cues' ? 'Show cues' : 'Explore subtext'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {guidanceLevel !== 'independent' && (
+              <button
+                onClick={() => setIsGuidanceDrawerOpen(!isGuidanceDrawerOpen)}
+                className="hover:text-ink-primary transition"
+              >
+                {isGuidanceDrawerOpen ? 'Collapse guidance' : 'Expand guidance'}
+              </button>
+            )}
+          </div>
+
+          {/* Guidance Drawer Content */}
+          {isGuidanceDrawerOpen && guidanceLevel !== 'independent' && latestPartnerTurn && (
+            <div className="p-4 rounded-2xl bg-canvas-surface border border-canvas-border space-y-3 shadow-xs animate-fadeIn text-left">
+              {/* Two-Way Bridge: What you meant vs How it might land */}
+              {guidanceLevel === 'subtext' && latestPartnerTurn.twoWayBridge && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-3 border-b border-canvas-borderSubtle">
+                  <div className="p-3 rounded-xl bg-canvas-subtle">
+                    <span className="text-[11px] font-semibold text-teal-brand uppercase block mb-1">
+                      In this simulation: What you meant
+                    </span>
+                    <p className="text-xs text-ink-secondary leading-relaxed">
+                      {latestPartnerTurn.twoWayBridge.userIntent}
+                    </p>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-canvas-subtle">
+                    <span className="text-[11px] font-semibold text-topic-apricot uppercase block mb-1">
+                      How it might land
+                    </span>
+                    <p className="text-xs text-ink-secondary leading-relaxed">
+                      May be perceived as: {latestPartnerTurn.twoWayBridge.receivedImpact}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Unspoken Subtext insight */}
+              {latestPartnerTurn.subtext && (
+                <div className="text-xs text-ink-secondary flex items-start gap-2">
+                  <span className="text-teal-brand font-semibold shrink-0">Subtext hint:</span>
+                  <span className="italic">“{latestPartnerTurn.subtext}”</span>
+                </div>
+              )}
+
+              {/* Optional Suggestion Phrasing */}
+              {latestPartnerTurn.suggestedWording && (
+                <div className="p-3 rounded-xl bg-teal-subtle/50 border border-teal-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                  <div>
+                    <span className="text-[11px] font-semibold text-teal-brand uppercase block mb-0.5">
+                      Another approach to consider
+                    </span>
+                    <p className="text-xs text-ink-primary italic">
+                      “{latestPartnerTurn.suggestedWording}”
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => handleUseSuggestedWording(latestPartnerTurn.suggestedWording!)}
+                    className="px-2.5 py-1 rounded-lg text-xs font-medium bg-canvas-surface border border-teal-border text-teal-brand hover:bg-teal-subtle transition shrink-0"
+                  >
+                    Edit this in response
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </main>
+
+      {/* Response Input Dock */}
+      <footer className="border-t border-canvas-borderSubtle bg-canvas-surface/90 backdrop-blur-xs p-4 sticky bottom-0 z-20">
+        <div className="max-w-2xl mx-auto flex flex-col gap-2">
+          {/* Action Row */}
+          <div className="flex items-center justify-between text-xs text-ink-muted">
+            <span>Type or speak your turn below</span>
+            <button
+              onClick={handleTryAnotherVersion}
+              className="text-teal-brand hover:underline font-medium"
+            >
+              + Try another version
+            </button>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleSubmitTurn} className="flex items-end gap-2">
+            <div className="relative flex-1">
+              <textarea
+                ref={inputRef}
+                value={userDraft}
+                onChange={(e) => setUserDraft(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSubmitTurn();
+                  }
+                }}
+                placeholder="What would you like to say? (Press Enter to send)"
+                rows={2}
+                disabled={isLoading}
+                className="w-full resize-none rounded-2xl bg-canvas-light border border-canvas-border px-4 py-3 text-sm text-ink-primary placeholder-ink-muted focus:outline-none focus:ring-2 focus:ring-teal-brand focus:border-transparent transition"
+              />
+            </div>
+
+            {/* Voice Input Button */}
+            <button
+              type="button"
+              onClick={toggleVoiceRecording}
+              className={`p-3 rounded-2xl border transition focus:outline-none focus:ring-2 focus:ring-teal-brand ${
+                isRecording
+                  ? 'bg-topic-apricot text-white border-topic-apricot animate-pulse'
+                  : 'bg-canvas-light border-canvas-border text-ink-muted hover:text-ink-primary hover:bg-canvas-subtle'
+              }`}
+              title={isRecording ? 'Stop recording' : 'Speak your response'}
+              aria-label="Microphone input"
+            >
+              🎤
+            </button>
+
+            {/* Send Button */}
+            <button
+              type="submit"
+              disabled={isLoading || !userDraft.trim()}
+              className={`px-5 py-3 rounded-2xl font-medium text-sm transition focus:outline-none focus:ring-2 focus:ring-teal-brand shadow-xs ${
+                isLoading || !userDraft.trim()
+                  ? 'bg-canvas-subtle text-ink-muted cursor-not-allowed border border-canvas-borderSubtle'
+                  : 'bg-teal-brand hover:bg-teal-hover active:bg-teal-active text-canvas-surface'
+              }`}
+            >
+              {isLoading ? 'Thinking…' : 'Send'}
+            </button>
+          </form>
+        </div>
+      </footer>
+
+      {/* ── PAUSE / CO-REGULATION MODAL ─────────────────────────────────────── */}
+      {isPaused && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-primary/30 backdrop-blur-xs"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="bg-canvas-surface border border-canvas-border rounded-3xl p-6 shadow-xl max-w-md w-full text-center space-y-5 animate-fadeIn">
+            <div className="w-16 h-16 rounded-full bg-teal-subtle text-teal-brand flex items-center justify-center mx-auto text-2xl font-light">
+              ☕
+            </div>
+
+            <div>
+              <h2 className="text-xl font-semibold text-ink-primary">Taking a quiet moment</h2>
+              <p className="text-xs text-ink-secondary mt-1 max-w-xs mx-auto">
+                The conversation is paused. Your draft and timeline are completely preserved.
+              </p>
+            </div>
+
+            {/* Gentle Optional Breathing Cue */}
+            <div className="p-4 rounded-2xl bg-canvas-subtle border border-canvas-borderSubtle flex flex-col items-center">
+              <span className="text-xs text-ink-muted mb-2 font-medium">Take a calm breath</span>
+              <div className="w-12 h-12 rounded-full border-2 border-teal-brand flex items-center justify-center animate-calm-pulse">
+                <span className="text-[10px] text-teal-brand font-medium">Breathe</span>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2 pt-2">
+              <button
+                onClick={() => setIsPaused(false)}
+                className="w-full py-2.5 rounded-xl bg-teal-brand text-canvas-surface text-sm font-medium hover:bg-teal-hover transition shadow-xs"
+              >
+                Resume conversation
+              </button>
+
+              <button
+                onClick={() => {
+                  setIsPaused(false);
+                  handleTryAnotherVersion();
+                }}
+                className="w-full py-2 rounded-xl bg-canvas-subtle text-ink-secondary text-xs font-medium hover:bg-canvas-border transition"
+              >
+                Try a different approach
+              </button>
+
+              <button
+                onClick={onExit}
+                className="w-full py-2 text-xs text-ink-muted hover:text-ink-primary transition"
+              >
+                Exit to dashboard
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── WORDS TO TAKE WITH YOU (TAKEAWAYS SCREEN) ────────────────────────── */}
+      {isTakeawayOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-primary/30 backdrop-blur-xs"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="bg-canvas-surface border border-canvas-border rounded-3xl p-6 sm:p-8 shadow-xl max-w-lg w-full text-left space-y-6 animate-fadeIn">
+            <div>
+              <span className="text-xs font-semibold text-teal-brand uppercase tracking-wider block mb-1">
+                Reflect & Keep
+              </span>
+              <h2 className="text-2xl font-semibold text-ink-primary">Words to take with you</h2>
+              <p className="text-xs text-ink-secondary mt-1">
+                Here is phrasing customized for this conversation. Adjust the words to make them yours.
+              </p>
+            </div>
+
+            {/* Editable Script Box */}
+            <div className="space-y-2">
+              <label htmlFor="takeaway-script" className="text-xs font-semibold uppercase text-ink-muted">
+                Your Pocket Script
+              </label>
+              <textarea
+                id="takeaway-script"
+                value={editableTakeaway}
+                onChange={(e) => {
+                  setEditableTakeaway(e.target.value);
+                  setTakeawaySaved(false);
+                }}
+                rows={4}
+                className="w-full rounded-2xl bg-canvas-light border border-canvas-border p-4 text-sm text-ink-primary leading-relaxed focus:outline-none focus:ring-2 focus:ring-teal-brand"
+              />
+            </div>
+
+            {/* Actions */}
+            <div className="space-y-3 pt-2">
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(editableTakeaway);
+                    alert('Copied wording to clipboard!');
+                  }}
+                  className="flex-1 py-2.5 rounded-xl bg-canvas-subtle hover:bg-canvas-border text-ink-primary text-xs font-medium transition text-center"
+                >
+                  Copy to clipboard
+                </button>
+
+                <button
+                  onClick={handleSaveTakeawayToProgress}
+                  disabled={takeawaySaved}
+                  className={`flex-1 py-2.5 rounded-xl text-xs font-medium transition text-center ${
+                    takeawaySaved
+                      ? 'bg-teal-subtle text-teal-brand font-semibold'
+                      : 'bg-canvas-surface border border-teal-border text-teal-brand hover:bg-teal-subtle'
+                  }`}
+                >
+                  {takeawaySaved ? '✓ Saved to Progress' : 'Save to My Progress'}
+                </button>
+              </div>
+
+              <button
+                onClick={onExit}
+                className="w-full py-3 rounded-xl bg-teal-brand text-canvas-surface text-sm font-medium hover:bg-teal-hover transition shadow-xs text-center"
+              >
+                Return to dashboard
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};

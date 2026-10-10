@@ -1,227 +1,223 @@
 'use client';
 
 /**
- * page.tsx — Say It First Interactive Sandbox
+ * page.tsx — Say It First Primary Product Experience
  *
- * Assembles the full sensory-calm UI across 3 functional panels:
- * Panel 1: The Stage (Avatar SVG Rig & Dialogue Captions)
- * Panel 2: The Subtext Lab (Affect Radar & Two-Way Bridge HUD)
- * Panel 3: The Control Dock (Dual-Modality Push-To-Talk & Rewind)
- * Plus Clinical Safety: CoRegulationModal (Tier 3) & PostSessionDebrief
+ * Implements the complete end-to-end user-facing journey:
+ * 1. Welcome ("Find more room to say what you mean.")
+ * 2. Skippable Onboarding (Interests, Goals, Guidance & Comfort)
+ * 3. Personalized Topic Dashboard (Home, Explore, My progress)
+ * 4. "Understand the idea" bite-sized learning & Double Empathy perspectives
+ * 5. Focused Practice Stage with warm 3D conversation partner
+ * 6. Non-destructive "Try another version" retries
+ * 7. "Words to take with you" editable pocket script takeaways
+ *
+ * Completely eliminates:
+ * - AffectRadarCanvas, VAD charts, and tension meters from the user UI
+ * - Clinical scoring, normality grades, and streak pressure
  */
 
-import React, { useState, useCallback } from 'react';
-import { AvatarSvgRig } from '../presentation/components/AvatarSvgRig';
-import { AffectRadarCanvas } from '../presentation/components/AffectRadarCanvas';
-import { SubtextHud } from '../presentation/components/SubtextHud';
-import { InputDock } from '../presentation/components/InputDock';
-import { CoRegulationModal } from '../presentation/components/CoRegulationModal';
-import { PostSessionDebrief } from '../presentation/components/PostSessionDebrief';
-import { useTimelineBranching } from '../presentation/hooks/useTimelineBranching';
-import { useWebAudioProsody } from '../presentation/hooks/useWebAudioProsody';
-import { createAffectVector } from '../domain/entities/AffectVector';
-import type { ProcessTurnResponse } from '../application/use-cases/ProcessTurnUseCase';
-import type { PocketScriptResult } from '../application/use-cases/GeneratePocketScriptUseCase';
+import React, { useState, useEffect } from 'react';
+import {
+  WelcomeOnboarding,
+  DEFAULT_PREFERENCES,
+  type UserPreferences,
+} from '../presentation/components/WelcomeOnboarding';
+import { TopicDashboard } from '../presentation/components/TopicDashboard';
+import { PracticeStage } from '../presentation/components/PracticeStage';
+import { PreferencesModal } from '../presentation/components/PreferencesModal';
+import {
+  TOPICS,
+  type ScenarioDefinition,
+  type TopicProgressStatus,
+} from '../domain/scenarios/topics';
+import type { SavedTakeaway } from '../presentation/components/MyProgress';
 
-export default function SayItFirstSandbox() {
-  const {
-    activeTurn,
-    linearHistory,
-    currentVad,
-    scaffoldingLevel,
-    rewindTo,
-    setScaffoldingLevel,
-    resetGraph,
-  } = useTimelineBranching();
+const STORAGE_KEY_PREFS = 'say_it_first_user_prefs';
+const STORAGE_KEY_PROGRESS = 'say_it_first_progress';
+const STORAGE_KEY_TAKEAWAYS = 'say_it_first_takeaways';
 
-  const {
-    isListening,
-    startListening,
-    stopListening,
-    metrics: liveProsody,
-  } = useWebAudioProsody();
+export default function SayItFirstRoot() {
+  const [currentView, setCurrentView] = useState<'welcome' | 'dashboard' | 'practice'>('welcome');
+  const [preferences, setPreferences] = useState<UserPreferences>(DEFAULT_PREFERENCES);
+  const [progressMap, setProgressMap] = useState<Record<string, TopicProgressStatus>>({});
+  const [savedTakeaways, setSavedTakeaways] = useState<SavedTakeaway[]>([]);
+  const [activePracticeTopic, setActivePracticeTopic] = useState<ScenarioDefinition | null>(null);
+  const [isPreferencesOpen, setIsPreferencesOpen] = useState<boolean>(false);
+  const [isHydrated, setIsHydrated] = useState<boolean>(false);
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [showCoRegulation, setShowCoRegulation] = useState(false);
-  const [showDebrief, setShowDebrief] = useState(false);
-  const [pocketScript, setPocketScript] = useState<PocketScriptResult | null>(null);
-  const [reducedMotion, setReducedMotion] = useState(false);
-
-  // Latest turn metadata
-  const spokenCaption = activeTurn?.content ?? 'Hey, do you have a minute to run through the project rollout?';
-  const unspokenSubtext = activeTurn?.role === 'persona'
-    ? 'I am already pressed for time before the deadline.'
-    : undefined;
-  const twoWayBridge = activeTurn?.twoWayBridge;
-
-  const handleTurnSubmit = useCallback(async (input: { text: string; mode: 'voice' | 'text' }) => {
-    setIsLoading(true);
-
+  // Hydrate user settings from local browser storage on mount
+  useEffect(() => {
     try {
-      const response = await fetch('/api/v1/conversation/turn', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          scenario_id: 'workplace_written_specs',
-          active_branch_id: 'branch_root',
-          parent_turn_id: activeTurn?.turnId ?? null,
-          user_input: {
-            text: input.text,
-            input_mode: input.mode,
-            prosody: {
-              words_per_minute: liveProsody.wordsPerMinute,
-              volume_rms: liveProsody.volumeRms,
-              pitch_variance_hz: liveProsody.pitchVarianceHz,
-            },
-          },
-          current_vad: {
-            valence: currentVad.valence,
-            arousal: currentVad.arousal,
-            dominance: currentVad.dominance,
-          },
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
+      const storedPrefs = localStorage.getItem(STORAGE_KEY_PREFS);
+      if (storedPrefs) {
+        setPreferences(JSON.parse(storedPrefs));
+        setCurrentView('dashboard'); // Returning users jump straight to dashboard
       }
 
-      const turnData: ProcessTurnResponse = await response.json();
-
-      // Trigger Co-Regulation modal if Tier 3 Curtain Drop
-      if (turnData.safety_gate.co_regulation_active) {
-        setShowCoRegulation(true);
+      const storedProgress = localStorage.getItem(STORAGE_KEY_PROGRESS);
+      if (storedProgress) {
+        setProgressMap(JSON.parse(storedProgress));
       }
 
-      // Store pivot recommendation for debrief
-      if (turnData.pocket_script_pivot) {
-        setPocketScript({
-          actionableScript: turnData.pocket_script_pivot.recommended_text,
-          clinicalFramework: 'DBT DEAR MAN',
-          underlyingIntent: turnData.two_way_bridge.user_intent,
-          neurotypicalImpactNeutralized: turnData.two_way_bridge.received_as,
-        });
+      const storedTakeaways = localStorage.getItem(STORAGE_KEY_TAKEAWAYS);
+      if (storedTakeaways) {
+        setSavedTakeaways(JSON.parse(storedTakeaways));
       }
     } catch {
-      // Offline fallback handling
+      // Local storage fallback
     } finally {
-      setIsLoading(false);
+      setIsHydrated(true);
     }
-  }, [activeTurn, currentVad, liveProsody]);
+  }, []);
 
-  const handleRewind = useCallback(() => {
-    if (activeTurn?.parentId) {
-      rewindTo(activeTurn.parentId);
+  // Update preferences and persist locally
+  const handleUpdatePreferences = (updated: UserPreferences) => {
+    setPreferences(updated);
+    try {
+      localStorage.setItem(STORAGE_KEY_PREFS, JSON.stringify(updated));
+    } catch {
+      // Fallback
     }
-  }, [activeTurn, rewindTo]);
-
-  const handleFinishSession = () => {
-    if (!pocketScript) {
-      setPocketScript({
-        actionableScript:
-          'I want to save your time. What if I write a 2-minute bulleted recap after our meetings, and you just give it a quick thumbs-up?',
-        clinicalFramework: 'DBT DEAR MAN (Describe, Express, Assert, Reinforce, Mindful, Appear confident, Negotiate)',
-        underlyingIntent:
-          'Self-advocacy to ensure delivery accuracy and eliminate cognitive overwhelm.',
-        neurotypicalImpactNeutralized:
-          'Perceived administrative demand placed on the manager that criticizes their verbal briefing style.',
-      });
-    }
-    setShowDebrief(true);
   };
 
-  return (
-    <main className="min-h-screen bg-[#0F141C] text-slate-100 flex flex-col p-4 md:p-8 max-w-7xl mx-auto">
-      {/* Top Bar: Title & Controls */}
-      <header className="flex items-center justify-between pb-6 border-b border-slate-800">
-        <div>
-          <h1 className="text-xl md:text-2xl font-bold tracking-tight text-slate-100">
-            Say It First
-          </h1>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Neurodiversity-Affirming Conversation Sandbox • Workplace Accommodation
-          </p>
-        </div>
+  // Onboarding completion
+  const handleCompleteOnboarding = (prefs: UserPreferences) => {
+    handleUpdatePreferences(prefs);
+    setCurrentView('dashboard');
+  };
 
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => setReducedMotion((prev) => !prev)}
-            className="px-3 py-1.5 bg-slate-800 text-xs text-slate-300 rounded-lg border border-slate-700 hover:bg-slate-700"
-          >
-            {reducedMotion ? '✓ Calm Motion Active' : 'Calm Motion Toggle'}
-          </button>
-          <button
-            type="button"
-            onClick={handleFinishSession}
-            className="px-4 py-1.5 bg-[#8B5CF6] text-xs font-semibold text-white rounded-lg hover:bg-[#7C3AED]"
-          >
-            Finish & Get Script
-          </button>
-        </div>
-      </header>
+  // Direct explore from welcome
+  const handleExploreDirectly = () => {
+    setCurrentView('dashboard');
+  };
 
-      {/* Main Grid: 2 Columns */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 my-6 flex-1 items-start">
-        {/* Panel 1: The Stage (Left Panel) */}
-        <div className="lg:col-span-5 flex flex-col gap-6">
-          <AvatarSvgRig
-            currentVad={currentVad}
-            spokenCaption={spokenCaption}
-            reducedMotion={reducedMotion}
-          />
-        </div>
+  // Mark topic explored
+  const handleMarkExplored = (topicId: string) => {
+    setProgressMap((prev) => {
+      const current = prev[topicId];
+      if (current === 'practiced' || current === 'revisited') return prev;
+      const updated = { ...prev, [topicId]: 'explored' as TopicProgressStatus };
+      try {
+        localStorage.setItem(STORAGE_KEY_PROGRESS, JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+  };
 
-        {/* Panel 2: The Subtext Lab (Right Panel) */}
-        <div className="lg:col-span-7 flex flex-col gap-6">
-          <AffectRadarCanvas
-            currentVad={currentVad}
-            historyCoordinates={linearHistory.map((n) => n.affectSnapshot.resolved)}
-          />
+  // Launch practice stage
+  const handleStartPractice = (topic: ScenarioDefinition) => {
+    setActivePracticeTopic(topic);
+    setProgressMap((prev) => {
+      const updated = {
+        ...prev,
+        [topic.id]: (prev[topic.id] === 'practiced' ? 'revisited' : 'in-progress') as TopicProgressStatus,
+      };
+      try {
+        localStorage.setItem(STORAGE_KEY_PROGRESS, JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+    setCurrentView('practice');
+  };
 
-          <SubtextHud
-            twoWayBridge={twoWayBridge}
-            unspokenSubtext={unspokenSubtext}
-            scaffoldingLevel={scaffoldingLevel}
-            onScaffoldingChange={setScaffoldingLevel}
-          />
-        </div>
+  // Complete practice session
+  const handleCompleteTopic = (topicId: string) => {
+    setProgressMap((prev) => {
+      const updated = {
+        ...prev,
+        [topicId]: (prev[topicId] === 'practiced' ? 'revisited' : 'practiced') as TopicProgressStatus,
+      };
+      try {
+        localStorage.setItem(STORAGE_KEY_PROGRESS, JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+  };
+
+  // Save takeaway script
+  const handleSaveTakeaway = (takeaway: SavedTakeaway) => {
+    setSavedTakeaways((prev) => {
+      const updated = [takeaway, ...prev.filter((t) => t.topicId !== takeaway.topicId)];
+      try {
+        localStorage.setItem(STORAGE_KEY_TAKEAWAYS, JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+  };
+
+  // Delete takeaway script
+  const handleDeleteTakeaway = (id: string) => {
+    setSavedTakeaways((prev) => {
+      const updated = prev.filter((t) => t.id !== id);
+      try {
+        localStorage.setItem(STORAGE_KEY_TAKEAWAYS, JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+  };
+
+  // Clear all saved wording
+  const handleClearSavedWording = () => {
+    setSavedTakeaways([]);
+    try {
+      localStorage.removeItem(STORAGE_KEY_TAKEAWAYS);
+    } catch {}
+  };
+
+  // Avoid hydration mismatch flicker
+  if (!isHydrated) {
+    return (
+      <div className="min-h-screen bg-canvas-light flex items-center justify-center text-ink-muted text-sm">
+        Opening Say It First…
       </div>
+    );
+  }
 
-      {/* Panel 3: The Control Dock (Bottom Panel) */}
-      <footer className="mt-auto">
-        <InputDock
-          onSubmit={handleTurnSubmit}
-          onRewind={handleRewind}
-          isListening={isListening}
-          onStartListening={startListening}
-          onStopListening={stopListening}
-          canRewind={Boolean(activeTurn?.parentId)}
-          disabled={isLoading}
+  return (
+    <>
+      {/* VIEW 1: WELCOME & ONBOARDING */}
+      {currentView === 'welcome' && (
+        <WelcomeOnboarding
+          onComplete={handleCompleteOnboarding}
+          onExploreDirectly={handleExploreDirectly}
         />
-      </footer>
-
-      {/* Safety Overlays */}
-      <CoRegulationModal
-        isOpen={showCoRegulation}
-        onComplete={() => setShowCoRegulation(false)}
-        onExitScenario={() => {
-          setShowCoRegulation(false);
-          resetGraph();
-        }}
-      />
-
-      {showDebrief && pocketScript && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
-          <PostSessionDebrief
-            pocketScript={pocketScript}
-            onRestart={() => {
-              setShowDebrief(false);
-              resetGraph();
-            }}
-          />
-        </div>
       )}
-    </main>
+
+      {/* VIEW 2: PERSONALIZED DASHBOARD */}
+      {currentView === 'dashboard' && (
+        <TopicDashboard
+          preferences={preferences}
+          progressMap={progressMap}
+          savedTakeaways={savedTakeaways}
+          activeTopicId={activePracticeTopic?.id}
+          onStartPractice={handleStartPractice}
+          onOpenPreferences={() => setIsPreferencesOpen(true)}
+          onMarkExplored={handleMarkExplored}
+          onDeleteTakeaway={handleDeleteTakeaway}
+        />
+      )}
+
+      {/* VIEW 3: PRACTICE STAGE */}
+      {currentView === 'practice' && activePracticeTopic && (
+        <PracticeStage
+          topic={activePracticeTopic}
+          preferences={preferences}
+          onExit={() => setCurrentView('dashboard')}
+          onSaveTakeaway={handleSaveTakeaway}
+          onCompleteTopic={handleCompleteTopic}
+        />
+      )}
+
+      {/* GLOBAL PREFERENCES MODAL */}
+      {isPreferencesOpen && (
+        <PreferencesModal
+          preferences={preferences}
+          onUpdatePreferences={handleUpdatePreferences}
+          onClose={() => setIsPreferencesOpen(false)}
+          onClearSavedWording={handleClearSavedWording}
+        />
+      )}
+    </>
   );
 }
