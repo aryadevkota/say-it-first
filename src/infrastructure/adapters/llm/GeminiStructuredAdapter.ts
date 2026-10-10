@@ -109,8 +109,15 @@ export class GeminiStructuredAdapter implements LLMInferencePort {
 
       if (!this.caller) {
         // If a real GEMINI_API_KEY is available in environment and not a dummy placeholder, execute real API inference
-        const apiKey = process.env.GEMINI_API_KEY;
-        if (apiKey && apiKey.length > 10 && !apiKey.startsWith('AIzaSy...') && apiKey !== 'test-ci-key') {
+        const rawApiKey = process.env.GEMINI_API_KEY;
+        const apiKey = rawApiKey ? rawApiKey.replace(/^["'\s]+|["'\s]+$/g, '') : '';
+        if (
+          apiKey &&
+          apiKey.length > 10 &&
+          !apiKey.includes('...') &&
+          apiKey !== 'test-ci-key' &&
+          apiKey !== 'AIzaSy_PLACEHOLDER'
+        ) {
           try {
             const liveResult = await this.callGeminiLiveApi(apiKey, userContentPrompt, systemPrompt);
             if (liveResult) return liveResult;
@@ -249,14 +256,148 @@ export class GeminiStructuredAdapter implements LLMInferencePort {
       };
     }
 
-    // ── 3. Custom Scenarios (Dynamic from ScenarioGenerator) ──────────────────
+    // ── 3. Unrelated Questions / Conversational Tangents ───────────────────────
+    if (
+      lower.includes('weather') ||
+      lower.includes('game last night') ||
+      lower.includes('who won') ||
+      lower.includes('cafeteria') ||
+      lower.includes('for lunch') ||
+      lower.includes('what time is it') ||
+      lower.includes('random question')
+    ) {
+      const topicContext =
+        scenarioId === 'friendship-quiet-place'
+          ? 'where we should meet up'
+          : scenarioId === 'boundary-saying-no'
+          ? 'the volunteer schedule'
+          : 'our check-in notes';
+      return {
+        spokenResponse: `Wait, haha—did you mean about our conversation or something else? I was focusing on ${topicContext}.`,
+        unspokenSubtext:
+          'A bit caught off guard by the sudden topic switch, checking if we lost track of the main discussion.',
+        twoWayBridge: {
+          userIntent: 'A casual tangent or distraction during an active conversation.',
+          receivedImpact: 'An unexpected topic change that momentarily breaks conversational flow.',
+        },
+        emotionalDelta: createAffectVector(0.05, 0.10, 0.0),
+        postureCue: 'Slight head tilt, friendly curious smile, hands pausing',
+        pivotRecommendation: {
+          suggestedWording:
+            `Sorry about that tangent! Let's get back to ${topicContext}.`,
+          psychologicalRationale:
+            'Acknowledges conversational shift gracefully without embarrassment.',
+        },
+      };
+    }
+
+    // ── 4. Correction of Misunderstandings ──────────────────────────────────
+    if (
+      lower.includes('not what i meant') ||
+      lower.includes('misunderstanding') ||
+      lower.includes("didn't mean that") ||
+      lower.includes("wasn't asking you") ||
+      lower.includes('you misunderstood') ||
+      lower.includes('to be clear, i') ||
+      lower.includes('actually, i meant') ||
+      lower.includes('actually, what i mean')
+    ) {
+      return {
+        spokenResponse:
+          "Oh, I see! My apologies, I thought you were asking something else. What did you have in mind instead?",
+        unspokenSubtext:
+          'Relieved to hear I misunderstood and that my initial worry was unwarranted. Happy to listen to the real intent.',
+        twoWayBridge: {
+          userIntent: 'Constructive course-correction to align on reality without friction.',
+          receivedImpact: 'Clear conversational repair that resolves misinterpretation promptly.',
+        },
+        emotionalDelta: createAffectVector(0.25, -0.20, 0.05),
+        postureCue: 'Receptive nod, leaning forward, open hands',
+        pivotRecommendation: {
+          suggestedWording:
+            "Thanks for listening—here is what I meant to explain.",
+          psychologicalRationale:
+            'Focuses on forward momentum rather than rehashing what went wrong.',
+        },
+      };
+    }
+
+    // ── 5. Collaborative Proposals & Compromises ─────────────────────────────
+    if (
+      lower.includes('what if we') ||
+      lower.includes('how about') ||
+      lower.includes('could we compromise') ||
+      lower.includes('would it work if') ||
+      lower.includes('what if i')
+    ) {
+      return {
+        spokenResponse:
+          "That actually sounds like a great compromise! That would work nicely on my end. What do you think about trying that?",
+        unspokenSubtext:
+          'Appreciative that they offered a collaborative suggestion that balances both of our needs.',
+        twoWayBridge: {
+          userIntent: 'Proposing a mutually beneficial compromise that respects boundaries.',
+          receivedImpact: 'A considerate, collaborative proposal that builds partnership.',
+        },
+        emotionalDelta: createAffectVector(0.35, -0.20, 0.10),
+        postureCue: 'Affirmative nod, relaxed shoulders, open smile',
+        pivotRecommendation: {
+          suggestedWording:
+            "Sounds like we have a plan! Thanks for working through this together.",
+          psychologicalRationale:
+            'Locks in mutual consensus and celebrates collaborative problem-solving.',
+        },
+      };
+    }
+
+    // ── 6. Multi-turn Recall / Continuity ───────────────────────────────────
+    if (
+      lower.includes('like i said earlier') ||
+      lower.includes('as i mentioned') ||
+      lower.includes('remember when') ||
+      (params.history && params.history.length > 2 && lower.includes('earlier'))
+    ) {
+      return {
+        spokenResponse:
+          `Right, absolutely! Going back to what you mentioned earlier, I want to make sure we keep that in mind. Where should we go from here?`,
+        unspokenSubtext:
+          'Recalling our earlier context and staying aligned on the commitments we made.',
+        twoWayBridge: {
+          userIntent: 'Anchoring to earlier conversational context and shared agreements.',
+          receivedImpact: 'Consistent multi-turn accountability and continuity.',
+        },
+        emotionalDelta: createAffectVector(0.20, -0.10, 0.05),
+        postureCue: 'Attentive nod, maintaining eye contact, relaxed posture',
+        pivotRecommendation: {
+          suggestedWording:
+            "Keeping that in mind, let's take the next step together.",
+          psychologicalRationale:
+            'Bridges previous agreements into current action.',
+        },
+      };
+    }
+
+    // ── 7. Custom Scenarios (Dynamic from ScenarioGenerator) ──────────────────
     if (scenarioId.startsWith('custom-') || topic?.category === 'custom') {
-      const partnerRole = topic?.partner.role || 'Partner';
+      const partnerRole =
+        params.customScenario?.partner_role ||
+        params.customScenario?.partner?.role ||
+        topic?.partner.role ||
+        'Partner';
+      const customPartnerName =
+        params.customScenario?.partner_name ||
+        params.customScenario?.partner?.name ||
+        topic?.partner.name ||
+        'Alex';
+      const customUserGoal =
+        params.customScenario?.user_goal ||
+        topic?.userGoal ||
+        'Communicating living and collaborative needs clearly.';
       const roleLower = partnerRole.toLowerCase();
 
       // Custom Roommate Scenario
       if (roleLower.includes('roommate') || lower.includes('dishes') || lower.includes('apartment') || lower.includes('noise')) {
-        if (lower.includes('quiet') || lower.includes('noise') || lower.includes('loud')) {
+        if (lower.includes('quiet') || lower.includes('noise') || lower.includes('loud') || lower.includes('headphones')) {
           return {
             spokenResponse:
               "Oh, I'm sorry! I didn't realize that was too loud. I'll definitely keep it down or use headphones. Thanks for telling me.",
@@ -282,7 +423,7 @@ export class GeminiStructuredAdapter implements LLMInferencePort {
           unspokenSubtext:
             'I appreciate having an open talk about our living habits rather than letting small things build up.',
           twoWayBridge: {
-            userIntent: topic?.userGoal || 'Communicating living needs collaboratively.',
+            userIntent: customUserGoal,
             receivedImpact: 'Constructive, direct discussion regarding shared living spaces.',
           },
           emotionalDelta: createAffectVector(0.25, -0.10, 0.05),
@@ -302,7 +443,7 @@ export class GeminiStructuredAdapter implements LLMInferencePort {
         unspokenSubtext:
           'They communicated their perspective clearly. I am ready to collaborate on next steps.',
         twoWayBridge: {
-          userIntent: topic?.userGoal || 'Clear and authentic self-advocacy.',
+          userIntent: customUserGoal,
           receivedImpact: 'A constructive statement opening a two-way discussion.',
         },
         emotionalDelta: createAffectVector(0.20, -0.10, 0.05),
@@ -454,50 +595,64 @@ export class GeminiStructuredAdapter implements LLMInferencePort {
     prompt: string,
     systemPrompt: string,
   ): Promise<LLMInferenceResult | null> {
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
-    const payload = {
-      systemInstruction: { parts: [{ text: systemPrompt }] },
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: {
-        temperature: 0.35,
-        topP: 0.85,
-        maxOutputTokens: 600,
-        responseMimeType: 'application/json',
-      },
-    };
+    const candidateModels = [
+      process.env.GEMINI_MODEL || 'gemini-3.8-flash',
+      'gemini-2.5-flash',
+      'gemini-1.5-flash',
+    ].filter(Boolean);
 
-    const res = await fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
+    for (const model of candidateModels) {
+      try {
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+        const payload = {
+          systemInstruction: { parts: [{ text: systemPrompt }] },
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: 0.35,
+            topP: 0.85,
+            maxOutputTokens: 600,
+            responseMimeType: 'application/json',
+          },
+        };
 
-    if (!res.ok) {
-      console.warn(`[GeminiStructuredAdapter] Gemini API HTTP ${res.status}`);
-      return null;
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) {
+          console.warn(`[GeminiStructuredAdapter] Gemini API model ${model} HTTP ${res.status}`);
+          continue;
+        }
+
+        const data = await res.json();
+        const candidateText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!candidateText) continue;
+
+        const parsed = RawLLMResponseSchema.parse(JSON.parse(candidateText));
+        return {
+          spokenResponse: parsed.spoken_response,
+          unspokenSubtext: parsed.unspoken_subtext,
+          twoWayBridge: {
+            userIntent: parsed.two_way_bridge.user_intent,
+            receivedImpact: parsed.two_way_bridge.received_as,
+          },
+          emotionalDelta: createAffectVector(
+            parsed.emotional_delta.valence,
+            parsed.emotional_delta.arousal,
+            parsed.emotional_delta.dominance,
+          ),
+          postureCue: parsed.posture_cue,
+          pivotRecommendation: {
+            suggestedWording: parsed.pivot_recommendation.suggested_wording,
+            psychologicalRationale: parsed.pivot_recommendation.psychological_rationale,
+          },
+        };
+      } catch (err) {
+        console.warn(`[GeminiStructuredAdapter] Model ${model} execution error:`, err);
+      }
     }
-    const data = await res.json();
-    const candidateText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!candidateText) return null;
-
-    const parsed = RawLLMResponseSchema.parse(JSON.parse(candidateText));
-    return {
-      spokenResponse: parsed.spoken_response,
-      unspokenSubtext: parsed.unspoken_subtext,
-      twoWayBridge: {
-        userIntent: parsed.two_way_bridge.user_intent,
-        receivedImpact: parsed.two_way_bridge.received_as,
-      },
-      emotionalDelta: createAffectVector(
-        parsed.emotional_delta.valence,
-        parsed.emotional_delta.arousal,
-        parsed.emotional_delta.dominance,
-      ),
-      postureCue: parsed.posture_cue,
-      pivotRecommendation: {
-        suggestedWording: parsed.pivot_recommendation.suggested_wording,
-        psychologicalRationale: parsed.pivot_recommendation.psychological_rationale,
-      },
-    };
+    return null;
   }
 }

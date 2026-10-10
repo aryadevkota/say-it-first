@@ -135,6 +135,14 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
     }
     return userAvatar;
   });
+
+  // Sync user avatar changes from parent state or studio modal
+  useEffect(() => {
+    if (userAvatar) {
+      setLocalUserAvatar(userAvatar);
+    }
+  }, [userAvatar]);
+
   const [isAvatarStudioOpen, setIsAvatarStudioOpen] = useState<boolean>(false);
 
   // ElevenLabs Voice Hook

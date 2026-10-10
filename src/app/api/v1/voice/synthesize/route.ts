@@ -55,7 +55,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const apiKey = process.env.ELEVENLABS_API_KEY;
+    const rawApiKey = process.env.ELEVENLABS_API_KEY;
+    const apiKey = rawApiKey ? rawApiKey.replace(/^["'\s]+|["'\s]+$/g, '') : '';
 
     if (!apiKey || apiKey.trim() === '' || apiKey.startsWith('your_') || apiKey === 'test-key') {
       return NextResponse.json(
@@ -72,10 +73,11 @@ export async function POST(request: Request) {
       );
     }
 
+    // Default to verified "Alexandra — Conversational and Natural" (kdmDKE6EkgrWrrykO9Qt)
     const voiceId =
       process.env.ELEVENLABS_VOICE_ID ||
       body?.voiceId ||
-      '21m00Tcm4TlvDq8ikWAM'; // Rachel/Alexandra default standard natural voice id fallback
+      'kdmDKE6EkgrWrrykO9Qt';
 
     const modelId =
       process.env.ELEVENLABS_MODEL_ID || body?.modelId || DEFAULT_ELEVENLABS_MODEL;

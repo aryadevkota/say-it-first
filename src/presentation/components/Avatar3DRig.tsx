@@ -187,67 +187,78 @@ export const Avatar3DRig: React.FC<Avatar3DRigProps> = ({
       color: skinColorHex,
       roughness: 0.84,
       metalness: 0.0,
+      side: THREE.DoubleSide,
     });
 
     const hairMaterial = new THREE.MeshStandardMaterial({
       color: hairColorHex,
       roughness: 0.78,
       metalness: 0.05,
+      side: THREE.DoubleSide,
     });
 
     const browMaterial = new THREE.MeshStandardMaterial({
       color: hairColorHex,
       roughness: 0.82,
+      side: THREE.DoubleSide,
     });
 
     const clothingMaterial = new THREE.MeshStandardMaterial({
       color: clothingColorHex,
       roughness: 0.88,
       metalness: 0.02,
+      side: THREE.DoubleSide,
     });
 
     const innerCollarMaterial = new THREE.MeshStandardMaterial({
       color: 0xfaf8f5,
       roughness: 0.9,
+      side: THREE.DoubleSide,
     });
 
     const eyeWhiteMaterial = new THREE.MeshStandardMaterial({
       color: 0xfbfbfb,
       roughness: 0.25,
       metalness: 0.05,
+      side: THREE.DoubleSide,
     });
 
     const irisMaterial = new THREE.MeshStandardMaterial({
       color: 0x3d312a,
       roughness: 0.2,
       metalness: 0.1,
+      side: THREE.DoubleSide,
     });
 
     const pupilMaterial = new THREE.MeshBasicMaterial({
       color: 0x111111,
+      side: THREE.DoubleSide,
     });
 
     const catchlightMaterial = new THREE.MeshBasicMaterial({
       color: 0xffffff,
+      side: THREE.DoubleSide,
     });
 
     const lipMaterial = new THREE.MeshStandardMaterial({
       color: 0xaa5b57,
       roughness: 0.6,
       metalness: 0.0,
+      side: THREE.DoubleSide,
     });
 
     const eyewearMaterial = new THREE.MeshStandardMaterial({
       color: 0x2a2c30,
       roughness: 0.3,
       metalness: 0.8,
+      side: THREE.DoubleSide,
     });
 
     // Character Root
     const characterRoot = new THREE.Group();
-    if (mirror) {
-      characterRoot.scale.x = -1; // Mirror for inward conversation stance
-    }
+    // Inward conversational stance for Two-Person Stage:
+    // Left partner angles slightly right (+0.20 rad); Right user avatar angles slightly left (-0.20 rad)
+    characterRoot.rotation.y = mirror ? -0.20 : 0.20;
     scene.add(characterRoot);
 
     // ── 1. Upper Torso & Attire ──────────────────────────────────────────────

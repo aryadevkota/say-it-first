@@ -76,6 +76,32 @@ export class ProcessTurnUseCase {
       graph = new ConversationTimelineGraph();
     }
 
+    // Seed prior turns from client-supplied active branch history if graph has not yet recorded them
+    if (command.history && command.history.length > 0 && graph.getAllNodes().length === 0) {
+      const isLatestTurnInHistory =
+        command.history[command.history.length - 1]?.content === command.userInput.text;
+      const priorTurns = isLatestTurnInHistory
+        ? command.history.slice(0, -1)
+        : command.history;
+
+      let lastSeededId: string | null = null;
+      for (const prior of priorTurns) {
+        lastSeededId = graph.appendTurn({
+          parentId: lastSeededId,
+          branchId: command.activeBranchId,
+          role: prior.role === 'partner' ? 'persona' : (prior.role as 'user' | 'persona'),
+          content: prior.content,
+          inputMode: 'text',
+          timestamp: Date.now(),
+          affectSnapshot: {
+            delta: { valence: 0, arousal: 0, dominance: 0 },
+            resolved: command.currentVad,
+          },
+          deEscalationWarning: false,
+        });
+      }
+    }
+
     if (
       command.parentTurnId &&
       command.parentTurnId !== graph.getActiveHeadId() &&
@@ -84,7 +110,10 @@ export class ProcessTurnUseCase {
       graph.rewindTo(command.parentTurnId);
     }
 
-    const parentTurnId = command.parentTurnId ?? graph.getActiveHeadId();
+    const parentTurnId =
+      command.parentTurnId && graph.getNode(command.parentTurnId)
+        ? command.parentTurnId
+        : graph.getActiveHeadId();
 
     // 1. Append User Turn Node
     const userTurnId = graph.appendTurn({
