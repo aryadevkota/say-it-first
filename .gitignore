@@ -51,3 +51,8 @@ Thumbs.db
 *.raw
 *.mp3
 *.ogg
+
+# Documents, PDFs & Product Specifications
+*.pdf
+say_it_first_technical_specification.md
+say_it_first_system_architecture_manual.md

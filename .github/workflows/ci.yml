@@ -37,8 +37,12 @@ jobs:
 
       - name: Run Vitest Suite (128 Tests)
         run: npx vitest run --reporter=verbose
+        env:
+          GEMINI_API_KEY: "test-ci-key"
+          NEXT_PUBLIC_APP_ENV: "test"
 
       - name: Next.js 14 Production Build
         run: npm run build
         env:
-          NEXT_PUBLIC_APP_ENV: production
+          GEMINI_API_KEY: "test-ci-key"
+          NEXT_PUBLIC_APP_ENV: "production"
