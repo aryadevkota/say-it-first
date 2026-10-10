@@ -187,10 +187,14 @@ npm install
 ```
 
 ### 3. Environment Configuration
-Copy the template and configure your API key:
+Create a `.env.local` file:
 ```bash
-cp .env.example .env.local
-# Open .env.local and paste your GEMINI_API_KEY
+# Core AI Gateway
+GEMINI_API_KEY="AIzaSy..."
+
+# Runtime Configuration
+NEXT_PUBLIC_APP_ENV="development"
+NEXT_PUBLIC_DEFAULT_INERTIA="0.65"
 ```
 
 ### 4. Run Development Server

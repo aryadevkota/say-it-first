@@ -39,7 +39,6 @@ src/
 ```bash
 git clone https://github.com/say-it-first/say-it-first.git
 cd say-it-first
-cp .env.example .env.local
 npm install
 ```
 
