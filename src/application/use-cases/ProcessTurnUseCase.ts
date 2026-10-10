@@ -112,6 +112,7 @@ export class ProcessTurnUseCase {
       userInput: command.userInput,
       currentVad: command.currentVad,
       inertiaLambda: this.defaultInertia,
+      customScenario: command.customScenario,
     });
 
     // 3. Resolve next affect state via damping

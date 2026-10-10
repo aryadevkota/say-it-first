@@ -61,10 +61,10 @@ export const FALLBACK_INFERENCE_RESULT: LLMInferenceResult = Object.freeze({
 
 export class GeminiStructuredAdapter implements LLMInferencePort {
   public static readonly HYPERPARAMETERS = {
-    model: 'gemini-1.5-flash',
+    model: 'gemini-3.8-flash',
     temperature: 0.35,
     topP: 0.85,
-    maxOutputTokens: 450,
+    maxOutputTokens: 600,
     responseFormat: 'application/json',
   };
 
@@ -73,8 +73,16 @@ export class GeminiStructuredAdapter implements LLMInferencePort {
   public async inferTurn(params: LLMInferenceParams): Promise<LLMInferenceResult> {
     try {
       const topic = getTopicById(params.scenarioId);
-      const personaName = topic?.partner.name || this.resolvePersonaName(params.scenarioId);
+      const personaName =
+        params.customScenario?.partner_name ||
+        params.customScenario?.partner?.name ||
+        topic?.partner.name ||
+        this.resolvePersonaName(params.scenarioId);
+
       const systemContext =
+        (params.customScenario
+          ? `Custom scenario: ${params.customScenario.situation || ''}. Partner role: ${params.customScenario.partner_role || params.customScenario.partner?.role || 'Peer'}. User goal: ${params.customScenario.user_goal || ''}. Constraints: ${params.customScenario.constraints || 'None'}.`
+          : '') ||
         topic?.partner.defaultTone ||
         topic?.subtitle ||
         this.resolveSystemContext(params.scenarioId);
@@ -92,6 +100,7 @@ export class GeminiStructuredAdapter implements LLMInferencePort {
         parent_turn_id: params.parentTurnId,
         user_input: params.userInput,
         current_vad: params.currentVad,
+        custom_scenario: params.customScenario,
         history: params.history.map((h) => ({
           role: h.role,
           content: h.content,
@@ -105,7 +114,8 @@ export class GeminiStructuredAdapter implements LLMInferencePort {
           try {
             const liveResult = await this.callGeminiLiveApi(apiKey, userContentPrompt, systemPrompt);
             if (liveResult) return liveResult;
-          } catch {
+          } catch (liveErr) {
+            console.warn('[GeminiStructuredAdapter] Live inference failed, falling back to dynamic simulation:', liveErr);
             // Fall through to contextual dynamic simulation
           }
         }
@@ -444,14 +454,14 @@ export class GeminiStructuredAdapter implements LLMInferencePort {
     prompt: string,
     systemPrompt: string,
   ): Promise<LLMInferenceResult | null> {
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
     const payload = {
       systemInstruction: { parts: [{ text: systemPrompt }] },
       contents: [{ parts: [{ text: prompt }] }],
       generationConfig: {
         temperature: 0.35,
         topP: 0.85,
-        maxOutputTokens: 450,
+        maxOutputTokens: 600,
         responseMimeType: 'application/json',
       },
     };
@@ -462,7 +472,10 @@ export class GeminiStructuredAdapter implements LLMInferencePort {
       body: JSON.stringify(payload),
     });
 
-    if (!res.ok) return null;
+    if (!res.ok) {
+      console.warn(`[GeminiStructuredAdapter] Gemini API HTTP ${res.status}`);
+      return null;
+    }
     const data = await res.json();
     const candidateText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
     if (!candidateText) return null;

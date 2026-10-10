@@ -27,6 +27,11 @@ import { TopicDashboard } from '../presentation/components/TopicDashboard';
 import { PracticeStage } from '../presentation/components/PracticeStage';
 import { PreferencesModal } from '../presentation/components/PreferencesModal';
 import { ScenarioCreator } from '../presentation/components/ScenarioCreator';
+import { AvatarStudioModal } from '../presentation/components/AvatarStudioModal';
+import {
+  type AvatarCustomization,
+  DEFAULT_USER_AVATAR,
+} from '../domain/entities/AvatarCustomization';
 import {
   TOPICS,
   type ScenarioDefinition,
@@ -38,6 +43,7 @@ const STORAGE_KEY_PREFS = 'say_it_first_user_prefs';
 const STORAGE_KEY_PROGRESS = 'say_it_first_progress';
 const STORAGE_KEY_TAKEAWAYS = 'say_it_first_takeaways';
 const STORAGE_KEY_CUSTOM_SCENARIOS = 'say_it_first_custom_scenarios';
+const STORAGE_KEY_USER_AVATAR = 'say_it_first_user_avatar';
 
 export default function SayItFirstRoot() {
   const [currentView, setCurrentView] = useState<'welcome' | 'dashboard' | 'practice' | 'create-scenario'>('welcome');
@@ -47,6 +53,9 @@ export default function SayItFirstRoot() {
   const [customScenarios, setCustomScenarios] = useState<ScenarioDefinition[]>([]);
   const [activePracticeTopic, setActivePracticeTopic] = useState<ScenarioDefinition | null>(null);
   const [isPreferencesOpen, setIsPreferencesOpen] = useState<boolean>(false);
+  const [isAvatarStudioOpen, setIsAvatarStudioOpen] = useState<boolean>(false);
+  const [userAvatar, setUserAvatar] = useState<AvatarCustomization>(DEFAULT_USER_AVATAR);
+  const [isReturningUser, setIsReturningUser] = useState<boolean>(false);
   const [isHydrated, setIsHydrated] = useState<boolean>(false);
 
   // Hydrate user settings from local browser storage on mount
@@ -55,7 +64,14 @@ export default function SayItFirstRoot() {
       const storedPrefs = localStorage.getItem(STORAGE_KEY_PREFS);
       if (storedPrefs) {
         setPreferences(JSON.parse(storedPrefs));
-        setCurrentView('dashboard'); // Returning users jump straight to dashboard
+        setIsReturningUser(true);
+        // Note: Per Section 10 requirements, app freshly mounts on welcome screen.
+        // Returning users see "Continue" which takes them right into their saved dashboard.
+      }
+
+      const storedAvatar = localStorage.getItem(STORAGE_KEY_USER_AVATAR);
+      if (storedAvatar) {
+        setUserAvatar(JSON.parse(storedAvatar));
       }
 
       const storedProgress = localStorage.getItem(STORAGE_KEY_PROGRESS);
@@ -211,6 +227,7 @@ export default function SayItFirstRoot() {
         <WelcomeOnboarding
           onComplete={handleCompleteOnboarding}
           onExploreDirectly={handleExploreDirectly}
+          isReturningUser={isReturningUser}
         />
       )}
 
@@ -224,6 +241,7 @@ export default function SayItFirstRoot() {
           customScenarios={customScenarios}
           onStartPractice={handleStartPractice}
           onOpenPreferences={() => setIsPreferencesOpen(true)}
+          onOpenAvatarStudio={() => setIsAvatarStudioOpen(true)}
           onMarkExplored={handleMarkExplored}
           onDeleteTakeaway={handleDeleteTakeaway}
           onCreateCustomScenario={() => setCurrentView('create-scenario')}
@@ -236,6 +254,13 @@ export default function SayItFirstRoot() {
         <PracticeStage
           topic={activePracticeTopic}
           preferences={preferences}
+          userAvatar={userAvatar}
+          onUpdateUserAvatar={(customization) => {
+            setUserAvatar(customization);
+            try {
+              localStorage.setItem(STORAGE_KEY_USER_AVATAR, JSON.stringify(customization));
+            } catch {}
+          }}
           onExit={() => setCurrentView('dashboard')}
           onSaveTakeaway={handleSaveTakeaway}
           onCompleteTopic={handleCompleteTopic}
@@ -285,6 +310,20 @@ export default function SayItFirstRoot() {
           onUpdatePreferences={handleUpdatePreferences}
           onClose={() => setIsPreferencesOpen(false)}
           onClearSavedWording={handleClearSavedWording}
+        />
+      )}
+
+      {/* GLOBAL AVATAR STUDIO MODAL */}
+      {isAvatarStudioOpen && (
+        <AvatarStudioModal
+          initialCustomization={userAvatar}
+          onSave={(customization) => {
+            setUserAvatar(customization);
+            try {
+              localStorage.setItem(STORAGE_KEY_USER_AVATAR, JSON.stringify(customization));
+            } catch {}
+          }}
+          onClose={() => setIsAvatarStudioOpen(false)}
         />
       )}
     </>

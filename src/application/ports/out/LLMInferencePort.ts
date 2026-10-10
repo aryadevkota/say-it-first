@@ -22,6 +22,19 @@ export interface LLMInferenceParams {
   };
   currentVad: AffectVector;
   inertiaLambda?: number;
+  customScenario?: {
+    id?: string;
+    situation?: string;
+    partner_role?: string;
+    partner_name?: string;
+    user_goal?: string;
+    constraints?: string;
+    partner?: {
+      name?: string;
+      role?: string;
+      concerns?: string;
+    };
+  };
 }
 
 export interface LLMInferenceResult {

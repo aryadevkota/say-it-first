@@ -104,6 +104,7 @@ describe('GeminiStructuredAdapter', () => {
       userInput: {
         text: 'Hey Alex, could we agree on keeping music to headphones after 10 PM?',
         inputMode: 'text',
+        prosody: dummyProsody,
       },
       customScenario: {
         id: 'custom-roommate-noise-123',
@@ -131,6 +132,7 @@ describe('GeminiStructuredAdapter', () => {
       userInput: {
         text: "I don't know how to put this, but things have felt a bit overwhelming lately.",
         inputMode: 'text',
+        prosody: dummyProsody,
       },
       currentVad: dummyVad,
     });
@@ -149,11 +151,66 @@ describe('GeminiStructuredAdapter', () => {
       userInput: {
         text: "I can't take on this extra project right now.",
         inputMode: 'text',
+        prosody: dummyProsody,
       },
       currentVad: dummyVad,
     });
 
     expect(result.spokenResponse).toBeTruthy();
     expect(result.twoWayBridge.userIntent).toContain('Self-advocacy');
+  });
+
+  it('incorporates multi-turn history and custom scenario metadata into inference', async () => {
+    const mockCaller: LLMCaller = {
+      generateJson: vi.fn().mockResolvedValue({
+        spoken_response: 'Understood, let us keep it quiet after 10.',
+        unspoken_subtext: 'Respecting the boundary.',
+        two_way_bridge: {
+          user_intent: 'Quiet hours request.',
+          received_as: 'Clear roommate communication.',
+        },
+        emotional_delta: { valence: 0.2, arousal: -0.1, dominance: 0.1 },
+        posture_cue: 'Affirmative nod.',
+        pivot_recommendation: {
+          suggested_wording: 'Thanks for agreeing.',
+          psychological_rationale: 'Positive reinforcement.',
+        },
+      }),
+    };
+
+    const adapter = new GeminiStructuredAdapter(mockCaller);
+    const result = await adapter.inferTurn({
+      scenarioId: 'custom-roommate',
+      activeBranchId: 'main',
+      parentTurnId: 'turn-1',
+      history: [
+        {
+          turnId: 'turn-1',
+          parentId: null,
+          branchId: 'main',
+          role: 'persona',
+          content: 'Hey, did you need something?',
+          inputMode: 'text',
+          timestamp: 1000,
+          affectSnapshot: { delta: dummyVad, resolved: dummyVad },
+          deEscalationWarning: false,
+        },
+      ],
+      userInput: {
+        text: 'Could we set quiet hours after 10 PM?',
+        inputMode: 'text',
+        prosody: dummyProsody,
+      },
+      currentVad: dummyVad,
+      customScenario: {
+        situation: 'Roommate plays loud games late at night',
+        partner_role: 'Roommate',
+        partner_name: 'Alex',
+        user_goal: 'Quiet hours after 10 PM',
+      },
+    });
+
+    expect(result.spokenResponse).toBe('Understood, let us keep it quiet after 10.');
+    expect(mockCaller.generateJson).toHaveBeenCalled();
   });
 });

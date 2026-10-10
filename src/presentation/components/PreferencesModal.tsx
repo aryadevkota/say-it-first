@@ -12,8 +12,9 @@
  * - Data management (Clear locally saved wording)
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import type { UserPreferences } from './WelcomeOnboarding';
+import { isUiSoundEnabled, setUiSoundEnabled, playCozySound } from '../utils/cozyAudio';
 
 interface PreferencesModalProps {
   preferences: UserPreferences;
@@ -28,6 +29,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({
   onClose,
   onClearSavedWording,
 }) => {
+  const [uiSoundsEnabled, setUiSoundsEnabled] = useState<boolean>(() => isUiSoundEnabled());
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-primary/30 backdrop-blur-xs"
@@ -172,6 +174,31 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({
                 <span
                   className={`block w-4 h-4 rounded-full bg-white transition-transform ${
                     preferences.spokenPartnerAudio ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* Tactile Interaction Sounds Toggle */}
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-sm font-medium text-ink-primary block">Tactile Interaction Sounds</span>
+                <span className="text-xs text-ink-muted">Play subtle, soft clicks on buttons & branches</span>
+              </div>
+              <button
+                onClick={() => {
+                  const next = !uiSoundsEnabled;
+                  setUiSoundsEnabled(next);
+                  setUiSoundEnabled(next);
+                  if (next) playCozySound('toggle');
+                }}
+                className={`w-11 h-6 rounded-full transition-colors relative focus:outline-none ${
+                  uiSoundsEnabled ? 'bg-teal-brand' : 'bg-canvas-border'
+                }`}
+              >
+                <span
+                  className={`block w-4 h-4 rounded-full bg-white transition-transform ${
+                    uiSoundsEnabled ? 'translate-x-6' : 'translate-x-1'
                   }`}
                 />
               </button>

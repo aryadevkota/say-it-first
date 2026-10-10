@@ -18,6 +18,7 @@
 
 import React, { useState } from 'react';
 import { Avatar3DRig } from './Avatar3DRig';
+import { playCozySound } from '../utils/cozyAudio';
 
 export interface UserPreferences {
   interests: string[];
@@ -42,11 +43,13 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
 interface WelcomeOnboardingProps {
   onComplete: (prefs: UserPreferences) => void;
   onExploreDirectly: () => void;
+  isReturningUser?: boolean;
 }
 
 export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
   onComplete,
   onExploreDirectly,
+  isReturningUser = false,
 }) => {
   const [stage, setStage] = useState<'welcome' | 'step1' | 'step2' | 'step3'>('welcome');
   const [selectedInterests, setSelectedInterests] = useState<string[]>([
@@ -135,12 +138,12 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
         <main className="max-w-5xl mx-auto w-full my-auto py-10 grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center">
           {/* Left: Warm, clear copy */}
           <div className="md:col-span-7 flex flex-col items-start text-left">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-teal-subtle text-teal-brand border border-teal-border mb-6">
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-teal-subtle text-teal-brand border border-teal-border mb-4">
               <span className="w-2 h-2 rounded-full bg-teal-brand" />
-              Conversational Sandbox
+              {isReturningUser ? 'Welcome back • Settings & progress saved' : 'Conversational Sandbox'}
             </span>
 
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-ink-primary leading-tight mb-5">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-display font-semibold tracking-tight text-ink-primary leading-tight mb-5">
               Find more room to say what you mean.
             </h1>
 
@@ -149,19 +152,51 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
             </p>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
-              <button
-                onClick={() => setStage('step1')}
-                className="px-6 py-3.5 rounded-xl bg-teal-brand text-canvas-surface font-medium hover:bg-teal-hover active:bg-teal-active transition shadow-sm text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-brand"
-              >
-                Make it yours
-              </button>
+              {isReturningUser ? (
+                <>
+                  <button
+                    onClick={() => {
+                      playCozySound('tap');
+                      onExploreDirectly();
+                    }}
+                    className="px-6 py-3.5 rounded-xl bg-teal-brand text-canvas-surface font-medium hover:bg-teal-hover active:bg-teal-active transition shadow-sm text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-brand"
+                  >
+                    Continue
+                  </button>
 
-              <button
-                onClick={onExploreDirectly}
-                className="px-6 py-3.5 rounded-xl bg-canvas-surface border border-canvas-border text-ink-primary font-medium hover:bg-canvas-subtle transition text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-brand"
-              >
-                Explore first
-              </button>
+                  <button
+                    onClick={() => {
+                      playCozySound('tap');
+                      setStage('step1');
+                    }}
+                    className="px-6 py-3.5 rounded-xl bg-canvas-surface border border-canvas-border text-ink-primary font-medium hover:bg-canvas-subtle transition text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-brand"
+                  >
+                    Adjust preferences
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => {
+                      playCozySound('tap');
+                      setStage('step1');
+                    }}
+                    className="px-6 py-3.5 rounded-xl bg-teal-brand text-canvas-surface font-medium hover:bg-teal-hover active:bg-teal-active transition shadow-sm text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-brand"
+                  >
+                    Make it yours
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      playCozySound('tap');
+                      onExploreDirectly();
+                    }}
+                    className="px-6 py-3.5 rounded-xl bg-canvas-surface border border-canvas-border text-ink-primary font-medium hover:bg-canvas-subtle transition text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-brand"
+                  >
+                    Explore first
+                  </button>
+                </>
+              )}
             </div>
 
             <p className="text-xs text-ink-muted mt-6 flex items-center gap-1.5">

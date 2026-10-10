@@ -121,6 +121,8 @@ export async function handleTurnRequest(
         prosody,
       },
       currentVad: vad,
+      customScenario: parsed.data.custom_scenario,
+      history: parsed.data.history,
     });
 
     return {

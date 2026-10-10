@@ -24,4 +24,16 @@ export interface ProcessTurnCommand {
   readonly parentTurnId: string | null;
   readonly userInput: ProcessTurnUserInput;
   readonly currentVad: AffectVector;
+  readonly customScenario?: {
+    id?: string;
+    situation?: string;
+    partner_role?: string;
+    partner_name?: string;
+    user_goal?: string;
+    constraints?: string;
+  };
+  readonly history?: readonly {
+    role: 'partner' | 'user' | 'persona';
+    content: string;
+  }[];
 }

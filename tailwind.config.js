@@ -50,6 +50,8 @@ module.exports = {
       },
       fontFamily: {
         sans: ['system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
+        display: ['"Dream Orphans"', 'system-ui', 'sans-serif'],
+        accent: ['"Caviar Dreams"', 'system-ui', 'sans-serif'],
       },
     },
   },

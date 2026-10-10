@@ -39,6 +39,10 @@ next-env.d.ts
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Raw font archives
+/fonts/
+Thumbs.db
 *.swp
 *.swo
 *~

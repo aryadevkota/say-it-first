@@ -2,6 +2,73 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ══════════════════════════════════════════════════════════════════════
+   Artistic Identity Typography — Dream Orphans (CC0) & Caviar Dreams
+   ══════════════════════════════════════════════════════════════════════ */
+@font-face {
+  font-family: 'Dream Orphans';
+  src: url('/fonts/dream_orphans/Dream Orphans.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Dream Orphans';
+  src: url('/fonts/dream_orphans/Dream Orphans Bd.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Dream Orphans';
+  src: url('/fonts/dream_orphans/Dream Orphans It.otf') format('opentype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Dream Orphans';
+  src: url('/fonts/dream_orphans/Dream Orphans Bd It.otf') format('opentype');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Caviar Dreams';
+  src: url('/fonts/caviar_dreams/CaviarDreams.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Caviar Dreams';
+  src: url('/fonts/caviar_dreams/CaviarDreams_Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Caviar Dreams';
+  src: url('/fonts/caviar_dreams/CaviarDreams_Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Caviar Dreams';
+  src: url('/fonts/caviar_dreams/CaviarDreams_BoldItalic.ttf') format('truetype');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
 :root {
   --canvas-bg: #FAF7F2;
   --canvas-subtle: #F4EFEB;
@@ -64,3 +131,26 @@ body {
     animation: none !important;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+   Interactive Micro-Styles & Typography (Workstream C)
+   ══════════════════════════════════════════════════════════════════════ */
+button:not(:disabled):active {
+  transform: scale(0.985);
+}
+
+button:focus-visible, a:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--canvas-bg), 0 0 0 4px var(--teal-brand);
+}
+
+.font-display {
+  font-family: 'Dream Orphans', system-ui, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+.font-accent {
+  font-family: 'Caviar Dreams', system-ui, sans-serif;
+  letter-spacing: 0.01em;
+}
+

@@ -23,6 +23,13 @@ import type { ScenarioDefinition } from '../../domain/scenarios/topics';
 import type { UserPreferences } from './WelcomeOnboarding';
 import { Avatar3DRig, type AvatarState } from './Avatar3DRig';
 import type { SavedTakeaway } from './MyProgress';
+import { usePartnerVoice } from '../hooks/usePartnerVoice';
+import { AvatarStudioModal } from './AvatarStudioModal';
+import {
+  type AvatarCustomization,
+  DEFAULT_USER_AVATAR,
+} from '../../domain/entities/AvatarCustomization';
+import { playCozySound } from '../utils/cozyAudio';
 
 interface TurnMessage {
   id: string;
@@ -46,6 +53,8 @@ interface AttemptBranch {
 interface PracticeStageProps {
   topic: ScenarioDefinition;
   preferences: UserPreferences;
+  userAvatar?: AvatarCustomization;
+  onUpdateUserAvatar?: (customization: AvatarCustomization) => void;
   onExit: () => void;
   onSaveTakeaway: (takeaway: SavedTakeaway) => void;
   onCompleteTopic: (topicId: string) => void;
@@ -54,6 +63,8 @@ interface PracticeStageProps {
 export const PracticeStage: React.FC<PracticeStageProps> = ({
   topic,
   preferences,
+  userAvatar = DEFAULT_USER_AVATAR,
+  onUpdateUserAvatar,
   onExit,
   onSaveTakeaway,
   onCompleteTopic,
@@ -113,6 +124,36 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
   const abortControllerRef = useRef<AbortController | null>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
+  // Two-person stage & user avatar customization
+  const [stageMode, setStageMode] = useState<'two-person' | 'partner-only'>('two-person');
+  const [localUserAvatar, setLocalUserAvatar] = useState<AvatarCustomization>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('say_it_first_user_avatar');
+        if (stored) return JSON.parse(stored);
+      } catch {}
+    }
+    return userAvatar;
+  });
+  const [isAvatarStudioOpen, setIsAvatarStudioOpen] = useState<boolean>(false);
+
+  // ElevenLabs Voice Hook
+  const {
+    isPlaying: isSpeakingAudio,
+    voiceNotice,
+    isMuted,
+    toggleMute,
+    speak: speakVoice,
+    stop: stopVoice,
+  } = usePartnerVoice({
+    allowBrowserSpeechFallback: preferences.spokenPartnerAudio,
+  });
+
+  const handleSaveAvatar = (customization: AvatarCustomization) => {
+    setLocalUserAvatar(customization);
+    onUpdateUserAvatar?.(customization);
+  };
+
   const activeBranch = attempts[activeAttemptIndex] || attempts[0];
   const latestPartnerTurn = [...activeBranch.turns]
     .reverse()
@@ -125,30 +166,25 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
-      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-      }
+      stopVoice();
     };
-  }, []);
+  }, [stopVoice]);
 
-  // Partner speech synthesis if enabled in preferences
+  // Partner speech synthesis when latest partner turn changes
   useEffect(() => {
-    if (preferences.spokenPartnerAudio && latestPartnerTurn && typeof window !== 'undefined') {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(latestPartnerTurn.text);
-        utterance.rate = 0.95;
-        utterance.pitch = 1.0;
-        window.speechSynthesis.speak(utterance);
-      }
+    if (preferences.spokenPartnerAudio && latestPartnerTurn?.text) {
+      speakVoice(latestPartnerTurn.text);
     }
-  }, [latestPartnerTurn, preferences.spokenPartnerAudio]);
+  }, [latestPartnerTurn?.id, preferences.spokenPartnerAudio, speakVoice]);
 
   // Handle submitting a turn to API
   const handleSubmitTurn = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     const trimmedInput = userDraft.trim();
     if (!trimmedInput || isLoading) return;
+
+    playCozySound('tap');
+    stopVoice();
 
     const currentAttemptId = activeBranch.id;
     const currentAttemptIdx = activeAttemptIndex;
@@ -256,6 +292,9 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
       };
 
       setPartnerState('speaking');
+      if (partnerTurn.text) {
+        speakVoice(partnerTurn.text);
+      }
       setTimeout(() => {
         if (requestId === activeRequestIdRef.current) {
           setPartnerState('receptive');
@@ -300,6 +339,9 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
   const handleSwitchAttempt = (targetIndex: number) => {
     if (targetIndex === activeAttemptIndex) return;
 
+    playCozySound('pop');
+    stopVoice();
+
     activeRequestIdRef.current++;
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -319,14 +361,13 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
     setActiveAttemptIndex(targetIndex);
     setPartnerState('listening');
     setErrorMessage(null);
-
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-    }
   };
 
   // Branch a non-destructive new version ("Try another version")
   const handleTryAnotherVersion = () => {
+    playCozySound('branch');
+    stopVoice();
+
     activeRequestIdRef.current++;
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -360,10 +401,6 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
     setUserDraft('');
     setPartnerState('listening');
     setErrorMessage(null);
-
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-    }
   };
 
   // Speech to text toggle (Web Speech API)
@@ -412,6 +449,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
 
   // Insert suggested phrasing into draft (editable, never auto-submits)
   const handleUseSuggestedWording = (phrase: string) => {
+    playCozySound('tap');
     setUserDraft(phrase);
     if (inputRef.current) {
       inputRef.current.focus();
@@ -420,12 +458,11 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
 
   // Finish practice session and show takeaways
   const handleFinishPractice = () => {
+    playCozySound('tap');
+    stopVoice();
     activeRequestIdRef.current++;
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
-    }
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
     }
     onCompleteTopic(topic.id);
     setIsTakeawayOpen(true);
@@ -433,6 +470,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
 
   // Save takeaway script
   const handleSaveTakeawayToProgress = () => {
+    playCozySound('tap');
     const newTakeaway: SavedTakeaway = {
       id: `takeaway-${Date.now()}`,
       topicId: topic.id,
@@ -449,12 +487,11 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
 
   // Clean exit
   const handleExitStage = () => {
+    playCozySound('tap');
+    stopVoice();
     activeRequestIdRef.current++;
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
-    }
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
     }
     onExit();
   };
@@ -569,18 +606,141 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
           </div>
         )}
 
-        {/* Prominent 3D Character Partner */}
-        <div className="w-full max-w-md flex flex-col items-center">
-          <Avatar3DRig
-            state={partnerState}
-            partnerVariant={topic.partner.avatarVariant}
-            partnerName={topic.partner.name}
-            partnerRole={topic.partner.role}
-            isHidden={hideAvatar}
-            onToggleHidden={() => setHideAvatar(!hideAvatar)}
-            className="w-full"
-          />
-        </div>
+        {/* Two-Person Conversational Stage (or Partner Focus) */}
+        {!hideAvatar ? (
+          <div className="w-full max-w-3xl flex flex-col items-center">
+            {/* Stage Bar: Two-Person vs Partner Only & Avatar Studio Link */}
+            <div className="w-full flex items-center justify-between mb-3 px-2 text-xs text-ink-muted">
+              <div className="flex items-center gap-1.5 bg-canvas-subtle p-1 rounded-xl border border-canvas-border">
+                <button
+                  onClick={() => {
+                    playCozySound('toggle');
+                    setStageMode('two-person');
+                  }}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-medium transition ${
+                    stageMode === 'two-person'
+                      ? 'bg-canvas-surface text-ink-primary shadow-2xs font-semibold'
+                      : 'text-ink-muted hover:text-ink-primary'
+                  }`}
+                >
+                  Two-Person Stage
+                </button>
+                <button
+                  onClick={() => {
+                    playCozySound('toggle');
+                    setStageMode('partner-only');
+                  }}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-medium transition ${
+                    stageMode === 'partner-only'
+                      ? 'bg-canvas-surface text-ink-primary shadow-2xs font-semibold'
+                      : 'text-ink-muted hover:text-ink-primary'
+                  }`}
+                >
+                  Partner Only
+                </button>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    playCozySound('tap');
+                    setIsAvatarStudioOpen(true);
+                  }}
+                  className="px-2.5 py-1 rounded-lg border border-canvas-border bg-canvas-surface hover:bg-canvas-subtle text-ink-secondary text-xs flex items-center gap-1.5 transition"
+                  title="Customize your avatar"
+                >
+                  <span className="w-2 h-2 rounded-full bg-teal-brand" />
+                  My avatar
+                </button>
+
+                <button
+                  onClick={() => {
+                    playCozySound('toggle');
+                    setHideAvatar(true);
+                  }}
+                  className="text-xs text-ink-muted hover:text-ink-primary underline ml-1"
+                >
+                  Text mode
+                </button>
+              </div>
+            </div>
+
+            {/* Stage Podiums */}
+            {stageMode === 'two-person' ? (
+              <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-4 items-stretch">
+                {/* Left: Partner Podium */}
+                <div className="relative rounded-2xl bg-canvas-surface border border-canvas-border p-3 shadow-2xs flex flex-col items-center">
+                  <div className="absolute top-2.5 left-3 z-10">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-canvas-subtle border border-canvas-border text-ink-secondary">
+                      Partner • {topic.partner.name}
+                    </span>
+                  </div>
+                  <Avatar3DRig
+                    state={partnerState}
+                    partnerVariant={topic.partner.avatarVariant}
+                    partnerName={topic.partner.name}
+                    partnerRole={topic.partner.role}
+                    isSpeakingAudio={isSpeakingAudio}
+                    className="w-full max-w-[220px]"
+                  />
+                  <div className="mt-1 text-center">
+                    <span className="text-xs font-medium text-ink-primary block">{topic.partner.name}</span>
+                    <span className="text-[11px] text-ink-muted block">{topic.partner.role}</span>
+                  </div>
+                </div>
+
+                {/* Right: User Avatar Podium (mirrored, inward facing) */}
+                <div className="relative rounded-2xl bg-canvas-surface border border-canvas-border p-3 shadow-2xs flex flex-col items-center">
+                  <div className="absolute top-2.5 left-3 z-10 flex items-center gap-1.5">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-teal-subtle text-teal-brand border border-teal-border">
+                      You
+                    </span>
+                  </div>
+                  <Avatar3DRig
+                    state={isLoading ? 'thinking' : userDraft.trim().length > 0 ? 'speaking' : 'listening'}
+                    customization={localUserAvatar}
+                    mirror={true}
+                    partnerName="You"
+                    partnerRole="User Avatar"
+                    className="w-full max-w-[220px]"
+                  />
+                  <div className="mt-1 text-center">
+                    <span className="text-xs font-medium text-ink-primary block">Your Presence</span>
+                    <span className="text-[11px] text-ink-muted block">
+                      {userDraft.trim().length > 0 ? 'Composing response' : 'Listening attentively'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* Single Partner View */
+              <div className="w-full max-w-md flex flex-col items-center">
+                <Avatar3DRig
+                  state={partnerState}
+                  partnerVariant={topic.partner.avatarVariant}
+                  partnerName={topic.partner.name}
+                  partnerRole={topic.partner.role}
+                  isSpeakingAudio={isSpeakingAudio}
+                  className="w-full"
+                />
+              </div>
+            )}
+          </div>
+        ) : (
+          /* Accessible Text-Only Fallback */
+          <div className="w-full max-w-md p-4 rounded-2xl bg-canvas-subtle border border-canvas-border flex items-center justify-between text-xs text-ink-secondary">
+            <span>Visual avatars hidden (Accessible text mode)</span>
+            <button
+              onClick={() => {
+                playCozySound('toggle');
+                setHideAvatar(false);
+              }}
+              className="text-teal-brand font-medium hover:underline"
+            >
+              Show 3D Avatars
+            </button>
+          </div>
+        )}
 
         {/* Latest Spoken Dialogue Card */}
         {latestPartnerTurn && (
@@ -589,6 +749,20 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-sm text-ink-primary">{topic.partner.name}</span>
                 <span className="text-xs text-ink-muted">({topic.partner.role})</span>
+                <button
+                  onClick={() => {
+                    playCozySound('toggle');
+                    toggleMute();
+                  }}
+                  className={`text-xs px-2 py-0.5 rounded-lg border transition ${
+                    isMuted
+                      ? 'bg-canvas-subtle text-ink-muted border-canvas-border'
+                      : 'bg-teal-subtle text-teal-brand border-teal-border font-medium'
+                  }`}
+                  title={isMuted ? 'Unmute partner voice' : 'Mute partner voice'}
+                >
+                  {isMuted ? '🔇 Audio muted' : '🔊 Voice active'}
+                </button>
               </div>
               {latestPartnerTurn.postureCue && (
                 <span className="text-[11px] text-ink-muted italic bg-canvas-subtle px-2 py-0.5 rounded-full border border-canvas-borderSubtle">
@@ -596,6 +770,13 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
                 </span>
               )}
             </div>
+
+            {voiceNotice && (
+              <div className="mb-2 text-[11px] text-ink-muted bg-canvas-subtle px-2.5 py-1 rounded-lg border border-canvas-border flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-topic-amber" />
+                <span>{voiceNotice}</span>
+              </div>
+            )}
 
             <p className="text-base sm:text-lg font-medium text-ink-primary leading-relaxed">
               “{latestPartnerTurn.text}”
@@ -900,6 +1081,15 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
             </div>
           </div>
         </div>
+      )}
+
+      {/* User Avatar Studio Modal */}
+      {isAvatarStudioOpen && (
+        <AvatarStudioModal
+          initialCustomization={localUserAvatar}
+          onSave={handleSaveAvatar}
+          onClose={() => setIsAvatarStudioOpen(false)}
+        />
       )}
     </div>
   );

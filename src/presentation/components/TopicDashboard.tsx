@@ -24,6 +24,7 @@ import type { UserPreferences } from './WelcomeOnboarding';
 import { TopicDetailModal } from './TopicDetailModal';
 import { MyProgress, type SavedTakeaway } from './MyProgress';
 import { MyScenarios } from './MyScenarios';
+import { playCozySound } from '../utils/cozyAudio';
 
 interface TopicDashboardProps {
   preferences: UserPreferences;
@@ -33,6 +34,7 @@ interface TopicDashboardProps {
   customScenarios?: ScenarioDefinition[];
   onStartPractice: (topic: ScenarioDefinition) => void;
   onOpenPreferences: () => void;
+  onOpenAvatarStudio?: () => void;
   onMarkExplored: (topicId: string) => void;
   onDeleteTakeaway?: (id: string) => void;
   onCreateCustomScenario?: () => void;
@@ -47,6 +49,7 @@ export const TopicDashboard: React.FC<TopicDashboardProps> = ({
   customScenarios = [],
   onStartPractice,
   onOpenPreferences,
+  onOpenAvatarStudio,
   onMarkExplored,
   onDeleteTakeaway,
   onCreateCustomScenario,
@@ -159,10 +162,27 @@ export const TopicDashboard: React.FC<TopicDashboardProps> = ({
             </button>
           </div>
 
-          {/* Right Action: Preferences */}
-          <div className="flex items-center gap-2">
+          {/* Right Action: Avatar Studio & Preferences */}
+          <div className="flex items-center gap-2.5">
+            {onOpenAvatarStudio && (
+              <button
+                onClick={() => {
+                  playCozySound('tap');
+                  onOpenAvatarStudio();
+                }}
+                className="px-3 py-1.5 rounded-xl text-xs font-medium border border-canvas-border bg-canvas-surface hover:bg-canvas-subtle text-ink-primary flex items-center gap-1.5 transition shadow-2xs focus:outline-none focus:ring-2 focus:ring-teal-brand"
+                title="Customize your avatar"
+              >
+                <span className="w-2 h-2 rounded-full bg-teal-brand" />
+                My avatar
+              </button>
+            )}
+
             <button
-              onClick={onOpenPreferences}
+              onClick={() => {
+                playCozySound('tap');
+                onOpenPreferences();
+              }}
               className="p-2 rounded-xl text-ink-muted hover:text-ink-primary hover:bg-canvas-subtle transition focus:outline-none focus:ring-2 focus:ring-teal-brand"
               aria-label="Preferences and comfort settings"
               title="Preferences"
@@ -193,7 +213,7 @@ export const TopicDashboard: React.FC<TopicDashboardProps> = ({
           <div className="space-y-12 animate-fadeIn">
             {/* Welcoming Greeting */}
             <div>
-              <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-ink-primary">
+              <h1 className="text-2xl sm:text-3xl font-display font-semibold tracking-tight text-ink-primary">
                 What would you like to explore today?
               </h1>
               <p className="text-sm text-ink-secondary mt-1 max-w-2xl">
