@@ -17,8 +17,9 @@
  */
 
 import React, { useState } from 'react';
-import { Avatar3DRig } from './Avatar3DRig';
 import { playCozySound } from '../utils/cozyAudio';
+import { EvaPresentationView } from './EvaPresentationView';
+import { EVA_PRESENTATION_CONFIGS } from '../../domain/entities/EvaScenarioPresentation';
 
 export interface UserPreferences {
   interests: string[];
@@ -206,20 +207,28 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
             </p>
           </div>
 
-          {/* Right: Tasteful 3D Partner Preview */}
+          {/* Right: Practice Partner Preview (Eva) */}
           <div className="md:col-span-5 flex flex-col items-center justify-center">
             <div className="w-full max-w-sm rounded-3xl bg-canvas-surface border border-canvas-border p-4 shadow-sm relative overflow-hidden">
               <div className="absolute top-4 left-4 z-10">
                 <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-canvas-subtle border border-canvas-border text-ink-secondary">
-                  Interactive 3D Partner
+                  Practice Partner • Eva
                 </span>
               </div>
-              <Avatar3DRig
-                state="listening"
-                partnerVariant="maya"
-                partnerName="Maya"
-                partnerRole="Friend & Practice Partner"
-              />
+              
+              {/* Eva Presentation Preview */}
+              <div className="w-full rounded-2xl overflow-hidden mt-6 mb-2">
+                <EvaPresentationView
+                  presentation={{
+                    scenarioId: 'welcome-preview',
+                    ...EVA_PRESENTATION_CONFIGS['everyday-casual'],
+                  }}
+                  partnerState="receptive"
+                  partnerName="Eva"
+                  partnerRole="Practice Partner"
+                />
+              </div>
+
               <div className="text-center pt-2 pb-1">
                 <p className="text-xs text-ink-muted">
                   Warm, expressive partner with visible nonverbal cues

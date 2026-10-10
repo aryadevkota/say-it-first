@@ -57,7 +57,7 @@ export const MyScenarios: React.FC<MyScenariosProps> = ({
             <h2 className="text-lg font-semibold text-ink-primary">No personal scenarios yet</h2>
             <p className="text-xs text-ink-muted max-w-md mx-auto mt-1 leading-relaxed">
               Have an upcoming conversation with a roommate, manager, friend, or service provider?
-              Describe the situation and we’ll prepare an adaptive 3D practice partner.
+              Describe the situation and we’ll prepare an adaptive practice partner.
             </p>
           </div>
           <button

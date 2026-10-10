@@ -119,7 +119,7 @@ export class ScenarioGenerator {
       partner: {
         name: partnerName,
         role: partnerRole,
-        avatarVariant: this.pickAvatarVariant(partnerName),
+        avatarVariant: 'eva',
         defaultTone: partnerStyle,
         initialDialogue: plausibleOpening,
       },
@@ -265,11 +265,5 @@ export class ScenarioGenerator {
     return `Conversation with your ${role}`;
   }
 
-  private static pickAvatarVariant(name: string): 'alex' | 'maya' | 'jordan' | 'sam' {
-    const lower = name.toLowerCase();
-    if (lower.includes('maya')) return 'maya';
-    if (lower.includes('jordan')) return 'jordan';
-    if (lower.includes('sam')) return 'sam';
-    return 'alex';
-  }
+  
 }

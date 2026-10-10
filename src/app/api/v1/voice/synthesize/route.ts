@@ -121,13 +121,10 @@ export async function POST(request: Request) {
       );
     }
 
-    const audioArrayBuffer = await response.arrayBuffer();
-
-    return new Response(audioArrayBuffer, {
+    return new Response(response.body, {
       status: 200,
       headers: {
         'Content-Type': 'audio/mpeg',
-        'Content-Length': audioArrayBuffer.byteLength.toString(),
         'Cache-Control': 'no-store, no-cache',
       },
     });

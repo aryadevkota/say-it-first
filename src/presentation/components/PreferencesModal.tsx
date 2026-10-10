@@ -8,7 +8,7 @@
  * - Input method (Typing vs Voice)
  * - Partner spoken audio (Browser synthesis)
  * - Motion settings (Full animation vs Reduced motion)
- * - 3D Avatar visibility (Show vs Hide 3D partner)
+ * - Partner Avatar visibility (Show vs Hide partner avatar)
  * - Data management (Clear locally saved wording)
  */
 
@@ -107,8 +107,8 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({
             {/* Hide Avatar Toggle */}
             <div className="flex items-center justify-between">
               <div>
-                <span className="text-sm font-medium text-ink-primary block">3D Partner Avatar</span>
-                <span className="text-xs text-ink-muted">Display animated dimensional 3D character</span>
+                <span className="text-sm font-medium text-ink-primary block">Partner Avatar</span>
+                <span className="text-xs text-ink-muted">Display realistic conversational practice partner (Eva)</span>
               </div>
               <button
                 onClick={() =>

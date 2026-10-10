@@ -46,7 +46,7 @@ export interface LearningIdea {
 export interface PracticePartner {
   name: string;
   role: string;
-  avatarVariant: 'alex' | 'maya' | 'jordan' | 'sam';
+  avatarVariant: 'eva';
   defaultTone: string;
   initialDialogue: string;
 }
@@ -96,9 +96,9 @@ export const TOPICS: ScenarioDefinition[] = [
       },
     },
     partner: {
-      name: 'Alex',
+      name: 'Eva',
       role: 'Project Lead',
-      avatarVariant: 'alex',
+      avatarVariant: 'eva',
       defaultTone: 'Direct, fast-paced, balancing several deadlines',
       initialDialogue:
         "Hey, thanks for jumping on. Like we just talked through, I need you to push that update before end of day. Any questions before we wrap up?",
@@ -134,9 +134,9 @@ export const TOPICS: ScenarioDefinition[] = [
       },
     },
     partner: {
-      name: 'Maya',
+      name: 'Eva',
       role: 'Close Friend',
-      avatarVariant: 'maya',
+      avatarVariant: 'eva',
       defaultTone: 'Warm, enthusiastic, loves lively social outings',
       initialDialogue:
         "I'm so excited for Friday! I was thinking we could check out that new rooftop lounge downtown—it gets super packed with music, which sounded like so much fun!",
@@ -172,9 +172,9 @@ export const TOPICS: ScenarioDefinition[] = [
       },
     },
     partner: {
-      name: 'Jordan',
+      name: 'Eva',
       role: 'Community Organizer',
-      avatarVariant: 'jordan',
+      avatarVariant: 'eva',
       defaultTone: 'Optimistic, eager to find volunteers, persuasive',
       initialDialogue:
         "Hey! We're putting together the weekend volunteer shift and we really need one more person to lead the registration desk. Could you take Saturday morning?",
@@ -206,13 +206,13 @@ export const TOPICS: ScenarioDefinition[] = [
       ],
       examplePhrases: {
         gentle: 'Morning! How is your week shaping up with that new project launch?',
-        direct: 'Hey Sam, good to see you. Did you get a chance to finish that report yesterday?',
+        direct: 'Hey Eva, good to see you. Did you get a chance to finish that report yesterday?',
       },
     },
     partner: {
-      name: 'Sam',
+      name: 'Eva',
       role: 'Teammate / Neighbor',
-      avatarVariant: 'sam',
+      avatarVariant: 'eva',
       defaultTone: 'Casual, friendly, approachable',
       initialDialogue:
         "Morning! How's your week going so far? Seems like everyone is rushing around today.",
@@ -247,9 +247,9 @@ export const TOPICS: ScenarioDefinition[] = [
       },
     },
     partner: {
-      name: 'Morgan',
+      name: 'Eva',
       role: 'Meetup Participant',
-      avatarVariant: 'sam',
+      avatarVariant: 'eva',
       defaultTone: 'Engaged, conversing in a small circle',
       initialDialogue:
         "...and that's when we realized the whole schedule had to shift! Oh, hi there! Were you looking to join the discussion?",
@@ -284,9 +284,9 @@ export const TOPICS: ScenarioDefinition[] = [
       },
     },
     partner: {
-      name: 'Dr. Taylor',
+      name: 'Eva',
       role: 'Specialist',
-      avatarVariant: 'alex',
+      avatarVariant: 'eva',
       defaultTone: 'Professional, brisk, highly informational',
       initialDialogue:
         "Alright, so you'll take this dosage twice daily with meals, schedule the follow-up panel in 3 weeks, and check in if you notice any changes. Sound good?",

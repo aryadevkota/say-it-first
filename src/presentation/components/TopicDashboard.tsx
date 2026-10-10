@@ -33,9 +33,7 @@ interface TopicDashboardProps {
   activeTopicId?: string;
   customScenarios?: ScenarioDefinition[];
   onStartPractice: (topic: ScenarioDefinition) => void;
-  onOpenPreferences: () => void;
-  onOpenAvatarStudio?: () => void;
-  onMarkExplored: (topicId: string) => void;
+  onOpenPreferences: () => void;  onMarkExplored: (topicId: string) => void;
   onDeleteTakeaway?: (id: string) => void;
   onCreateCustomScenario?: () => void;
   onDeleteCustomScenario?: (id: string) => void;
@@ -48,9 +46,7 @@ export const TopicDashboard: React.FC<TopicDashboardProps> = ({
   activeTopicId,
   customScenarios = [],
   onStartPractice,
-  onOpenPreferences,
-  onOpenAvatarStudio,
-  onMarkExplored,
+  onOpenPreferences,  onMarkExplored,
   onDeleteTakeaway,
   onCreateCustomScenario,
   onDeleteCustomScenario,
@@ -162,22 +158,8 @@ export const TopicDashboard: React.FC<TopicDashboardProps> = ({
             </button>
           </div>
 
-          {/* Right Action: Avatar Studio & Preferences */}
+          {/* Right Action: Preferences */}
           <div className="flex items-center gap-2.5">
-            {onOpenAvatarStudio && (
-              <button
-                onClick={() => {
-                  playCozySound('tap');
-                  onOpenAvatarStudio();
-                }}
-                className="px-3 py-1.5 rounded-xl text-xs font-medium border border-canvas-border bg-canvas-surface hover:bg-canvas-subtle text-ink-primary flex items-center gap-1.5 transition shadow-2xs focus:outline-none focus:ring-2 focus:ring-teal-brand"
-                title="Customize your avatar"
-              >
-                <span className="w-2 h-2 rounded-full bg-teal-brand" />
-                My avatar
-              </button>
-            )}
-
             <button
               onClick={() => {
                 playCozySound('tap');
@@ -259,7 +241,7 @@ export const TopicDashboard: React.FC<TopicDashboardProps> = ({
                   Have a specific conversation in mind?
                 </h2>
                 <p className="text-xs text-ink-secondary mt-0.5 max-w-xl">
-                  Paste a situation or upload notes (.txt, .md, .json) to prepare an adaptive 3D practice partner with customized boundaries and goals.
+                  Paste a situation or upload notes (.txt, .md, .json) to prepare an adaptive practice partner with customized boundaries and goals.
                 </p>
               </div>
               <button

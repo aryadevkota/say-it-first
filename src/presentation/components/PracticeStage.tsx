@@ -4,7 +4,7 @@
  * PracticeStage.tsx — Focused Conversational Practice Stage
  *
  * Implements:
- * - Prominent 3D Conversation Partner (Avatar3DRig) with dynamic states
+ * - Realistic practice partner Eva (EvaLiveAvatar) with scenario-adaptive presentation and dynamic states
  * - Readable spoken dialogue captions
  * - Accessible user goal summary & scenario context
  * - Clean response dock (typing + optional voice input)
@@ -18,17 +18,14 @@
  * - Per-version draft preservation & clean audio cancellation
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import type { ScenarioDefinition } from '../../domain/scenarios/topics';
+import { getEvaPresentationForScenario } from '../../domain/entities/EvaScenarioPresentation';
+import { EvaLiveAvatar } from './EvaLiveAvatar';
 import type { UserPreferences } from './WelcomeOnboarding';
-import { Avatar3DRig, type AvatarState } from './Avatar3DRig';
+type AvatarState = 'listening' | 'speaking' | 'thinking' | 'neutral' | 'receptive';
 import type { SavedTakeaway } from './MyProgress';
 import { usePartnerVoice } from '../hooks/usePartnerVoice';
-import { AvatarStudioModal } from './AvatarStudioModal';
-import {
-  type AvatarCustomization,
-  DEFAULT_USER_AVATAR,
-} from '../../domain/entities/AvatarCustomization';
 import { playCozySound } from '../utils/cozyAudio';
 
 interface TurnMessage {
@@ -52,20 +49,14 @@ interface AttemptBranch {
 
 interface PracticeStageProps {
   topic: ScenarioDefinition;
-  preferences: UserPreferences;
-  userAvatar?: AvatarCustomization;
-  onUpdateUserAvatar?: (customization: AvatarCustomization) => void;
-  onExit: () => void;
+  preferences: UserPreferences;  onExit: () => void;
   onSaveTakeaway: (takeaway: SavedTakeaway) => void;
   onCompleteTopic: (topicId: string) => void;
 }
 
 export const PracticeStage: React.FC<PracticeStageProps> = ({
   topic,
-  preferences,
-  userAvatar = DEFAULT_USER_AVATAR,
-  onUpdateUserAvatar,
-  onExit,
+  preferences,  onExit,
   onSaveTakeaway,
   onCompleteTopic,
 }) => {
@@ -88,9 +79,10 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
   const [activeAttemptIndex, setActiveAttemptIndex] = useState<number>(0);
   const [draftsByAttempt, setDraftsByAttempt] = useState<Record<string, string>>({});
 
-  // Character state
+  // Character state & scenario presentation
   const [partnerState, setPartnerState] = useState<AvatarState>('listening');
   const [hideAvatar, setHideAvatar] = useState<boolean>(preferences.hideAvatar);
+  const evaPresentation = useMemo(() => getEvaPresentationForScenario(topic), [topic]);
 
   // Response input draft & state
   const [userDraft, setUserDraft] = useState<string>('');
@@ -125,26 +117,6 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   // Two-person stage & user avatar customization
-  const [stageMode, setStageMode] = useState<'two-person' | 'partner-only'>('two-person');
-  const [localUserAvatar, setLocalUserAvatar] = useState<AvatarCustomization>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const stored = localStorage.getItem('say_it_first_user_avatar');
-        if (stored) return JSON.parse(stored);
-      } catch {}
-    }
-    return userAvatar;
-  });
-
-  // Sync user avatar changes from parent state or studio modal
-  useEffect(() => {
-    if (userAvatar) {
-      setLocalUserAvatar(userAvatar);
-    }
-  }, [userAvatar]);
-
-  const [isAvatarStudioOpen, setIsAvatarStudioOpen] = useState<boolean>(false);
-
   // ElevenLabs Voice Hook
   const {
     isPlaying: isSpeakingAudio,
@@ -155,17 +127,17 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
     stop: stopVoice,
   } = usePartnerVoice({
     allowBrowserSpeechFallback: preferences.spokenPartnerAudio,
+    onPlaybackStateChange: (isPlaying) => {
+      setPartnerState(isPlaying ? 'speaking' : 'receptive');
+    },
   });
-
-  const handleSaveAvatar = (customization: AvatarCustomization) => {
-    setLocalUserAvatar(customization);
-    onUpdateUserAvatar?.(customization);
-  };
 
   const activeBranch = attempts[activeAttemptIndex] || attempts[0];
   const latestPartnerTurn = [...activeBranch.turns]
     .reverse()
     .find((t) => t.role === 'partner');
+
+  const lastSpokenTurnIdRef = useRef<string | null>(null);
 
   // Cancel any audio & in-flight requests on unmount
   useEffect(() => {
@@ -180,10 +152,16 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
 
   // Partner speech synthesis when latest partner turn changes
   useEffect(() => {
-    if (preferences.spokenPartnerAudio && latestPartnerTurn?.text) {
+    if (
+      preferences.spokenPartnerAudio &&
+      latestPartnerTurn?.id &&
+      latestPartnerTurn.text &&
+      lastSpokenTurnIdRef.current !== latestPartnerTurn.id
+    ) {
+      lastSpokenTurnIdRef.current = latestPartnerTurn.id;
       speakVoice(latestPartnerTurn.text);
     }
-  }, [latestPartnerTurn?.id, preferences.spokenPartnerAudio, speakVoice]);
+  }, [latestPartnerTurn?.id, latestPartnerTurn?.text, preferences.spokenPartnerAudio, speakVoice]);
 
   // Handle submitting a turn to API
   const handleSubmitTurn = async (e?: React.FormEvent) => {
@@ -299,15 +277,12 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
         suggestedWording: data.pivot_recommendation?.suggested_wording || '',
       };
 
-      setPartnerState('speaking');
-      if (partnerTurn.text) {
+      if (partnerTurn.text && preferences.spokenPartnerAudio) {
+        lastSpokenTurnIdRef.current = partnerTurn.id;
         speakVoice(partnerTurn.text);
+      } else {
+        setPartnerState('receptive');
       }
-      setTimeout(() => {
-        if (requestId === activeRequestIdRef.current) {
-          setPartnerState('receptive');
-        }
-      }, 3500);
 
       // Append partner turn to the specific attempt branch that made the request
       setAttempts((prev) => {
@@ -614,138 +589,35 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
           </div>
         )}
 
-        {/* Two-Person Conversational Stage (or Partner Focus) */}
+        {/* Eva Live Avatar Presentation */}
         {!hideAvatar ? (
           <div className="w-full max-w-3xl flex flex-col items-center">
-            {/* Stage Bar: Two-Person vs Partner Only & Avatar Studio Link */}
-            <div className="w-full flex items-center justify-between mb-3 px-2 text-xs text-ink-muted">
-              <div className="flex items-center gap-1.5 bg-canvas-subtle p-1 rounded-xl border border-canvas-border">
-                <button
-                  onClick={() => {
-                    playCozySound('toggle');
-                    setStageMode('two-person');
-                  }}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-medium transition ${
-                    stageMode === 'two-person'
-                      ? 'bg-canvas-surface text-ink-primary shadow-2xs font-semibold'
-                      : 'text-ink-muted hover:text-ink-primary'
-                  }`}
-                >
-                  Two-Person Stage
-                </button>
-                <button
-                  onClick={() => {
-                    playCozySound('toggle');
-                    setStageMode('partner-only');
-                  }}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-medium transition ${
-                    stageMode === 'partner-only'
-                      ? 'bg-canvas-surface text-ink-primary shadow-2xs font-semibold'
-                      : 'text-ink-muted hover:text-ink-primary'
-                  }`}
-                >
-                  Partner Only
-                </button>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => {
-                    playCozySound('tap');
-                    setIsAvatarStudioOpen(true);
-                  }}
-                  className="px-2.5 py-1 rounded-lg border border-canvas-border bg-canvas-surface hover:bg-canvas-subtle text-ink-secondary text-xs flex items-center gap-1.5 transition"
-                  title="Customize your avatar"
-                >
-                  <span className="w-2 h-2 rounded-full bg-teal-brand" />
-                  My avatar
-                </button>
-
-                <button
-                  onClick={() => {
-                    playCozySound('toggle');
-                    setHideAvatar(true);
-                  }}
-                  className="text-xs text-ink-muted hover:text-ink-primary underline ml-1"
-                >
-                  Text mode
-                </button>
-              </div>
-            </div>
-
-            {/* Stage Podiums */}
-            {stageMode === 'two-person' ? (
-              <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-4 items-stretch">
-                {/* Left: Partner Podium */}
-                <div className="relative rounded-2xl bg-canvas-surface border border-canvas-border p-3 shadow-2xs flex flex-col items-center">
-                  <div className="absolute top-2.5 left-3 z-10">
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-canvas-subtle border border-canvas-border text-ink-secondary">
-                      Partner • {topic.partner.name}
-                    </span>
-                  </div>
-                  <Avatar3DRig
-                    state={partnerState}
-                    partnerVariant={topic.partner.avatarVariant}
-                    partnerName={topic.partner.name}
-                    partnerRole={topic.partner.role}
-                    isSpeakingAudio={isSpeakingAudio}
-                    className="w-full max-w-[220px]"
-                  />
-                  <div className="mt-1 text-center">
-                    <span className="text-xs font-medium text-ink-primary block">{topic.partner.name}</span>
-                    <span className="text-[11px] text-ink-muted block">{topic.partner.role}</span>
-                  </div>
-                </div>
-
-                {/* Right: User Avatar Podium (mirrored, inward facing) */}
-                <div className="relative rounded-2xl bg-canvas-surface border border-canvas-border p-3 shadow-2xs flex flex-col items-center">
-                  <div className="absolute top-2.5 left-3 z-10 flex items-center gap-1.5">
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-teal-subtle text-teal-brand border border-teal-border">
-                      You
-                    </span>
-                  </div>
-                  <Avatar3DRig
-                    state={isLoading ? 'thinking' : userDraft.trim().length > 0 ? 'speaking' : 'listening'}
-                    customization={localUserAvatar}
-                    mirror={true}
-                    partnerName="You"
-                    partnerRole="User Avatar"
-                    className="w-full max-w-[220px]"
-                  />
-                  <div className="mt-1 text-center">
-                    <span className="text-xs font-medium text-ink-primary block">Your Presence</span>
-                    <span className="text-[11px] text-ink-muted block">
-                      {userDraft.trim().length > 0 ? 'Composing response' : 'Listening attentively'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              /* Single Partner View */
-              <div className="w-full max-w-md flex flex-col items-center">
-                <Avatar3DRig
-                  state={partnerState}
-                  partnerVariant={topic.partner.avatarVariant}
-                  partnerName={topic.partner.name}
-                  partnerRole={topic.partner.role}
-                  isSpeakingAudio={isSpeakingAudio}
-                  className="w-full"
-                />
-              </div>
-            )}
+            <EvaLiveAvatar
+              presentation={evaPresentation}
+              partnerState={partnerState}
+              isSpeakingAudio={isSpeakingAudio}
+              isMuted={isMuted}
+              onToggleMute={toggleMute}
+              onToggleTextMode={() => setHideAvatar(true)}
+              className="w-full"
+            />
           </div>
         ) : (
           /* Accessible Text-Only Fallback */
           <div className="w-full max-w-md p-4 rounded-2xl bg-canvas-subtle border border-canvas-border flex items-center justify-between text-xs text-ink-secondary">
-            <span>Visual avatars hidden (Accessible text mode)</span>
+            <div className="flex flex-col gap-0.5">
+              <span>Visual avatar hidden (Accessible text mode)</span>
+              <span className="text-[11px] text-ink-muted">
+                {evaPresentation.visualSummary}
+              </span>
+            </div>
             <button
               onClick={() => {
-                playCozySound('toggle');
                 setHideAvatar(false);
               }}
               className="text-teal-brand font-medium hover:underline"
             >
-              Show 3D Avatars
+              Show Avatar
             </button>
           </div>
         )}
@@ -1091,14 +963,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
         </div>
       )}
 
-      {/* User Avatar Studio Modal */}
-      {isAvatarStudioOpen && (
-        <AvatarStudioModal
-          initialCustomization={localUserAvatar}
-          onSave={handleSaveAvatar}
-          onClose={() => setIsAvatarStudioOpen(false)}
-        />
-      )}
+
     </div>
   );
 };

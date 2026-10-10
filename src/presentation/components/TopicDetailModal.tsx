@@ -11,8 +11,9 @@
  * - Honest preview state for upcoming topics
  */
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import type { ScenarioDefinition } from '../../domain/scenarios/topics';
+import { getEvaPresentationForScenario } from '../../domain/entities/EvaScenarioPresentation';
 
 interface TopicDetailModalProps {
   topic: ScenarioDefinition;
@@ -28,6 +29,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
   onMarkExplored,
 }) => {
   const [activeTab, setActiveTab] = useState<'learn' | 'partner'>('learn');
+  const evaPresentation = useMemo(() => getEvaPresentationForScenario(topic), [topic]);
 
   const handleStartPractice = () => {
     if (onMarkExplored) {
@@ -175,6 +177,9 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                   <h3 className="font-semibold text-ink-primary text-base">{topic.partner.name}</h3>
                   <p className="text-xs text-ink-muted">{topic.partner.role}</p>
                   <p className="text-xs text-ink-secondary mt-1">{topic.partner.defaultTone}</p>
+                  <span className="inline-block mt-2 px-2.5 py-0.5 rounded-full text-[11px] bg-canvas-surface border border-canvas-border text-teal-brand font-medium">
+                    {evaPresentation.visualSummary}
+                  </span>
                 </div>
               </div>
 
