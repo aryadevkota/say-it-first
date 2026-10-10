@@ -14,6 +14,8 @@
  * - Calm pause modal & optional co-regulation
  * - "Words to take with you" takeaways screen with editable 2-sentence pocket script
  * - Zero radars, emotion charts, VAD meters, or clinical readouts
+ * - Race-condition prevention (aborts late in-flight responses on reset/exit/switch)
+ * - Per-version draft preservation & clean audio cancellation
  */
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -73,6 +75,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
     },
   ]);
   const [activeAttemptIndex, setActiveAttemptIndex] = useState<number>(0);
+  const [draftsByAttempt, setDraftsByAttempt] = useState<Record<string, string>>({});
 
   // Character state
   const [partnerState, setPartnerState] = useState<AvatarState>('listening');
@@ -105,11 +108,28 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
   // Voice recording simulation / browser speech
   const [isRecording, setIsRecording] = useState<boolean>(false);
 
+  // Race condition & cancellation refs
+  const activeRequestIdRef = useRef<number>(0);
+  const abortControllerRef = useRef<AbortController | null>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
   const activeBranch = attempts[activeAttemptIndex] || attempts[0];
   const latestPartnerTurn = [...activeBranch.turns]
     .reverse()
     .find((t) => t.role === 'partner');
+
+  // Cancel any audio & in-flight requests on unmount
+  useEffect(() => {
+    return () => {
+      activeRequestIdRef.current++;
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
 
   // Partner speech synthesis if enabled in preferences
   useEffect(() => {
@@ -130,6 +150,17 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
     const trimmedInput = userDraft.trim();
     if (!trimmedInput || isLoading) return;
 
+    const currentAttemptId = activeBranch.id;
+    const currentAttemptIdx = activeAttemptIndex;
+
+    // Track request ID and abort controller
+    const requestId = ++activeRequestIdRef.current;
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     const userTurnId = `user-${Date.now()}`;
     const newUserTurn: TurnMessage = {
       id: userTurnId,
@@ -139,13 +170,19 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
 
     // Optimistically append user turn and clear draft
     const updatedTurns = [...activeBranch.turns, newUserTurn];
-    const updatedAttempts = [...attempts];
-    updatedAttempts[activeAttemptIndex] = {
-      ...activeBranch,
-      turns: updatedTurns,
-    };
-    setAttempts(updatedAttempts);
+    setAttempts((prev) => {
+      const copy = [...prev];
+      if (copy[currentAttemptIdx]) {
+        copy[currentAttemptIdx] = {
+          ...copy[currentAttemptIdx],
+          turns: updatedTurns,
+        };
+      }
+      return copy;
+    });
+
     setUserDraft('');
+    setDraftsByAttempt((prev) => ({ ...prev, [currentAttemptId]: '' }));
     setIsLoading(true);
     setErrorMessage(null);
     setPartnerState('thinking');
@@ -154,6 +191,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
       const response = await fetch('/api/v1/conversation/turn', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
         body: JSON.stringify({
           scenario_id: topic.id,
           active_branch_id: activeBranch.id,
@@ -172,14 +210,36 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
             arousal: 0.05,
             dominance: 0.0,
           },
+          history: updatedTurns.map((t) => ({
+            role: t.role,
+            content: t.text,
+          })),
+          custom_scenario: topic.customMetadata
+            ? {
+                situation: topic.customMetadata.userProvidedSituation,
+                partner_role: topic.partner.role,
+                partner_name: topic.partner.name,
+                user_goal: topic.userGoal,
+                constraints: topic.customMetadata.avoidConstraints,
+              }
+            : undefined,
         }),
       });
+
+      // Discard response if cancelled or user changed attempt/reset
+      if (requestId !== activeRequestIdRef.current || controller.signal.aborted) {
+        return;
+      }
 
       if (!response.ok) {
         throw new Error(`Inference returned status ${response.status}`);
       }
 
       const data = await response.json();
+
+      if (requestId !== activeRequestIdRef.current || controller.signal.aborted) {
+        return;
+      }
 
       // Partner response
       const partnerTurn: TurnMessage = {
@@ -195,26 +255,34 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
         suggestedWording: data.pivot_recommendation?.suggested_wording || '',
       };
 
-      // Set partner state to speaking
       setPartnerState('speaking');
       setTimeout(() => {
-        setPartnerState('receptive');
+        if (requestId === activeRequestIdRef.current) {
+          setPartnerState('receptive');
+        }
       }, 3500);
 
-      // Append partner turn
-      const finalTurns = [...updatedTurns, partnerTurn];
-      const finalAttempts = [...attempts];
-      finalAttempts[activeAttemptIndex] = {
-        ...activeBranch,
-        turns: finalTurns,
-      };
-      setAttempts(finalAttempts);
+      // Append partner turn to the specific attempt branch that made the request
+      setAttempts((prev) => {
+        const copy = [...prev];
+        if (copy[currentAttemptIdx]) {
+          copy[currentAttemptIdx] = {
+            ...copy[currentAttemptIdx],
+            turns: [...copy[currentAttemptIdx].turns, partnerTurn],
+          };
+        }
+        return copy;
+      });
 
-      // Auto update takeaway suggestion if provided
       if (data.pivot_recommendation?.suggested_wording) {
         setEditableTakeaway(data.pivot_recommendation.suggested_wording);
       }
     } catch (err: unknown) {
+      if (controller.signal.aborted || (err as any)?.name === 'AbortError') {
+        return;
+      }
+      if (requestId !== activeRequestIdRef.current) return;
+
       // Preserve draft on failure so user never loses their work
       setUserDraft(trimmedInput);
       setPartnerState('neutral');
@@ -222,12 +290,56 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
         'Could not reach the conversational partner right now. Your draft has been preserved.',
       );
     } finally {
-      setIsLoading(false);
+      if (requestId === activeRequestIdRef.current) {
+        setIsLoading(false);
+      }
+    }
+  };
+
+  // Switch between versions while saving drafts and canceling in-flight calls
+  const handleSwitchAttempt = (targetIndex: number) => {
+    if (targetIndex === activeAttemptIndex) return;
+
+    activeRequestIdRef.current++;
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    setIsLoading(false);
+
+    // Save draft for current attempt
+    setDraftsByAttempt((prev) => ({
+      ...prev,
+      [activeBranch.id]: userDraft,
+    }));
+
+    // Restore draft for target attempt
+    const targetBranch = attempts[targetIndex];
+    setUserDraft(draftsByAttempt[targetBranch.id] || '');
+    setActiveAttemptIndex(targetIndex);
+    setPartnerState('listening');
+    setErrorMessage(null);
+
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
     }
   };
 
   // Branch a non-destructive new version ("Try another version")
   const handleTryAnotherVersion = () => {
+    activeRequestIdRef.current++;
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    setIsLoading(false);
+
+    // Save current draft
+    setDraftsByAttempt((prev) => ({
+      ...prev,
+      [activeBranch.id]: userDraft,
+    }));
+
     const nextVersionNumber = attempts.length + 1;
     const newAttempt: AttemptBranch = {
       id: `version-${nextVersionNumber}`,
@@ -243,11 +355,15 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
       ],
     };
 
-    setAttempts([...attempts, newAttempt]);
+    setAttempts((prev) => [...prev, newAttempt]);
     setActiveAttemptIndex(attempts.length);
     setUserDraft('');
     setPartnerState('listening');
     setErrorMessage(null);
+
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
   };
 
   // Speech to text toggle (Web Speech API)
@@ -304,6 +420,10 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
 
   // Finish practice session and show takeaways
   const handleFinishPractice = () => {
+    activeRequestIdRef.current++;
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       window.speechSynthesis.cancel();
     }
@@ -327,6 +447,18 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
     setTakeawaySaved(true);
   };
 
+  // Clean exit
+  const handleExitStage = () => {
+    activeRequestIdRef.current++;
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+    onExit();
+  };
+
   return (
     <div className="min-h-screen bg-canvas-light text-ink-primary flex flex-col justify-between">
       {/* Top Stage Bar */}
@@ -335,7 +467,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
           {/* Back & Title */}
           <div className="flex items-center gap-3">
             <button
-              onClick={onExit}
+              onClick={handleExitStage}
               className="text-xs font-medium text-ink-muted hover:text-ink-primary px-2.5 py-1.5 rounded-lg hover:bg-canvas-subtle transition"
             >
               ← Back to dashboard
@@ -359,7 +491,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
                 {attempts.map((att, idx) => (
                   <button
                     key={att.id}
-                    onClick={() => setActiveAttemptIndex(idx)}
+                    onClick={() => handleSwitchAttempt(idx)}
                     className={`px-2.5 py-1 rounded-lg text-xs font-medium transition ${
                       activeAttemptIndex === idx
                         ? 'bg-canvas-surface text-ink-primary shadow-2xs font-semibold'
@@ -408,7 +540,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
             onClick={() => setShowHistoryDrawer(!showHistoryDrawer)}
             className="text-xs text-ink-muted hover:text-ink-primary underline ml-4 shrink-0"
           >
-            {showHistoryDrawer ? 'Hide full history' : `View full dialogue (${activeBranch.turns.length})`}
+            {showHistoryDrawer ? 'Hide dialogue transcript' : `View full dialogue (${activeBranch.turns.length})`}
           </button>
         </div>
       </div>
@@ -553,7 +685,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
                 </div>
               )}
 
-              {/* Optional Suggestion Phrasing */}
+              {/* Optional Suggestion Phrasing (Purely optional, never auto-submits) */}
               {latestPartnerTurn.suggestedWording && (
                 <div className="p-3 rounded-xl bg-teal-subtle/50 border border-teal-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                   <div>
@@ -582,7 +714,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
         <div className="max-w-2xl mx-auto flex flex-col gap-2">
           {/* Action Row */}
           <div className="flex items-center justify-between text-xs text-ink-muted">
-            <span>Type or speak your turn below</span>
+            <span>Respond in your own words (Text or Speech)</span>
             <button
               onClick={handleTryAnotherVersion}
               className="text-teal-brand hover:underline font-medium"
@@ -688,7 +820,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
               </button>
 
               <button
-                onClick={onExit}
+                onClick={handleExitStage}
                 className="w-full py-2 text-xs text-ink-muted hover:text-ink-primary transition"
               >
                 Exit to dashboard
@@ -760,7 +892,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
               </div>
 
               <button
-                onClick={onExit}
+                onClick={handleExitStage}
                 className="w-full py-3 rounded-xl bg-teal-brand text-canvas-surface text-sm font-medium hover:bg-teal-hover transition shadow-xs text-center"
               >
                 Return to dashboard

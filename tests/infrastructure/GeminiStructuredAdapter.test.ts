@@ -93,4 +93,67 @@ describe('GeminiStructuredAdapter', () => {
     expect(result.emotionalDelta.valence).toBeCloseTo(-0.42);
     expect(result.emotionalDelta.arousal).toBeCloseTo(0.51);
   });
+
+  it('adapts to custom scenario context and user text dynamically', async () => {
+    const adapter = new GeminiStructuredAdapter();
+    const result = await adapter.inferTurn({
+      scenarioId: 'custom-roommate-noise-123',
+      activeBranchId: 'main',
+      parentTurnId: null,
+      history: [],
+      userInput: {
+        text: 'Hey Alex, could we agree on keeping music to headphones after 10 PM?',
+        inputMode: 'text',
+      },
+      customScenario: {
+        id: 'custom-roommate-noise-123',
+        partner: {
+          name: 'Alex',
+          role: 'Roommate',
+          concerns: 'Felt defensive about previous noise complaints',
+        },
+      },
+      currentVad: dummyVad,
+    });
+
+    expect(result.spokenResponse).toBeTruthy();
+    expect(result.spokenResponse).not.toContain('recap emails');
+    expect(result.twoWayBridge.userIntent).toBeTruthy();
+  });
+
+  it('recognizes verbal hesitation without defensive escalation', async () => {
+    const adapter = new GeminiStructuredAdapter();
+    const result = await adapter.inferTurn({
+      scenarioId: 'custom-hesitation-456',
+      activeBranchId: 'main',
+      parentTurnId: null,
+      history: [],
+      userInput: {
+        text: "I don't know how to put this, but things have felt a bit overwhelming lately.",
+        inputMode: 'text',
+      },
+      currentVad: dummyVad,
+    });
+
+    expect(result.spokenResponse).toContain('Take your time');
+    expect(result.twoWayBridge.userIntent).toContain('processing pause');
+  });
+
+  it('respects user boundaries without demanding compromise', async () => {
+    const adapter = new GeminiStructuredAdapter();
+    const result = await adapter.inferTurn({
+      scenarioId: 'work-boundaries',
+      activeBranchId: 'main',
+      parentTurnId: null,
+      history: [],
+      userInput: {
+        text: "I can't take on this extra project right now.",
+        inputMode: 'text',
+      },
+      currentVad: dummyVad,
+    });
+
+    expect(result.spokenResponse).toBeTruthy();
+    expect(result.twoWayBridge.userIntent).toContain('Self-advocacy');
+  });
 });

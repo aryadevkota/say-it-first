@@ -260,19 +260,31 @@ export const Avatar3DRig: React.FC<Avatar3DRigProps> = ({
     headMesh.scale.set(1.0, 1.08, 0.96);
     headGroup.add(headMesh);
 
-    // Stylized Hair Cap
-    const hairGeo = new THREE.SphereGeometry(0.49, 32, 32, 0, Math.PI * 2, 0, Math.PI * 0.58);
+    // Stylized Hair Cap (Cleanly situated at crown & back of head, stopping well above forehead)
+    const hairGeo = new THREE.SphereGeometry(0.48, 32, 32, 0, Math.PI * 2, 0, Math.PI * 0.42);
     const hairMesh = new THREE.Mesh(hairGeo, hairMaterial);
-    hairMesh.rotation.x = -0.15;
-    hairMesh.position.set(0, 0.08, -0.02);
+    hairMesh.rotation.x = -0.28;
+    hairMesh.position.set(0, 0.08, -0.06);
     headGroup.add(hairMesh);
 
-    // Friendly hair volume front
-    const hairFrontGeo = new THREE.CapsuleGeometry(0.14, 0.44, 8, 16);
-    const hairFrontMesh = new THREE.Mesh(hairFrontGeo, hairMaterial);
-    hairFrontMesh.rotation.z = Math.PI / 2.3;
-    hairFrontMesh.position.set(0, 0.48, 0.22);
-    headGroup.add(hairFrontMesh);
+    // Styled hair volume on crown (resting cleanly above forehead without dipping down)
+    const hairTopGeo = new THREE.CapsuleGeometry(0.08, 0.36, 8, 16);
+    const hairTopMesh = new THREE.Mesh(hairTopGeo, hairMaterial);
+    hairTopMesh.rotation.z = Math.PI / 2;
+    hairTopMesh.position.set(0, 0.49, 0.12);
+    headGroup.add(hairTopMesh);
+
+    // Subtle side volume at temples (frames face without obscuring eyes or brows)
+    const templeGeo = new THREE.CapsuleGeometry(0.06, 0.22, 6, 12);
+    const leftTemple = new THREE.Mesh(templeGeo, hairMaterial);
+    leftTemple.position.set(-0.38, 0.16, 0.06);
+    leftTemple.rotation.z = -0.15;
+    headGroup.add(leftTemple);
+
+    const rightTemple = new THREE.Mesh(templeGeo, hairMaterial);
+    rightTemple.position.set(0.38, 0.16, 0.06);
+    rightTemple.rotation.z = 0.15;
+    headGroup.add(rightTemple);
 
     // Friendly dimensional nose
     const noseGeo = new THREE.ConeGeometry(0.065, 0.12, 16);
@@ -299,24 +311,24 @@ export const Avatar3DRig: React.FC<Avatar3DRigProps> = ({
     rightCheek.rotation.y = 0.35;
     headGroup.add(rightCheek);
 
-    // Expressive Eyes
+    // Expressive Eyes (Cleanly positioned forward for high readability)
     const eyeGeo = new THREE.SphereGeometry(0.065, 20, 20);
     const leftEyeMesh = new THREE.Mesh(eyeGeo, eyeMaterial);
-    leftEyeMesh.position.set(-0.16, 0.08, 0.42);
+    leftEyeMesh.position.set(-0.16, 0.08, 0.44);
     headGroup.add(leftEyeMesh);
 
     const rightEyeMesh = new THREE.Mesh(eyeGeo, eyeMaterial);
-    rightEyeMesh.position.set(0.16, 0.08, 0.42);
+    rightEyeMesh.position.set(0.16, 0.08, 0.44);
     headGroup.add(rightEyeMesh);
 
     // Friendly Eye catchlights (highlights)
     const highlightGeo = new THREE.SphereGeometry(0.02, 12, 12);
     const leftHighlight = new THREE.Mesh(highlightGeo, eyeHighlightMaterial);
-    leftHighlight.position.set(-0.145, 0.1, 0.47);
+    leftHighlight.position.set(-0.145, 0.1, 0.49);
     headGroup.add(leftHighlight);
 
     const rightHighlight = new THREE.Mesh(highlightGeo, eyeHighlightMaterial);
-    rightHighlight.position.set(0.175, 0.1, 0.47);
+    rightHighlight.position.set(0.175, 0.1, 0.49);
     headGroup.add(rightHighlight);
 
     // Expressive Eyebrows
@@ -324,12 +336,12 @@ export const Avatar3DRig: React.FC<Avatar3DRigProps> = ({
 
     const leftBrowMesh = new THREE.Mesh(browGeo, browMaterial);
     leftBrowMesh.rotation.z = Math.PI / 2.15;
-    leftBrowMesh.position.set(-0.16, 0.22, 0.43);
+    leftBrowMesh.position.set(-0.16, 0.23, 0.45);
     headGroup.add(leftBrowMesh);
 
     const rightBrowMesh = new THREE.Mesh(browGeo, browMaterial);
     rightBrowMesh.rotation.z = -Math.PI / 2.15;
-    rightBrowMesh.position.set(0.16, 0.22, 0.43);
+    rightBrowMesh.position.set(0.16, 0.23, 0.45);
     headGroup.add(rightBrowMesh);
 
     // Articulated Mouth
@@ -444,20 +456,20 @@ export const Avatar3DRig: React.FC<Avatar3DRigProps> = ({
             // Brow furrow (tilt inward)
             leftBrowMesh.rotation.z = THREE.MathUtils.lerp(leftBrowMesh.rotation.z, Math.PI / 2.6, 0.1);
             rightBrowMesh.rotation.z = THREE.MathUtils.lerp(rightBrowMesh.rotation.z, -Math.PI / 2.6, 0.1);
-            leftBrowMesh.position.y = THREE.MathUtils.lerp(leftBrowMesh.position.y, 0.20, 0.1);
-            rightBrowMesh.position.y = THREE.MathUtils.lerp(rightBrowMesh.position.y, 0.20, 0.1);
+            leftBrowMesh.position.y = THREE.MathUtils.lerp(leftBrowMesh.position.y, 0.21, 0.1);
+            rightBrowMesh.position.y = THREE.MathUtils.lerp(rightBrowMesh.position.y, 0.21, 0.1);
           } else if (currentState === 'thinking' || currentState === 'listening') {
             // Inquisitive slight brow lift
             leftBrowMesh.rotation.z = THREE.MathUtils.lerp(leftBrowMesh.rotation.z, Math.PI / 2.05, 0.1);
             rightBrowMesh.rotation.z = THREE.MathUtils.lerp(rightBrowMesh.rotation.z, -Math.PI / 2.05, 0.1);
-            leftBrowMesh.position.y = THREE.MathUtils.lerp(leftBrowMesh.position.y, 0.23, 0.1);
-            rightBrowMesh.position.y = THREE.MathUtils.lerp(rightBrowMesh.position.y, 0.23, 0.1);
+            leftBrowMesh.position.y = THREE.MathUtils.lerp(leftBrowMesh.position.y, 0.25, 0.1);
+            rightBrowMesh.position.y = THREE.MathUtils.lerp(rightBrowMesh.position.y, 0.25, 0.1);
           } else {
             // Gentle resting brows
             leftBrowMesh.rotation.z = THREE.MathUtils.lerp(leftBrowMesh.rotation.z, Math.PI / 2.15, 0.1);
             rightBrowMesh.rotation.z = THREE.MathUtils.lerp(rightBrowMesh.rotation.z, -Math.PI / 2.15, 0.1);
-            leftBrowMesh.position.y = THREE.MathUtils.lerp(leftBrowMesh.position.y, 0.22, 0.1);
-            rightBrowMesh.position.y = THREE.MathUtils.lerp(rightBrowMesh.position.y, 0.22, 0.1);
+            leftBrowMesh.position.y = THREE.MathUtils.lerp(leftBrowMesh.position.y, 0.23, 0.1);
+            rightBrowMesh.position.y = THREE.MathUtils.lerp(rightBrowMesh.position.y, 0.23, 0.1);
           }
         }
 

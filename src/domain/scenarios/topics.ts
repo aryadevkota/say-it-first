@@ -14,7 +14,19 @@ export type InterestCategory =
   | 'everyday'
   | 'boundaries'
   | 'meeting-people'
-  | 'appointments';
+  | 'appointments'
+  | 'custom';
+
+export interface CustomScenarioMetadata {
+  userProvidedSituation: string;
+  relationshipContext?: string;
+  avoidConstraints?: string;
+  inferredPartnerConcerns?: string;
+  inferredConversationalStyle?: string;
+  sourceType: 'manual' | 'document';
+  uploadedFileName?: string;
+  createdTimestamp: number;
+}
 
 export type TopicProgressStatus = 'not-started' | 'in-progress' | 'explored' | 'practiced' | 'revisited';
 
@@ -48,10 +60,11 @@ export interface ScenarioDefinition {
   userGoal: string;
   estimatedMinutes: number;
   status: 'ready' | 'preview';
-  accentColor: 'apricot' | 'lavender' | 'sage' | 'amber';
+  accentColor: 'teal' | 'apricot' | 'lavender' | 'sage' | 'amber';
   learning: LearningIdea;
   partner: PracticePartner;
   defaultTakeawayScript: string;
+  customMetadata?: CustomScenarioMetadata;
 }
 
 export const TOPICS: ScenarioDefinition[] = [
@@ -283,10 +296,23 @@ export const TOPICS: ScenarioDefinition[] = [
   },
 ];
 
+const customScenarioRegistry = new Map<string, ScenarioDefinition>();
+
+export function registerCustomTopic(topic: ScenarioDefinition): void {
+  customScenarioRegistry.set(topic.id, topic);
+}
+
+export function getRegisteredCustomTopics(): ScenarioDefinition[] {
+  return Array.from(customScenarioRegistry.values());
+}
+
 export function getTopicById(id: string): ScenarioDefinition | undefined {
-  return TOPICS.find((t) => t.id === id);
+  return customScenarioRegistry.get(id) || TOPICS.find((t) => t.id === id);
 }
 
 export function getTopicsByCategory(category: InterestCategory): ScenarioDefinition[] {
+  if (category === 'custom') {
+    return Array.from(customScenarioRegistry.values());
+  }
   return TOPICS.filter((t) => t.category === category);
 }

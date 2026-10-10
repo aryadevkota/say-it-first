@@ -26,6 +26,7 @@ import {
 import { TopicDashboard } from '../presentation/components/TopicDashboard';
 import { PracticeStage } from '../presentation/components/PracticeStage';
 import { PreferencesModal } from '../presentation/components/PreferencesModal';
+import { ScenarioCreator } from '../presentation/components/ScenarioCreator';
 import {
   TOPICS,
   type ScenarioDefinition,
@@ -36,12 +37,14 @@ import type { SavedTakeaway } from '../presentation/components/MyProgress';
 const STORAGE_KEY_PREFS = 'say_it_first_user_prefs';
 const STORAGE_KEY_PROGRESS = 'say_it_first_progress';
 const STORAGE_KEY_TAKEAWAYS = 'say_it_first_takeaways';
+const STORAGE_KEY_CUSTOM_SCENARIOS = 'say_it_first_custom_scenarios';
 
 export default function SayItFirstRoot() {
-  const [currentView, setCurrentView] = useState<'welcome' | 'dashboard' | 'practice'>('welcome');
+  const [currentView, setCurrentView] = useState<'welcome' | 'dashboard' | 'practice' | 'create-scenario'>('welcome');
   const [preferences, setPreferences] = useState<UserPreferences>(DEFAULT_PREFERENCES);
   const [progressMap, setProgressMap] = useState<Record<string, TopicProgressStatus>>({});
   const [savedTakeaways, setSavedTakeaways] = useState<SavedTakeaway[]>([]);
+  const [customScenarios, setCustomScenarios] = useState<ScenarioDefinition[]>([]);
   const [activePracticeTopic, setActivePracticeTopic] = useState<ScenarioDefinition | null>(null);
   const [isPreferencesOpen, setIsPreferencesOpen] = useState<boolean>(false);
   const [isHydrated, setIsHydrated] = useState<boolean>(false);
@@ -63,6 +66,11 @@ export default function SayItFirstRoot() {
       const storedTakeaways = localStorage.getItem(STORAGE_KEY_TAKEAWAYS);
       if (storedTakeaways) {
         setSavedTakeaways(JSON.parse(storedTakeaways));
+      }
+
+      const storedScenarios = localStorage.getItem(STORAGE_KEY_CUSTOM_SCENARIOS);
+      if (storedScenarios) {
+        setCustomScenarios(JSON.parse(storedScenarios));
       }
     } catch {
       // Local storage fallback
@@ -165,6 +173,28 @@ export default function SayItFirstRoot() {
     } catch {}
   };
 
+  // Save custom scenario
+  const handleSaveCustomScenario = (scenario: ScenarioDefinition) => {
+    setCustomScenarios((prev) => {
+      const updated = [scenario, ...prev.filter((s) => s.id !== scenario.id)];
+      try {
+        localStorage.setItem(STORAGE_KEY_CUSTOM_SCENARIOS, JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+  };
+
+  // Delete custom scenario
+  const handleDeleteCustomScenario = (id: string) => {
+    setCustomScenarios((prev) => {
+      const updated = prev.filter((s) => s.id !== id);
+      try {
+        localStorage.setItem(STORAGE_KEY_CUSTOM_SCENARIOS, JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+  };
+
   // Avoid hydration mismatch flicker
   if (!isHydrated) {
     return (
@@ -191,10 +221,13 @@ export default function SayItFirstRoot() {
           progressMap={progressMap}
           savedTakeaways={savedTakeaways}
           activeTopicId={activePracticeTopic?.id}
+          customScenarios={customScenarios}
           onStartPractice={handleStartPractice}
           onOpenPreferences={() => setIsPreferencesOpen(true)}
           onMarkExplored={handleMarkExplored}
           onDeleteTakeaway={handleDeleteTakeaway}
+          onCreateCustomScenario={() => setCurrentView('create-scenario')}
+          onDeleteCustomScenario={handleDeleteCustomScenario}
         />
       )}
 
@@ -207,6 +240,42 @@ export default function SayItFirstRoot() {
           onSaveTakeaway={handleSaveTakeaway}
           onCompleteTopic={handleCompleteTopic}
         />
+      )}
+
+      {/* VIEW 4: CUSTOM SCENARIO CREATOR */}
+      {currentView === 'create-scenario' && (
+        <div className="min-h-screen bg-canvas-light text-ink-primary flex flex-col">
+          <nav className="border-b border-canvas-borderSubtle bg-canvas-surface/80 backdrop-blur-xs sticky top-0 z-30">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+              <button
+                onClick={() => setCurrentView('dashboard')}
+                className="flex items-center gap-1.5 text-xs font-medium text-ink-muted hover:text-ink-primary transition"
+              >
+                <span>← Back to Dashboard</span>
+              </button>
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-lg bg-teal-brand text-canvas-surface flex items-center justify-center font-bold text-xs">
+                  S
+                </div>
+                <span className="font-semibold text-sm text-ink-primary">New Scenario</span>
+              </div>
+              <div className="w-16" />
+            </div>
+          </nav>
+          <main className="flex-1">
+            <ScenarioCreator
+              onStartPractice={(scenario) => {
+                handleSaveCustomScenario(scenario);
+                handleStartPractice(scenario);
+              }}
+              onSaveScenario={(scenario) => {
+                handleSaveCustomScenario(scenario);
+                setCurrentView('dashboard');
+              }}
+              onCancel={() => setCurrentView('dashboard')}
+            />
+          </main>
+        </div>
       )}
 
       {/* GLOBAL PREFERENCES MODAL */}

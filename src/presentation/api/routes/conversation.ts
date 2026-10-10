@@ -34,6 +34,23 @@ export const TurnRequestSchema = z.object({
     arousal: z.number().min(-1).max(1),
     dominance: z.number().min(-1).max(1),
   }),
+  custom_scenario: z
+    .object({
+      situation: z.string().optional(),
+      partner_role: z.string().optional(),
+      partner_name: z.string().optional(),
+      user_goal: z.string().optional(),
+      constraints: z.string().optional(),
+    })
+    .optional(),
+  history: z
+    .array(
+      z.object({
+        role: z.enum(['partner', 'user', 'persona']),
+        content: z.string(),
+      }),
+    )
+    .optional(),
 });
 
 export type TurnRequestPayload = z.infer<typeof TurnRequestSchema>;

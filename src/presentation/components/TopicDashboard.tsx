@@ -23,16 +23,20 @@ import {
 import type { UserPreferences } from './WelcomeOnboarding';
 import { TopicDetailModal } from './TopicDetailModal';
 import { MyProgress, type SavedTakeaway } from './MyProgress';
+import { MyScenarios } from './MyScenarios';
 
 interface TopicDashboardProps {
   preferences: UserPreferences;
   progressMap: Record<string, TopicProgressStatus>;
   savedTakeaways: SavedTakeaway[];
   activeTopicId?: string;
+  customScenarios?: ScenarioDefinition[];
   onStartPractice: (topic: ScenarioDefinition) => void;
   onOpenPreferences: () => void;
   onMarkExplored: (topicId: string) => void;
   onDeleteTakeaway?: (id: string) => void;
+  onCreateCustomScenario?: () => void;
+  onDeleteCustomScenario?: (id: string) => void;
 }
 
 export const TopicDashboard: React.FC<TopicDashboardProps> = ({
@@ -40,12 +44,15 @@ export const TopicDashboard: React.FC<TopicDashboardProps> = ({
   progressMap,
   savedTakeaways,
   activeTopicId,
+  customScenarios = [],
   onStartPractice,
   onOpenPreferences,
   onMarkExplored,
   onDeleteTakeaway,
+  onCreateCustomScenario,
+  onDeleteCustomScenario,
 }) => {
-  const [activeTab, setActiveTab] = useState<'home' | 'explore' | 'progress'>('home');
+  const [activeTab, setActiveTab] = useState<'home' | 'explore' | 'scenarios' | 'progress'>('home');
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>('all');
   const [modalTopic, setModalTopic] = useState<ScenarioDefinition | null>(null);
 
@@ -126,6 +133,21 @@ export const TopicDashboard: React.FC<TopicDashboardProps> = ({
               Explore
             </button>
             <button
+              onClick={() => setActiveTab('scenarios')}
+              className={`px-3.5 py-1.5 rounded-xl text-sm font-medium transition ${
+                activeTab === 'scenarios'
+                  ? 'bg-teal-subtle text-teal-brand font-semibold'
+                  : 'text-ink-muted hover:text-ink-primary'
+              }`}
+            >
+              My scenarios
+              {customScenarios.length > 0 && (
+                <span className="ml-1.5 px-1.5 py-0.5 rounded-full text-[10px] bg-teal-brand text-canvas-surface">
+                  {customScenarios.length}
+                </span>
+              )}
+            </button>
+            <button
               onClick={() => setActiveTab('progress')}
               className={`px-3.5 py-1.5 rounded-xl text-sm font-medium transition ${
                 activeTab === 'progress'
@@ -202,6 +224,31 @@ export const TopicDashboard: React.FC<TopicDashboardProps> = ({
                 </div>
               </div>
             )}
+
+            {/* Section: Create Custom Scenario Callout */}
+            <div className="p-6 rounded-3xl bg-teal-subtle/40 border border-teal-border/70 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-teal-brand">
+                    Personal Practice
+                  </span>
+                  <span className="text-canvas-border">•</span>
+                  <span className="text-xs text-ink-muted">Tailored to your real conversations</span>
+                </div>
+                <h2 className="text-base sm:text-lg font-semibold text-ink-primary">
+                  Have a specific conversation in mind?
+                </h2>
+                <p className="text-xs text-ink-secondary mt-0.5 max-w-xl">
+                  Paste a situation or upload notes (.txt, .md, .json) to prepare an adaptive 3D practice partner with customized boundaries and goals.
+                </p>
+              </div>
+              <button
+                onClick={onCreateCustomScenario || (() => setActiveTab('scenarios'))}
+                className="px-5 py-2.5 rounded-xl bg-teal-brand text-canvas-surface font-medium hover:bg-teal-hover transition text-xs shadow-xs shrink-0 flex items-center gap-1.5"
+              >
+                <span>+ Create a scenario</span>
+              </button>
+            </div>
 
             {/* Section: Topics for You */}
             <div>
@@ -331,7 +378,17 @@ export const TopicDashboard: React.FC<TopicDashboardProps> = ({
           </div>
         )}
 
-        {/* TAB 3: MY PROGRESS */}
+        {/* TAB 3: MY SCENARIOS */}
+        {activeTab === 'scenarios' && (
+          <MyScenarios
+            customScenarios={customScenarios}
+            onCreateNew={onCreateCustomScenario || (() => {})}
+            onPracticeScenario={onStartPractice}
+            onDeleteScenario={onDeleteCustomScenario || (() => {})}
+          />
+        )}
+
+        {/* TAB 4: MY PROGRESS */}
         {activeTab === 'progress' && (
           <MyProgress
             progressMap={progressMap}
