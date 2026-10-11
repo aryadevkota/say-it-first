@@ -21,6 +21,15 @@
 
 import React from 'react';
 import { playCozySound } from '../utils/cozyAudio';
+import {
+  Lightbulb,
+  Home,
+  Play,
+  BookOpen,
+  ClipboardList,
+  TrendingUp,
+  Bookmark,
+} from 'lucide-react';
 
 export type SidebarTab =
   | 'home'
@@ -349,7 +358,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
             data-testid="tutorial-trigger-btn"
           >
             <span className="flex items-center gap-2">
-              <span className="text-sif-primary text-sm group-hover:scale-110 transition-transform">💡</span>
+              <Lightbulb className="w-4 h-4 text-sif-primary group-hover:scale-110 transition-transform" />
               <span className="font-semibold text-ink-primary">How SiF Works</span>
             </span>
             <span className="text-[11px] text-sif-primary font-semibold">Guide →</span>
@@ -368,13 +377,14 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
       {/* Mobile Bottom Navigation Bar (< 768px) */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-canvas-surface border-t border-canvas-border px-2 py-1.5 flex items-center justify-around shadow-modal">
         {[
-          { id: 'home', label: 'Home', icon: '🏠' },
-          { id: 'practice', label: 'Practice', icon: '▶' },
-          { id: 'scenarios', label: 'Scenarios', icon: '📚' },
-          { id: 'reports', label: 'Reports', icon: '📋' },
-          { id: 'progress', label: 'Progress', icon: '📈' },
-          { id: 'favorites', label: 'Saved', icon: '🔖' },
+          { id: 'home', label: 'Home', icon: Home },
+          { id: 'practice', label: 'Practice', icon: Play },
+          { id: 'scenarios', label: 'Scenarios', icon: BookOpen },
+          { id: 'reports', label: 'Reports', icon: ClipboardList },
+          { id: 'progress', label: 'Progress', icon: TrendingUp },
+          { id: 'favorites', label: 'Saved', icon: Bookmark },
         ].map((item) => {
+          const Icon = item.icon;
           const isActive = activeTab === item.id;
           return (
             <button
@@ -387,7 +397,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                 isActive ? 'text-sif-primary font-bold' : 'text-ink-muted'
               }`}
             >
-              <span className="text-sm">{item.icon}</span>
+              <Icon className="w-4 h-4" />
               <span className="text-[10px] mt-0.5">{item.label}</span>
             </button>
           );

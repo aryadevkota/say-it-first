@@ -17,7 +17,7 @@ import { playCozySound } from '../utils/cozyAudio';
 interface ScenarioRailProps {
   title: string;
   subtitle?: string;
-  icon?: string;
+  icon?: React.ReactNode;
   scenarios: ScenarioDefinition[];
   savedMap?: Record<string, boolean>;
   progressMap?: Record<string, TopicProgressStatus>;

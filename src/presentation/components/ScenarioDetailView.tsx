@@ -25,6 +25,7 @@
 import React, { useState } from 'react';
 import type { ScenarioDefinition } from '../../domain/scenarios/topics';
 import { playCozySound } from '../utils/cozyAudio';
+import { Target, Ear, MessageSquare, Leaf, RefreshCw } from 'lucide-react';
 
 interface ScenarioDetailViewProps {
   scenario: ScenarioDefinition;
@@ -137,7 +138,7 @@ export const ScenarioDetailView: React.FC<ScenarioDetailViewProps> = ({
 
             {/* Goal pill */}
             <div className="p-4 rounded-card bg-sif-primarySubtle/60 border border-sif-border flex items-start gap-3 text-xs sm:text-sm">
-              <span className="text-sif-primary font-bold text-base shrink-0">🎯</span>
+              <Target className="w-5 h-5 text-sif-primary shrink-0 mt-0.5" />
               <div>
                 <span className="font-semibold text-ink-primary block mb-0.5">Your Scenario Goal:</span>
                 <p className="text-ink-secondary leading-relaxed">{scenario.userGoal}</p>
@@ -212,7 +213,7 @@ export const ScenarioDetailView: React.FC<ScenarioDetailViewProps> = ({
           {/* 4 Advice Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
             <div className="p-5 rounded-card bg-canvas-surface border border-canvas-border space-y-2 shadow-card">
-              <span className="text-base">👂</span>
+              <Ear className="w-5 h-5 text-sif-primary" />
               <h3 className="font-semibold text-ink-primary text-sm">What to Listen For</h3>
               <p className="text-ink-secondary leading-relaxed">
                 Listen for the partner's opening tone. Notice whether they seem hurried, warm, enthusiastic, or seeking quick reassurance.
@@ -220,7 +221,7 @@ export const ScenarioDetailView: React.FC<ScenarioDetailViewProps> = ({
             </div>
 
             <div className="p-5 rounded-card bg-canvas-surface border border-canvas-border space-y-2 shadow-card">
-              <span className="text-base">💬</span>
+              <MessageSquare className="w-5 h-5 text-emerald-600" />
               <h3 className="font-semibold text-ink-primary text-sm">What a Strong Response Might Include</h3>
               <p className="text-ink-secondary leading-relaxed">
                 A brief acknowledgment of what they said, followed by your preference or question in plain, unhurried words.
@@ -228,7 +229,7 @@ export const ScenarioDetailView: React.FC<ScenarioDetailViewProps> = ({
             </div>
 
             <div className="p-5 rounded-card bg-canvas-surface border border-canvas-border space-y-2 shadow-card">
-              <span className="text-base">🌿</span>
+              <Leaf className="w-5 h-5 text-topic-amber" />
               <h3 className="font-semibold text-ink-primary text-sm">What to Avoid Overthinking</h3>
               <p className="text-ink-secondary leading-relaxed">
                 Do not worry about awkward pauses or needing a moment to think. Pauses are completely natural in thoughtful communication.
@@ -236,7 +237,7 @@ export const ScenarioDetailView: React.FC<ScenarioDetailViewProps> = ({
             </div>
 
             <div className="p-5 rounded-card bg-canvas-surface border border-canvas-border space-y-2 shadow-card">
-              <span className="text-base">🔄</span>
+              <RefreshCw className="w-5 h-5 text-sky-600" />
               <h3 className="font-semibold text-ink-primary text-sm">Non-Destructive Retries</h3>
               <p className="text-ink-secondary leading-relaxed">
                 You can try "Version 2" or "Version 3" anytime inside the stage without losing your previous answers or receiving a score.

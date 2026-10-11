@@ -52,6 +52,21 @@ export interface ExchangeAnalysis {
   alternativeResponses: AlternativeResponseOption[];
 }
 
+export type TranscriptSufficiencyLevel =
+  | 'insufficient_evidence'
+  | 'minimal_participation'
+  | 'partial_participation'
+  | 'meaningful_participation';
+
+export interface TranscriptSufficiencyMetrics {
+  level: TranscriptSufficiencyLevel;
+  committedUserTurnsCount: number;
+  nonTrivialUserTurnsCount: number;
+  totalUserWordCount: number;
+  nonTrivialUserWordCount: number;
+  droppedUtterancesCount?: number;
+}
+
 export interface SessionSnapshot {
   scenarioTitle: string;
   categoryLabel: string;
@@ -59,6 +74,8 @@ export interface SessionSnapshot {
   userTurnsCount: number;
   overallToneSummary: string;
   plainLanguageSummary: string;
+  sufficiencyLevel?: TranscriptSufficiencyLevel;
+  sufficiencyMetrics?: TranscriptSufficiencyMetrics;
 }
 
 export interface RepeatableHabit {

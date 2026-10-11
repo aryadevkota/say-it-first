@@ -28,6 +28,7 @@ import {
   SkillTag,
 } from '../../domain/entities/SessionReport';
 import { playCozySound } from '../utils/cozyAudio';
+import { AlertTriangle, Lightbulb, Copy, Check } from 'lucide-react';
 
 interface ConversationReportPageProps {
   report: SessionReport;
@@ -112,9 +113,27 @@ export const ConversationReportPage: React.FC<ConversationReportPageProps> = ({
             </span>
             <div className="flex items-center gap-4 text-xs text-ink-muted">
               <span>Duration: ~{Math.max(1, Math.round(report.snapshot.conversationDurationSeconds / 60))} min</span>
-              <span>User turns: {report.snapshot.userTurnsCount}</span>
+              <span>Committed user turns: {report.snapshot.userTurnsCount}</span>
             </div>
           </div>
+
+          {report.snapshot.sufficiencyLevel === 'insufficient_evidence' && (
+            <div
+              className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900 flex items-start gap-2.5"
+              data-testid="insufficient-evidence-banner"
+            >
+              <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+              <div className="space-y-0.5">
+                <span className="font-semibold block text-amber-950">Limited Recorded Dialogue</span>
+                <p className="leading-relaxed text-amber-900">
+                  {report.snapshot.sufficiencyMetrics
+                    ? `Only ${report.snapshot.sufficiencyMetrics.nonTrivialUserWordCount} meaningful words across ${report.snapshot.sufficiencyMetrics.committedUserTurnsCount} committed turns were recorded.`
+                    : 'The recorded user dialogue was too limited to evaluate response quality with confidence.'}{' '}
+                  Analysis is grounded strictly in what was captured without assuming unspoken intent.
+                </p>
+              </div>
+            </div>
+          )}
 
           <div className="p-4 rounded-2xl bg-canvas-subtle/80 border border-canvas-borderSubtle space-y-2">
             <div className="text-xs font-semibold text-ink-secondary">Overall Tone:</div>
@@ -304,8 +323,9 @@ export const ConversationReportPage: React.FC<ConversationReportPageProps> = ({
                   {/* Coaching Note / Gentle Opportunity */}
                   {exchange.whatMayHaveBeenMissed && (
                     <div className="p-3.5 rounded-xl bg-amber-50/60 border border-amber-200/80 text-xs text-ink-primary">
-                      <span className="font-semibold text-amber-800 block mb-0.5">
-                        💡 Opportunity to explore:
+                      <span className="font-semibold text-amber-800 flex items-center gap-1.5 mb-0.5">
+                        <Lightbulb className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+                        Opportunity to explore:
                       </span>
                       <p className="text-amber-950 leading-relaxed">
                         {exchange.whatMayHaveBeenMissed}
@@ -574,9 +594,19 @@ export const ConversationReportPage: React.FC<ConversationReportPageProps> = ({
                 <button
                   type="button"
                   onClick={() => handleCopyGoal(goal.exampleTemplate)}
-                  className="w-full py-2 rounded-xl bg-canvas-surface hover:bg-canvas-borderSubtle border border-canvas-border text-ink-primary text-xs font-medium transition text-center"
+                  className="w-full py-2 rounded-xl bg-canvas-surface hover:bg-canvas-borderSubtle border border-canvas-border text-ink-primary text-xs font-medium transition flex items-center justify-center gap-1.5"
                 >
-                  {copiedGoal === goal.exampleTemplate ? '✓ Copied Template!' : '📋 Copy Template'}
+                  {copiedGoal === goal.exampleTemplate ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-emerald-600" />
+                      <span className="text-emerald-700 font-semibold">Copied Template!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5 text-ink-secondary" />
+                      <span>Copy Template</span>
+                    </>
+                  )}
                 </button>
               </div>
             ))}

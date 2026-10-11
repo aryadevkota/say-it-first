@@ -49,6 +49,8 @@ export async function POST(request: Request) {
     const avatarId = body?.avatarId || body?.avatar_id || ANAM_TARGET_AVATAR_ID;
     const firstMessage = body?.initialDialogue || body?.initial_dialogue || body?.firstMessage;
     const systemPrompt = body?.systemPrompt || body?.system_prompt;
+    const forceFresh = Boolean(body?.forceFresh || body?.force_fresh);
+    const disableOverrides = Boolean(body?.disableOverrides || body?.disable_overrides);
 
     try {
       const result = await requestAnamSessionToken({
@@ -58,6 +60,8 @@ export async function POST(request: Request) {
         avatarId,
         firstMessage,
         systemPrompt,
+        forceFresh,
+        disableOverrides,
       });
 
       return NextResponse.json(
@@ -66,6 +70,8 @@ export async function POST(request: Request) {
           session_token: result.sessionToken,
           avatar_id: result.avatarId,
           agent_id: result.agentId,
+          overrides_applied: Boolean(result.overridesApplied),
+          conversation_fresh: Boolean(result.conversationFresh),
           ...(result.deduplicated ? { deduplicated: true } : {}),
         },
         { status: 200 },

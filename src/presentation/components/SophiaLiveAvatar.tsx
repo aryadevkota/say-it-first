@@ -12,6 +12,7 @@
  */
 
 import React from 'react';
+import { Volume2, VolumeX, MessageSquare } from 'lucide-react';
 import type { SophiaScenarioPresentation } from '../../domain/entities/SophiaScenarioPresentation';
 
 export interface SophiaLiveAvatarProps {
@@ -24,6 +25,16 @@ export interface SophiaLiveAvatarProps {
   className?: string;
   videoRef?: React.RefObject<HTMLVideoElement>;
   sessionState?: 'idle' | 'creating' | 'active' | 'terminating' | 'terminated' | 'failed';
+  sessionPhase?:
+    | 'idle'
+    | 'connecting'
+    | 'streaming'
+    | 'conversation_ready'
+    | 'upstream_rejected'
+    | 'failed'
+    | 'terminating'
+    | 'terminated';
+  isUpstreamRejected?: boolean;
   errorMessage?: string | null;
   onRetry?: () => void;
 }
@@ -38,6 +49,8 @@ export const SophiaLiveAvatar: React.FC<SophiaLiveAvatarProps> = ({
   className = '',
   videoRef,
   sessionState = 'active',
+  sessionPhase,
+  isUpstreamRejected = false,
   errorMessage,
   onRetry,
 }) => {
@@ -46,9 +59,15 @@ export const SophiaLiveAvatar: React.FC<SophiaLiveAvatarProps> = ({
     presentation.visualSummary ||
     `Sophia • ${presentation.outfitLabel} • ${presentation.backgroundLabel}`;
 
-  const isConnected = sessionState === 'active';
-  const isConnecting = sessionState === 'creating' || sessionState === 'idle';
-  const isFailed = sessionState === 'failed';
+  const isRejected = isUpstreamRejected || sessionPhase === 'upstream_rejected';
+  const isConnected = sessionState === 'active' && !isRejected;
+  const isConnecting =
+    !isRejected &&
+    (sessionPhase === 'connecting' || sessionState === 'creating' || sessionState === 'idle');
+  const isMediaStreaming = sessionPhase === 'streaming' && !isRejected;
+  const isFailed = sessionState === 'failed' || isRejected;
+  const isTerminated = sessionState === 'terminated';
+  const showFallback = isFailed || isTerminated || isRejected;
 
   return (
     <section
@@ -57,14 +76,21 @@ export const SophiaLiveAvatar: React.FC<SophiaLiveAvatarProps> = ({
       className={`w-full max-w-4xl aspect-[4/3] sm:aspect-video rounded-3xl overflow-hidden relative shadow-xl border border-canvas-border flex flex-col justify-between transition-all select-none bg-canvas-dark ${className}`}
     >
       <div className="absolute inset-0 z-0 overflow-hidden bg-slate-950 flex items-center justify-center">
-        {isFailed ? (
+        {showFallback ? (
           <div
             data-testid="anam-error-boundary"
             className="flex flex-col items-center justify-center gap-3 text-center p-6 z-30 max-w-sm"
           >
-            <p className="text-sm font-semibold text-rose-300">Partner Connection Paused</p>
+            <p className="text-sm font-semibold text-rose-300">
+              {isRejected ? 'Provider Rejected Conversation Config' : 'Partner Connection Paused'}
+            </p>
             <p className="text-xs text-white/70 leading-relaxed">
-              {errorMessage || 'The avatar session is settling. You can retry or continue in text mode.'}
+              {errorMessage ||
+                (isRejected
+                  ? 'ElevenLabs rejected the agent configuration for this conversation. If you want to talk again, please start a new conversation.'
+                  : isTerminated
+                    ? 'The avatar session is paused. You can reconnect below or continue in text mode.'
+                    : 'The avatar session encountered an issue. You can retry or continue in text mode.')}
             </p>
             {onRetry && (
               <button
@@ -72,7 +98,7 @@ export const SophiaLiveAvatar: React.FC<SophiaLiveAvatarProps> = ({
                 onClick={onRetry}
                 className="mt-1 px-4 py-2 rounded-xl bg-sif-primary hover:bg-sif-primaryHover text-white text-xs font-semibold shadow-xs transition"
               >
-                Reconnect Partner
+                {isRejected ? 'Start Fresh Conversation' : 'Reconnect Partner'}
               </button>
             )}
           </div>
@@ -143,13 +169,22 @@ export const SophiaLiveAvatar: React.FC<SophiaLiveAvatarProps> = ({
               <>
                 <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0 animate-pulse" />
                 <span className="font-semibold text-white tracking-wide drop-shadow-xs">{badgeText}</span>
-                <span className="text-[10px] text-emerald-300 font-medium px-1.5 py-0.5 rounded bg-emerald-950/60 border border-emerald-500/30">Active</span>
+                <span className="text-[10px] text-emerald-300 font-medium px-1.5 py-0.5 rounded bg-emerald-950/60 border border-emerald-500/30">
+                  {isMediaStreaming ? 'Video Live' : 'Active'}
+                </span>
+                {isMediaStreaming && (
+                  <span className="text-[10px] text-amber-300 font-medium px-1.5 py-0.5 rounded bg-amber-950/60 border border-amber-500/30 animate-pulse">
+                    Initializing Conversation...
+                  </span>
+                )}
               </>
-            ) : isFailed ? (
+            ) : showFallback ? (
               <>
                 <span className="w-2 h-2 rounded-full bg-rose-400 shrink-0" />
                 <span className="font-semibold text-white tracking-wide drop-shadow-xs">{badgeText}</span>
-                <span className="text-[10px] text-rose-300 font-medium px-1.5 py-0.5 rounded bg-rose-950/60 border border-rose-500/30">Disconnected</span>
+                <span className="text-[10px] text-rose-300 font-medium px-1.5 py-0.5 rounded bg-rose-950/60 border border-rose-500/30">
+                  {isRejected ? 'Upstream Rejected' : isTerminated ? 'Paused' : 'Disconnected'}
+                </span>
               </>
             ) : (
               <>
@@ -171,7 +206,7 @@ export const SophiaLiveAvatar: React.FC<SophiaLiveAvatarProps> = ({
                 onClick={onToggleMute}
                 className="px-3 py-1.5 rounded-xl text-xs font-semibold border transition backdrop-blur-md flex items-center gap-1.5 bg-black/70 text-white border-white/25 hover:bg-black/90"
               >
-                <span>{isMuted ? '🔇' : '🔊'}</span>
+                {isMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
                 <span>{isMuted ? 'Unmute Audio' : 'Mute Audio'}</span>
               </button>
             )}
@@ -182,7 +217,7 @@ export const SophiaLiveAvatar: React.FC<SophiaLiveAvatarProps> = ({
                 onClick={onToggleTextMode}
                 className="px-3 py-1.5 rounded-xl bg-black/70 hover:bg-black/90 text-white text-xs font-medium border border-white/25 backdrop-blur-md transition flex items-center gap-1.5"
               >
-                <span>💬</span>
+                <MessageSquare className="w-3.5 h-3.5" />
                 <span>Switch to Text Mode</span>
               </button>
             )}

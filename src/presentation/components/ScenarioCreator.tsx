@@ -13,6 +13,7 @@
  */
 
 import React, { useState, useRef } from 'react';
+import { FileText } from 'lucide-react';
 import {
   ScenarioGenerator,
   type ScenarioGenerationResult,
@@ -289,8 +290,8 @@ export const ScenarioCreator: React.FC<ScenarioCreatorProps> = ({
                   onClick={() => fileInputRef.current?.click()}
                   className="border-2 border-dashed border-canvas-border hover:border-sif-border rounded-2xl p-6 sm:p-8 text-center bg-canvas-surface cursor-pointer transition flex flex-col items-center justify-center gap-2"
                 >
-                  <div className="w-12 h-12 rounded-full bg-sif-primarySubtle text-sif-primary flex items-center justify-center text-xl">
-                    📄
+                  <div className="w-12 h-12 rounded-full bg-sif-primarySubtle text-sif-primary flex items-center justify-center">
+                    <FileText className="w-6 h-6 text-sif-primary" />
                   </div>
                   <div>
                     <span className="text-sm font-medium text-ink-primary block">

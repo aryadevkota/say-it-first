@@ -119,4 +119,125 @@ describe('ReportGeneratorService & SessionReport Domain Suite', () => {
     expect(reportJson).not.toContain('score:');
     expect(reportJson).not.toContain('pass/fail');
   });
+
+  it('produces honest un-fabricated report when 0 user responses are recorded', () => {
+    const report = service.generateReport({
+      scenarioId: 'work-written-notes',
+      turns: [
+        {
+          role: 'partner',
+          text: 'Hey! Glad we could catch up. Do you have what you need to run with this?',
+        },
+      ],
+      durationSeconds: 30,
+    });
+
+    expect(report.snapshot.userTurnsCount).toBe(0);
+    expect(report.exchangeBreakdown).toHaveLength(0);
+    expect(report.snapshot.plainLanguageSummary).toContain('No participant responses were recorded');
+    expect(report.fullTranscript).toHaveLength(1);
+    expect(report.fullTranscript[0].text).toContain('Glad we could catch up');
+    expect(report.snapshot.sufficiencyLevel).toBe('insufficient_evidence');
+  });
+
+  it('handles trivial filler user turns with insufficient_evidence and refuses to manufacture praise', () => {
+    const report = service.generateReport({
+      scenarioId: 'friendship-quiet-place',
+      turns: [
+        {
+          role: 'partner',
+          text: 'Hey! The lounge downstairs is pretty buzzing tonight, let’s grab a table by the stage!',
+        },
+        {
+          role: 'user',
+          text: 'hello',
+        },
+        {
+          role: 'partner',
+          text: 'Oh hey! Want to head inside?',
+        },
+        {
+          role: 'user',
+          text: '...',
+        },
+      ],
+      durationSeconds: 45,
+    });
+
+    expect(report.snapshot.sufficiencyLevel).toBe('insufficient_evidence');
+    expect(report.snapshot.overallToneSummary).toContain('too limited to evaluate');
+    expect(report.snapshot.plainLanguageSummary).toContain(
+      'The recorded dialogue from your side was too limited to evaluate your response quality with confidence',
+    );
+
+    const reportJson = JSON.stringify(report);
+    // Explicit anti-hallucination checks:
+    expect(reportJson).not.toContain('clear, thoughtful contribution');
+    expect(reportJson).not.toContain('Clear, grounded self-advocacy');
+    expect(reportJson).not.toContain('Maintained consistent conversational presence');
+    expect(reportJson).not.toContain('Maintained steady boundaries');
+
+    // Exchange coaching should acknowledge brevity instead of pretending competence
+    expect(report.exchangeBreakdown).toHaveLength(2);
+    expect(report.exchangeBreakdown[0].cueConfidence).toBe('tentative');
+    expect(report.exchangeBreakdown[0].coachingNote).toContain(
+      'A brief greeting or filler acknowledges the other person, but does not yet communicate your perspective',
+    );
+  });
+
+  it('correctly classifies minimal participation vs meaningful participation', () => {
+    // Minimal: 1 turn with 4 non-trivial words
+    const minimalReport = service.generateReport({
+      scenarioId: 'work-written-notes',
+      turns: [
+        { role: 'partner', text: 'Hey, let us do this verbal check-in.' },
+        { role: 'user', text: 'I prefer written notes.' },
+      ],
+      durationSeconds: 40,
+    });
+    expect(minimalReport.snapshot.sufficiencyLevel).toBe('minimal_participation');
+    expect(minimalReport.snapshot.plainLanguageSummary).toContain('brief');
+
+    // Meaningful: multiple turns with substantial content
+    const meaningfulReport = service.generateReport({
+      scenarioId: 'friendship-quiet-place',
+      turns: mockTurns,
+      durationSeconds: 120,
+    });
+    expect(meaningfulReport.snapshot.sufficiencyLevel).toBe('meaningful_participation');
+  });
+
+  it('ignores uncommitted and dropped turns during report synthesis', () => {
+    const report = service.generateReport({
+      scenarioId: 'work-written-notes',
+      turns: [
+        {
+          role: 'partner',
+          text: 'Hey there!',
+          status: 'committed_assistant_turn',
+        },
+        {
+          role: 'user',
+          text: 'partial speech that was never finalized...',
+          status: 'partial_user_turn',
+        },
+        {
+          role: 'user',
+          text: 'dropped microphone audio',
+          status: 'dropped_or_unintelligible_turn',
+        },
+        {
+          role: 'user',
+          text: 'I prefer written notes sent over email after meetings.',
+          status: 'committed_user_turn',
+        },
+      ],
+      droppedUtterancesCount: 1,
+    });
+
+    // Only the committed user turn and committed partner turn should be analyzed
+    expect(report.fullTranscript).toHaveLength(2);
+    expect(report.snapshot.userTurnsCount).toBe(1);
+    expect(report.snapshot.sufficiencyMetrics?.droppedUtterancesCount).toBe(1);
+  });
 });

@@ -94,5 +94,27 @@ describe('Report UI Components Suite', () => {
       expect(html).toContain('Why this works:');
       expect(html).toContain('A more empathetic approach');
     });
+
+    it('renders the insufficient evidence banner when user participation is minimal or filler-only', () => {
+      const emptyReport = service.generateReport({
+        scenarioId: 'friendship-quiet-place',
+        turns: [
+          { role: 'partner', text: 'Hey, this place is so energetic!' },
+          { role: 'user', text: '...' },
+        ],
+        durationSeconds: 30,
+      });
+
+      const html = renderToString(
+        React.createElement(ConversationReportPage, {
+          report: emptyReport,
+          onRestartPractice: vi.fn(),
+          onReturnDashboard: vi.fn(),
+        }),
+      );
+
+      expect(html).toContain('data-testid="insufficient-evidence-banner"');
+      expect(html).toContain('Limited Recorded Dialogue');
+    });
   });
 });

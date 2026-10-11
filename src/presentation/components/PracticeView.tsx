@@ -14,6 +14,7 @@
 import React, { useState } from 'react';
 import { TOPICS, type ScenarioDefinition, type TopicProgressStatus } from '../../domain/scenarios/topics';
 import { playCozySound } from '../utils/cozyAudio';
+import { Target } from 'lucide-react';
 
 interface PracticeViewProps {
   progressMap: Record<string, TopicProgressStatus>;
@@ -224,7 +225,7 @@ export const PracticeView: React.FC<PracticeViewProps> = ({
 
           {/* Goal Callout */}
           <div className="p-4 rounded-card bg-sif-primarySubtle/60 border border-sif-border flex items-start gap-3 text-xs sm:text-sm">
-            <span className="text-sif-primary text-base font-bold shrink-0">🎯</span>
+            <Target className="w-5 h-5 text-sif-primary shrink-0 mt-0.5" />
             <div>
               <span className="font-semibold text-ink-primary block mb-0.5">Your Goal:</span>
               <p className="text-ink-secondary leading-relaxed">{selectedScenario.userGoal}</p>

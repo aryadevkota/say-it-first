@@ -11,6 +11,7 @@
  */
 
 import React, { useState } from 'react';
+import { Pencil } from 'lucide-react';
 import { TOPICS, type ScenarioDefinition, type TopicProgressStatus } from '../../domain/scenarios/topics';
 
 export interface SavedTakeaway {
@@ -98,8 +99,8 @@ export const MyProgress: React.FC<MyProgressProps> = ({
 
         {savedTakeaways.length === 0 ? (
           <div className="p-8 rounded-2xl bg-canvas-surface border border-canvas-border text-center">
-            <div className="w-12 h-12 rounded-full bg-canvas-subtle text-ink-muted flex items-center justify-center mx-auto mb-3 text-lg">
-              ✎
+            <div className="w-12 h-12 rounded-full bg-canvas-subtle text-ink-muted flex items-center justify-center mx-auto mb-3">
+              <Pencil className="w-5 h-5 text-ink-muted" />
             </div>
             <p className="text-sm font-medium text-ink-primary mb-1">No saved scripts yet</p>
             <p className="text-xs text-ink-muted max-w-sm mx-auto mb-4">

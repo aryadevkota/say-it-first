@@ -18,6 +18,7 @@ import type { SavedTakeaway } from './MyProgress';
 import type { SessionReport } from '../../domain/entities/SessionReport';
 import { ConversationReportPage } from './ConversationReportPage';
 import { playCozySound } from '../utils/cozyAudio';
+import { Pencil } from 'lucide-react';
 
 interface ProgressCenterViewProps {
   progressMap: Record<string, TopicProgressStatus>;
@@ -215,8 +216,8 @@ export const ProgressCenterView: React.FC<ProgressCenterViewProps> = ({
 
         {savedTakeaways.length === 0 ? (
           <div className="p-8 rounded-card bg-canvas-surface border border-canvas-border text-center space-y-3">
-            <div className="w-12 h-12 rounded-full bg-canvas-subtle text-ink-muted flex items-center justify-center mx-auto text-lg">
-              ✎
+            <div className="w-12 h-12 rounded-full bg-canvas-subtle text-ink-muted flex items-center justify-center mx-auto">
+              <Pencil className="w-5 h-5 text-ink-muted" />
             </div>
             <p className="text-sm font-semibold text-ink-primary">No saved wording yet</p>
             <p className="text-xs text-ink-muted max-w-sm mx-auto">

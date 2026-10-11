@@ -21,6 +21,7 @@ import { ScenarioRail } from './ScenarioRail';
 import type { UserPreferences } from './WelcomeOnboarding';
 import type { SessionReport } from '../../domain/entities/SessionReport';
 import { playCozySound } from '../utils/cozyAudio';
+import { Briefcase, Coffee, Shield, MessageSquare } from 'lucide-react';
 
 interface HomeViewProps {
   preferences: UserPreferences;
@@ -339,7 +340,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
         <ScenarioRail
           title="Workplace & School Check-Ins"
           subtitle="Managing expectations, asking for confirmation, and declining overload."
-          icon="💼"
+          icon={<Briefcase className="w-4 h-4 text-sif-primary" />}
           scenarios={workplaceScenarios}
           savedMap={savedMap}
           progressMap={progressMap}
@@ -350,7 +351,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
         <ScenarioRail
           title="Friendships & Social Bids"
           subtitle="Suggesting alternative plans, following up with friends, and gentle honesty."
-          icon="☕"
+          icon={<Coffee className="w-4 h-4 text-topic-amber" />}
           scenarios={friendshipScenarios}
           savedMap={savedMap}
           progressMap={progressMap}
@@ -361,7 +362,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
         <ScenarioRail
           title="Setting Boundaries & Saying No"
           subtitle="Saying no without over-explaining, asserting capacity, and protecting energy."
-          icon="🛡️"
+          icon={<Shield className="w-4 h-4 text-emerald-600" />}
           scenarios={boundaryScenarios}
           savedMap={savedMap}
           progressMap={progressMap}
@@ -372,7 +373,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
         <ScenarioRail
           title="Everyday & Casual Conversations"
           subtitle="Low-pressure check-ins, balanced turn-taking, and closing naturally."
-          icon="💬"
+          icon={<MessageSquare className="w-4 h-4 text-sky-600" />}
           scenarios={everydayScenarios}
           savedMap={savedMap}
           progressMap={progressMap}

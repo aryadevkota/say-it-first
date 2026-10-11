@@ -274,4 +274,29 @@ describe('Sophia Live Avatar Component Suite (Anam Video Stream)', () => {
     expect(html).toContain('Starting Anam live avatar stream');
     expect(html).toContain('Connecting...');
   });
+
+  it('renders explicit provider rejection state when upstream agent configuration is rejected', () => {
+    const presentation = getSophiaPresentationForScenario(mockInterviewScenario);
+
+    const html = renderToString(
+      React.createElement(SophiaLiveAvatar, {
+        presentation,
+        partnerState: 'neutral',
+        isSpeakingAudio: false,
+        isMuted: false,
+        sessionPhase: 'upstream_rejected',
+        isUpstreamRejected: true,
+        errorMessage:
+          'ElevenLabs rejected the agent configuration for this conversation. If you want to talk again, please start a new conversation.',
+        onRetry: vi.fn(),
+      }),
+    );
+
+    expect(html).toContain('Provider Rejected Conversation Config');
+    expect(html).toContain(
+      'ElevenLabs rejected the agent configuration for this conversation. If you want to talk again, please start a new conversation.',
+    );
+    expect(html).toContain('Start Fresh Conversation');
+    expect(html).toContain('Upstream Rejected');
+  });
 });

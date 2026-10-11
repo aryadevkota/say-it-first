@@ -115,42 +115,65 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
   // 1. WELCOME VIEW
   if (stage === 'welcome') {
     return (
-      <div className="min-h-screen bg-canvas-light text-ink-primary flex flex-col justify-between p-6 md:p-12 transition-colors">
+      <div className="min-h-screen bg-canvas-light text-ink-primary flex flex-col justify-between p-6 sm:p-10 md:p-12 relative overflow-hidden transition-all duration-700">
+        {/* Subtle, serene ambient lighting glows */}
+        <div
+          aria-hidden="true"
+          className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-sif-primary/10 blur-3xl pointer-events-none"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute top-1/3 -right-24 w-[28rem] h-[28rem] rounded-full bg-sif-accent/10 blur-3xl pointer-events-none"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute -bottom-24 left-1/4 w-[32rem] h-[32rem] rounded-full bg-sif-secondary/15 blur-3xl pointer-events-none"
+        />
+
         {/* Top minimal header */}
-        <header className="max-w-5xl mx-auto w-full flex items-center justify-between pt-2">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-sif-primary text-canvas-surface flex items-center justify-center font-bold text-base shadow-sm">
-              S
+        <header className="max-w-6xl mx-auto w-full flex items-center justify-between pt-2 relative z-10 animate-page-enter">
+          <div className="flex items-center gap-3">
+            <div className="relative w-10 h-8 sm:w-11 sm:h-9 flex items-center justify-center shrink-0">
+              <img
+                src="/logo-mark.png"
+                alt="Say It First logo"
+                className="w-full h-full object-contain filter drop-shadow-xs"
+              />
             </div>
-            <span className="font-semibold text-lg tracking-tight text-ink-primary">Say It First</span>
+            <span className="font-display font-bold text-xl sm:text-2xl tracking-tight text-ink-primary">
+              Say It First
+            </span>
           </div>
 
           <button
-            onClick={onExploreDirectly}
-            className="text-sm font-medium text-ink-muted hover:text-ink-primary px-3 py-1.5 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-sif-primary"
+            onClick={() => {
+              playCozySound('tap');
+              onExploreDirectly();
+            }}
+            className="text-xs sm:text-sm font-medium text-ink-secondary hover:text-ink-primary px-4 py-2 rounded-full border border-canvas-border hover:border-sif-border bg-white/70 hover:bg-white backdrop-blur-xs transition-all shadow-2xs hover:shadow-xs focus:outline-none focus:ring-2 focus:ring-sif-primary cursor-pointer"
           >
             Explore first
           </button>
         </header>
 
         {/* Main hero composition */}
-        <main className="max-w-5xl mx-auto w-full my-auto py-10 grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center">
-          {/* Left: Warm, clear copy */}
-          <div className="md:col-span-7 flex flex-col items-start text-left">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-sif-primarySubtle text-sif-primary border border-sif-border mb-4">
-              <span className="w-2 h-2 rounded-full bg-sif-primary" />
-              {isReturningUser ? 'Welcome back • Settings & progress saved' : 'Conversational Sandbox'}
-            </span>
+        <main className="max-w-6xl mx-auto w-full my-auto py-10 sm:py-14 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center relative z-10 animate-page-enter">
+          {/* Left: Clear, elegant editorial copy */}
+          <div className="lg:col-span-7 flex flex-col items-start text-left">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-sif-primarySubtle text-sif-primaryDeep border border-sif-border mb-6 shadow-2xs">
+              <span className="w-1.5 h-1.5 rounded-full bg-sif-primary animate-pulse" />
+              <span>{isReturningUser ? 'Welcome back • Settings & progress saved' : 'Conversational Sandbox'}</span>
+            </div>
 
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-display font-semibold tracking-tight text-ink-primary leading-tight mb-5">
-              Find more room to say what you mean.
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-display font-semibold tracking-tight text-ink-primary leading-[1.12] mb-6">
+              Find more room to <span className="text-sif-primary">say what you mean</span>.
             </h1>
 
-            <p className="text-lg md:text-xl text-ink-secondary leading-relaxed mb-8 max-w-xl">
+            <p className="text-base sm:text-lg lg:text-xl text-ink-secondary leading-relaxed mb-8 sm:mb-10 max-w-xl font-normal">
               Explore conversations, practice at your own pace, and discover approaches that work for you.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 w-full sm:w-auto">
               {isReturningUser ? (
                 <>
                   <button
@@ -158,9 +181,12 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
                       playCozySound('tap');
                       onExploreDirectly();
                     }}
-                    className="px-6 py-3.5 rounded-xl bg-sif-primary text-white font-medium hover:bg-sif-primaryHover transition shadow-glass-card text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sif-primary"
+                    className="px-7 py-3.5 rounded-2xl bg-sif-primary text-white font-medium hover:bg-sif-primaryHover transition-all shadow-card hover:shadow-card-hover text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sif-primary flex items-center justify-center gap-2 group cursor-pointer"
                   >
-                    Continue
+                    <span>Continue</span>
+                    <svg className="w-4 h-4 text-white/80 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                    </svg>
                   </button>
 
                   <button
@@ -168,7 +194,7 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
                       playCozySound('tap');
                       setStage('step1');
                     }}
-                    className="px-6 py-3.5 rounded-xl bg-white/80 border border-canvas-border text-ink-primary font-medium hover:bg-white transition text-center shadow-2xs focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sif-primary"
+                    className="px-6 py-3.5 rounded-2xl bg-white/80 border border-canvas-border hover:border-sif-border text-ink-primary font-medium hover:bg-white transition-all shadow-2xs hover:shadow-card text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sif-primary cursor-pointer"
                   >
                     Adjust preferences
                   </button>
@@ -180,9 +206,12 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
                       playCozySound('tap');
                       setStage('step1');
                     }}
-                    className="px-6 py-3.5 rounded-xl bg-sif-primary text-white font-medium hover:bg-sif-primaryHover transition shadow-glass-card text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sif-primary"
+                    className="px-7 py-3.5 rounded-2xl bg-sif-primary text-white font-medium hover:bg-sif-primaryHover transition-all shadow-card hover:shadow-card-hover text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sif-primary flex items-center justify-center gap-2 group cursor-pointer"
                   >
-                    Make it yours
+                    <span>Make it yours</span>
+                    <svg className="w-4 h-4 text-white/80 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                    </svg>
                   </button>
 
                   <button
@@ -190,7 +219,7 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
                       playCozySound('tap');
                       onExploreDirectly();
                     }}
-                    className="px-6 py-3.5 rounded-xl bg-white/80 border border-canvas-border text-ink-primary font-medium hover:bg-white transition text-center shadow-2xs focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sif-primary"
+                    className="px-6 py-3.5 rounded-2xl bg-white/80 border border-canvas-border hover:border-sif-border text-ink-primary font-medium hover:bg-white transition-all shadow-2xs hover:shadow-card text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sif-primary cursor-pointer"
                   >
                     Explore first
                   </button>
@@ -198,56 +227,82 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
               )}
             </div>
 
-            <p className="text-xs text-ink-muted mt-6 flex items-center gap-1.5">
-              <span>Low-pressure, non-judgmental practice.</span>
-              <span className="text-canvas-border">•</span>
-              <span>No communication scores or grading.</span>
-            </p>
+            <div className="pt-8 mt-2 border-t border-canvas-borderSubtle flex flex-wrap items-center gap-y-2 gap-x-4 text-xs text-ink-muted">
+              <span className="inline-flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                Low-pressure, non-judgmental practice.
+              </span>
+              <span className="text-canvas-border hidden sm:inline">•</span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-sif-primary" />
+                No communication scores or grading.
+              </span>
+            </div>
           </div>
 
-          {/* Right: Live Practice Partner (Sophia) Feature Card */}
-          <div className="md:col-span-5 flex flex-col items-center justify-center">
-            <div className="w-full max-w-sm rounded-3xl bg-white/80 backdrop-blur-md border border-sif-border p-5 shadow-glass-elevated relative overflow-hidden flex flex-col gap-4">
-              <div className="flex items-center justify-between">
-                <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-sif-primaryDeep/90 text-sif-secondary border border-sif-secondary/30 flex items-center gap-1.5 shadow-2xs">
-                  <span className="w-2 h-2 rounded-full bg-sif-secondary animate-pulse" />
-                  Sophia Live Avatar
-                </span>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-sif-primaryDeep text-sif-secondarySubtle border border-sif-primary/40">
-                  Anam Video • 16kHz
-                </span>
+          {/* Right: Atmospheric, Branded Conversation Scene */}
+          <div className="lg:col-span-5 flex flex-col items-center justify-center">
+            <div className="w-full max-w-md rounded-3xl bg-white/70 backdrop-blur-md border border-white/80 p-6 sm:p-7 shadow-featured-glass relative overflow-hidden flex flex-col gap-4">
+              {/* Subtle ambient lighting inner aura */}
+              <div
+                aria-hidden="true"
+                className="absolute -top-16 -right-16 w-48 h-48 rounded-full bg-sif-primary/10 blur-2xl pointer-events-none"
+              />
+              <div
+                aria-hidden="true"
+                className="absolute -bottom-16 -left-16 w-48 h-48 rounded-full bg-sif-accent/15 blur-2xl pointer-events-none"
+              />
+
+              {/* Top Scene Label */}
+              <div className="flex items-center justify-between relative z-10">
+                <div className="inline-flex items-center gap-2 text-xs font-semibold text-ink-primary">
+                  <div className="w-2 h-2 rounded-full bg-sif-primary animate-pulse" />
+                  <span>Double Empathy Practice</span>
+                </div>
+                <span className="text-[11px] text-ink-muted font-medium">Safe Space</span>
               </div>
 
-              {/* Realistic Scene Preview Container */}
-              <div className="w-full aspect-[4/3] rounded-2xl bg-gradient-to-br from-[#121833] via-[#1B234B] to-[#0D1226] border border-white/10 p-4 flex flex-col justify-between text-white shadow-inner relative overflow-hidden">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-sif-primary/20 via-transparent to-transparent pointer-events-none" />
-
-                <div className="relative z-10 flex items-center justify-between">
-                  <span className="text-[11px] font-mono text-sif-secondary bg-black/60 px-2 py-0.5 rounded-md border border-white/10">
-                    Live Video Stage
+              {/* Bubble 1: What you need (authentic expression) */}
+              <div className="relative z-10 self-start max-w-[85%] rounded-2xl rounded-bl-xs bg-white border border-canvas-border/80 p-4 shadow-card hover:shadow-card-hover transition-all duration-300">
+                <div className="flex items-center gap-1.5 mb-1.5">
+                  <span className="w-2 h-2 rounded-full bg-sif-primary" />
+                  <span className="text-[10px] uppercase tracking-wider font-semibold text-ink-muted">
+                    Your Need • Clear & Direct
                   </span>
-                  <span className="text-[11px] text-white/80">Sophia Voice</span>
                 </div>
-
-                <div className="relative z-10 space-y-1.5 bg-black/70 backdrop-blur-md p-3 rounded-xl border border-white/15">
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-sif-accent" />
-                    <span className="text-xs font-semibold text-white">Scenario-Adaptive Presence</span>
-                  </div>
-                  <p className="text-[11px] text-slate-300 leading-snug">
-                    Sophia adapts attire and setting to your scenario (Interview business attire, coffee chat turtleneck, quiet study, clinical office).
-                  </p>
-                </div>
-
-                <div className="relative z-10 flex items-center justify-between text-[10px] text-sif-secondarySubtle pt-1">
-                  <span>Lip-synced Speech-to-Video</span>
-                  <span>Sensory text mode toggle</span>
-                </div>
+                <p className="text-xs sm:text-sm text-ink-primary font-medium leading-relaxed">
+                  “Would it work if I send a quick 2-bullet summary in writing so we’re both aligned on deliverables?”
+                </p>
               </div>
 
-              <div className="text-center">
-                <p className="text-xs text-ink-muted">
-                  Warm, realistic conversational AI partner with visible nonverbal cues
+              {/* Reassuring Bridge Pill */}
+              <div className="relative z-10 self-center inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-sif-primarySubtle/90 border border-sif-border text-[11px] font-medium text-sif-primaryDeep shadow-2xs backdrop-blur-xs">
+                <svg className="w-3.5 h-3.5 text-sif-primary shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <span>Understood without masking</span>
+              </div>
+
+              {/* Bubble 2: Partner response (warm, aligned) */}
+              <div className="relative z-10 self-end max-w-[85%] rounded-2xl rounded-br-xs bg-[#F5F7FF] border border-sif-border p-4 shadow-card hover:shadow-card-hover transition-all duration-300">
+                <div className="flex items-center justify-between gap-1.5 mb-1.5">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                    <span className="text-[10px] uppercase tracking-wider font-semibold text-ink-muted">
+                      Sophia • Project Lead
+                    </span>
+                  </div>
+                  <span className="text-[10px] text-emerald-700 font-medium">Receptive</span>
+                </div>
+                <p className="text-xs sm:text-sm text-ink-primary font-medium leading-relaxed">
+                  “That helps a lot! A quick thumbs-up is all we need so nothing gets lost.”
+                </p>
+              </div>
+
+              {/* Quiet brand reassurance caption */}
+              <div className="text-center pt-1 relative z-10">
+                <p className="text-[11px] text-ink-muted leading-relaxed">
+                  Express needs comfortably • Retries without scoring
                 </p>
               </div>
             </div>
@@ -255,7 +310,7 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
         </main>
 
         {/* Minimal Footer */}
-        <footer className="max-w-5xl mx-auto w-full pt-4 pb-2 border-t border-canvas-borderSubtle flex flex-col sm:flex-row items-center justify-between text-xs text-ink-muted gap-2">
+        <footer className="max-w-6xl mx-auto w-full pt-4 pb-2 border-t border-canvas-borderSubtle flex flex-col sm:flex-row items-center justify-between text-xs text-ink-muted gap-2 relative z-10">
           <span>Say It First • Double Empathy Conversational Sandbox</span>
           <span>Accessible • Neurodiversity-Affirming • Sensory-Friendly</span>
         </footer>

@@ -20,6 +20,7 @@
 import React, { useState } from 'react';
 import type { ScenarioDefinition, TopicProgressStatus } from '../../domain/scenarios/topics';
 import { TOPICS } from '../../domain/scenarios/topics';
+import { Lightbulb, ClipboardList } from 'lucide-react';
 import type { UserPreferences } from './WelcomeOnboarding';
 import type { SavedTakeaway } from './MyProgress';
 import type { SessionReport } from '../../domain/entities/SessionReport';
@@ -163,7 +164,7 @@ export const AppShell: React.FC<AppShellProps> = ({
             className="p-1.5 rounded-lg text-sif-primary bg-sif-primarySubtle text-xs font-semibold"
             aria-label="Open tutorial"
           >
-            💡
+            <Lightbulb className="w-4 h-4" />
           </button>
         </header>
 
@@ -281,7 +282,7 @@ export const AppShell: React.FC<AppShellProps> = ({
                 ) : (
                   <div className="max-w-4xl mx-auto py-12 px-4 text-center space-y-4">
                     <div className="p-8 rounded-card bg-canvas-surface border border-canvas-border shadow-card space-y-3">
-                      <span className="text-2xl">📋</span>
+                      <ClipboardList className="w-8 h-8 text-sif-primary mx-auto" />
                       <h2 className="text-lg font-semibold text-ink-primary">No Guided Reports Yet</h2>
                       <p className="text-xs text-ink-secondary max-w-md mx-auto">
                         Complete your first interactive conversation practice session with Sophia to generate a 9-part coaching report, transcript, and strengths review.

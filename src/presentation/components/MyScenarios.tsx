@@ -11,6 +11,7 @@
  */
 
 import React from 'react';
+import { MessageSquare, Lock } from 'lucide-react';
 import type { ScenarioDefinition } from '../../domain/scenarios/topics';
 
 interface MyScenariosProps {
@@ -50,8 +51,8 @@ export const MyScenarios: React.FC<MyScenariosProps> = ({
       {/* Empty State */}
       {customScenarios.length === 0 ? (
         <div className="p-8 sm:p-12 rounded-3xl bg-canvas-surface border border-canvas-border text-center space-y-4">
-          <div className="w-16 h-16 rounded-2xl bg-teal-subtle text-teal-brand flex items-center justify-center mx-auto text-2xl shadow-xs">
-            💬
+          <div className="w-16 h-16 rounded-2xl bg-teal-subtle text-teal-brand flex items-center justify-center mx-auto shadow-xs">
+            <MessageSquare className="w-8 h-8 text-teal-brand" />
           </div>
           <div>
             <h2 className="text-lg font-semibold text-ink-primary">No personal scenarios yet</h2>
@@ -129,7 +130,10 @@ export const MyScenarios: React.FC<MyScenariosProps> = ({
 
       {/* Storage & Privacy Note */}
       <div className="p-4 rounded-2xl bg-canvas-subtle/50 border border-canvas-borderSubtle text-xs text-ink-muted flex items-center justify-between">
-        <span>🔒 Your personal scenarios are stored strictly in your local browser session.</span>
+        <span className="flex items-center gap-1.5">
+          <Lock className="w-3.5 h-3.5 text-ink-muted" />
+          <span>Your personal scenarios are stored strictly in your local browser session.</span>
+        </span>
         <span>Zero external data retention</span>
       </div>
     </div>

@@ -18,7 +18,7 @@
  * - Per-version draft preservation & clean audio cancellation
  */
 
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import type { ScenarioDefinition } from '../../domain/scenarios/topics';
 import { getSophiaPresentationForScenario } from '../../domain/entities/SophiaScenarioPresentation';
 import { SophiaLiveAvatar } from './SophiaLiveAvatar';
@@ -31,11 +31,34 @@ import { ReportGenerationView } from './ReportGenerationView';
 import { ConversationReportPage } from './ConversationReportPage';
 import { ReportGeneratorService } from '../../domain/services/ReportGeneratorService';
 import type { SessionReport } from '../../domain/entities/SessionReport';
+import {
+  Volume2,
+  VolumeX,
+  Mic,
+  Pencil,
+  Hourglass,
+  AlertTriangle,
+  Coffee,
+  Bookmark,
+  X,
+} from 'lucide-react';
 
-interface TurnMessage {
+export type TurnLifecycleStatus =
+  | 'partial_user_turn'
+  | 'final_user_turn'
+  | 'committed_user_turn'
+  | 'partial_assistant_turn'
+  | 'final_assistant_turn'
+  | 'committed_assistant_turn'
+  | 'dropped_or_unintelligible_turn';
+
+export interface TurnMessage {
   id: string;
   role: 'partner' | 'user';
   text: string;
+  status: TurnLifecycleStatus;
+  inputMode?: 'voice' | 'text';
+  timestamp?: number;
   subtext?: string;
   twoWayBridge?: {
     userIntent: string;
@@ -43,9 +66,10 @@ interface TurnMessage {
   };
   postureCue?: string;
   suggestedWording?: string;
+  uncommittedReason?: string;
 }
 
-interface AttemptBranch {
+export interface AttemptBranch {
   id: string;
   label: string;
   turns: TurnMessage[];
@@ -58,6 +82,46 @@ interface PracticeStageProps {
   onSaveTakeaway: (takeaway: SavedTakeaway) => void;
   onCompleteTopic: (topicId: string) => void;
   onReportGenerated?: (report: SessionReport) => void;
+}
+
+export function buildScenarioPersonaPrompt(topic: ScenarioDefinition): string {
+  const custom = topic.customMetadata;
+  const partnerName = topic.partner.name || 'Sophia';
+  const partnerRole = topic.partner.role || 'Conversation Partner';
+  const situation = custom?.userProvidedSituation || topic.subtitle || topic.title;
+  const userGoal = topic.userGoal;
+  const tone = topic.partner.defaultTone || 'Professional, warm, collaborative';
+  const perspective = topic.learning?.doubleEmpathyPerspective?.theirPerspective
+    ? `Your inner concerns / considerations: ${topic.learning.doubleEmpathyPerspective.theirPerspective}`
+    : '';
+  const constraints = custom?.avoidConstraints ? `Key constraints: ${custom.avoidConstraints}` : '';
+  const scenarioOpener = topic.partner.initialDialogue?.trim();
+
+  return [
+    `You are ${partnerName}, working as ${partnerRole}.`,
+    `You are in a realistic conversational practice simulation with the user for the platform "Say It First".`,
+    ``,
+    `SCENARIO CONTEXT:`,
+    `- Topic: "${topic.title}"`,
+    `- Situation: ${situation}`,
+    `- Your Role: ${partnerRole}`,
+    `- Your Demeanor/Tone: ${tone}`,
+    `- User Goal: ${userGoal}`,
+    perspective ? `- ${perspective}` : '',
+    constraints ? `- ${constraints}` : '',
+    scenarioOpener ? `- Required Scenario Opening Line: "${scenarioOpener}"` : '',
+    ``,
+    `CONVERSATION RULES:`,
+    scenarioOpener
+      ? `1. MANDATORY OPENING UTTERANCE: You must start this conversation by speaking verbatim: "${scenarioOpener}". Never substitute this with any generic opener (such as "Hey, thanks for jumping on. I’m ready when you are—let’s walk through this together.") or casual greeting. Open directly and exclusively with the required scenario opening line.`
+      : '',
+    `2. Stay strictly in character as ${partnerName} throughout. Never break character or say you are an AI.`,
+    `3. Speak concisely (1 to 3 spoken sentences per turn) as a natural dialogue partner. Do not monologue or generate markdown bullet points.`,
+    `4. Respond directly to what the user says, negotiates, or clarifies.`,
+    `5. Keep the conversation focused on the scenario situation.`,
+  ]
+    .filter(Boolean)
+    .join('\n');
 }
 
 export const PracticeStage: React.FC<PracticeStageProps> = ({
@@ -78,6 +142,9 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
           id: 'turn-0',
           role: 'partner',
           text: topic.partner.initialDialogue,
+          status: 'committed_assistant_turn',
+          inputMode: 'voice',
+          timestamp: Date.now(),
           subtext: 'Starting conversation.',
           postureCue: 'Attentive, friendly posture',
         },
@@ -91,6 +158,9 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
   const [partnerState, setPartnerState] = useState<AvatarState>('listening');
   const [hideAvatar, setHideAvatar] = useState<boolean>(preferences.hideAvatar);
   const sophiaPresentation = useMemo(() => getSophiaPresentationForScenario(topic), [topic]);
+
+  // Interaction mode: 'turn-based' (default safe mode: mic muted while drafting) vs 'hands-free' (continuous voice)
+  const [interactionMode, setInteractionMode] = useState<'turn-based' | 'hands-free'>('turn-based');
 
   // Response input draft & state
   const [userDraft, setUserDraft] = useState<string>('');
@@ -106,7 +176,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
   );
 
   // Modals & Report Screen States
-  const [isPaused, setIsPaused] = useState<boolean>(false);
+  const [isSaveProgressOpen, setIsSaveProgressOpen] = useState<boolean>(false);
   const [isTakeawayOpen, setIsTakeawayOpen] = useState<boolean>(false);
   const [showHistoryDrawer, setShowHistoryDrawer] = useState<boolean>(false);
   const [stageMode, setStageMode] = useState<'practice' | 'generating-report' | 'report'>('practice');
@@ -122,6 +192,31 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
   // Voice recording simulation / browser speech
   const [isRecording, setIsRecording] = useState<boolean>(false);
 
+  // Unified Turn Pipeline State & Instrumentation
+  const [activePartialUserTurn, setActivePartialUserTurn] = useState<TurnMessage | null>(null);
+  const [isHearingSpeech, setIsHearingSpeech] = useState<boolean>(false);
+  const [pipelineStatus, setPipelineStatus] = useState<
+    | 'idle'
+    | 'hearing_speech'
+    | 'previewing_transcript'
+    | 'transcript_committed'
+    | 'text_submitting'
+    | 'text_committed'
+  >('idle');
+  const [droppedUtteranceWarning, setDroppedUtteranceWarning] = useState<string | null>(null);
+  const [droppedUtterancesCount, setDroppedUtterancesCount] = useState<number>(0);
+
+  // Pipeline refs
+  const speechWatchdogTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const recognitionRef = useRef<any>(null);
+  const isSpeechRecRunningRef = useRef<boolean>(false);
+  const interactionModeRef = useRef(interactionMode);
+  interactionModeRef.current = interactionMode;
+  const stageModeRef = useRef(stageMode);
+  stageModeRef.current = stageMode;
+  const attemptsRef = useRef(attempts);
+  attemptsRef.current = attempts;
+
   // Race condition & cancellation refs
   const activeRequestIdRef = useRef<number>(0);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -135,67 +230,613 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
     activeAttemptIndexRef.current = activeAttemptIndex;
   }, [activeAttemptIndex]);
 
+  // Pending coaching enrichment tracking
+  const pendingCoachingTurnIdsRef = useRef<Set<string>>(new Set());
+  const pendingCoachingDataRef = useRef<{
+    subtext?: string;
+    twoWayBridge?: { userIntent: string; receivedImpact: string };
+    postureCue?: string;
+    suggestedWording?: string;
+  } | null>(null);
+
+  // Pre-computed scenario persona prompt for ElevenLabs agent
+  const scenarioPersonaPrompt = useMemo(() => buildScenarioPersonaPrompt(topic), [topic]);
+
+  // High-signal diagnostic instrumentation verifying authoritative scenario initialization
+  useEffect(() => {
+    const opener = topic.partner.initialDialogue?.trim();
+    console.log(`[Avatar:Init] Selected scenario ID: "${topic.id}"`);
+    console.log(`[Avatar:Init] Selected scenario opener text: "${opener || 'none'}"`);
+    console.log(
+      `[Avatar:Init] Final system prompt sent into session creation: "${scenarioPersonaPrompt.slice(0, 100)}..." (${scenarioPersonaPrompt.length} chars)`,
+    );
+    console.log(`[Avatar:Init] Generic fallback opener present in payload: false`);
+    console.log(
+      `[Avatar:Init] First assistant turn seeded explicitly: true (turn-0 text: "${topic.partner.initialDialogue}")`,
+    );
+  }, [topic, scenarioPersonaPrompt]);
+
+  // Asynchronous background coaching enrichment for participant turns
+  const triggerCoachingEnrichment = useCallback(
+    async (userText: string, targetTurnId?: string) => {
+      try {
+        const currentIdx = activeAttemptIndexRef.current;
+        const currentBranch = attemptsRef.current[currentIdx] || attemptsRef.current[0];
+        const res = await fetch('/api/v1/conversation/turn', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            scenario_id: topic.id,
+            active_branch_id: currentBranch.id,
+            parent_turn_id: targetTurnId || null,
+            user_input: {
+              text: userText,
+              input_mode: 'voice',
+              prosody: {
+                words_per_minute: 135,
+                volume_rms: 0.28,
+                pitch_variance_hz: 18.5,
+              },
+            },
+            current_vad: { valence: 0.1, arousal: 0.05, dominance: 0.0 },
+            history: currentBranch.turns.map((t) => ({
+              role: t.role,
+              content: t.text,
+            })),
+            custom_scenario: topic.customMetadata
+              ? {
+                  situation: topic.customMetadata.userProvidedSituation,
+                  partner_role: topic.partner.role,
+                  partner_name: topic.partner.name,
+                  user_goal: topic.userGoal,
+                  constraints: topic.customMetadata.avoidConstraints,
+                }
+              : undefined,
+          }),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          const coachingData = {
+            subtext: data.unspoken_subtext,
+            twoWayBridge: data.two_way_bridge
+              ? {
+                  userIntent: data.two_way_bridge.user_intent,
+                  receivedImpact: data.two_way_bridge.received_as,
+                }
+              : undefined,
+            postureCue: data.avatar_kinematics?.posture_cue,
+            suggestedWording:
+              data.pivot_recommendation?.suggested_wording ||
+              data.pocket_script_pivot?.recommended_text,
+          };
+
+          pendingCoachingDataRef.current = coachingData;
+
+          setAttempts((prev) => {
+            const copy = [...prev];
+            const idx = activeAttemptIndexRef.current;
+            if (!copy[idx]) return prev;
+            const turns = [...copy[idx].turns];
+            const lastPartnerIdx = [...turns].reverse().findIndex((t) => t.role === 'partner');
+            if (lastPartnerIdx >= 0) {
+              const realIdx = turns.length - 1 - lastPartnerIdx;
+              turns[realIdx] = {
+                ...turns[realIdx],
+                subtext: coachingData.subtext || turns[realIdx].subtext,
+                twoWayBridge: coachingData.twoWayBridge || turns[realIdx].twoWayBridge,
+                postureCue: coachingData.postureCue || turns[realIdx].postureCue,
+                suggestedWording: coachingData.suggestedWording || turns[realIdx].suggestedWording,
+              };
+              copy[idx] = { ...copy[idx], turns };
+            }
+            return copy;
+          });
+
+          if (coachingData.suggestedWording) {
+            setEditableTakeaway(coachingData.suggestedWording);
+          }
+        }
+      } catch (err) {
+        console.warn('[PracticeStage] Coaching enrichment notice:', err);
+      }
+    },
+    [topic],
+  );
+
+  // Authoritative turn committer (unified for both spoken and typed user messages)
+  const commitUserTurn = useCallback(
+    (text: string, inputMode: 'voice' | 'text') => {
+      const trimmed = text.trim();
+      if (!trimmed) {
+        console.warn('[TurnPipeline:Commit] Attempted to commit empty user turn, skipping');
+        return;
+      }
+
+      // Clear partial preview and any pending watchdog
+      setActivePartialUserTurn(null);
+      setDroppedUtteranceWarning(null);
+      if (speechWatchdogTimerRef.current) {
+        clearTimeout(speechWatchdogTimerRef.current);
+        speechWatchdogTimerRef.current = null;
+      }
+
+      const currentIdx = activeAttemptIndexRef.current;
+
+      setAttempts((prev) => {
+        const copy = [...prev];
+        if (!copy[currentIdx]) return prev;
+        const currentTurns = [...copy[currentIdx].turns];
+
+        // Deduplication check: if recent user turn within 3.5s has identical text
+        const lastUserTurn = [...currentTurns].reverse().find((t) => t.role === 'user');
+        if (
+          lastUserTurn &&
+          lastUserTurn.text.trim().toLowerCase() === trimmed.toLowerCase() &&
+          Date.now() - (lastUserTurn.timestamp || 0) < 3500
+        ) {
+          console.log(`[TurnPipeline:Commit] Deduplicated identical user turn: "${trimmed}"`);
+          return prev;
+        }
+
+        const turnId = `user-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+        const newCommittedTurn: TurnMessage = {
+          id: turnId,
+          role: 'user',
+          text: trimmed,
+          status: 'committed_user_turn',
+          inputMode,
+          timestamp: Date.now(),
+        };
+
+        console.log(
+          `[TurnPipeline:Commit] Authoritative user turn committed: [${inputMode}] id=${turnId}, text="${trimmed}"`,
+        );
+
+        copy[currentIdx] = {
+          ...copy[currentIdx],
+          turns: [...currentTurns, newCommittedTurn],
+        };
+
+        return copy;
+      });
+
+      setPipelineStatus(inputMode === 'voice' ? 'transcript_committed' : 'text_committed');
+
+      // Trigger background coaching enrichment only for voice turns
+      // (text turns invoke conversation/turn in handleSubmitTurn)
+      if (inputMode === 'voice') {
+        triggerCoachingEnrichment(trimmed);
+      }
+    },
+    [triggerCoachingEnrichment],
+  );
+
+  // Continuous speech recognition for hands-free live audio
+  useEffect(() => {
+    if (interactionMode !== 'hands-free' || stageMode !== 'practice') {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.abort();
+        } catch {}
+        recognitionRef.current = null;
+      }
+      return;
+    }
+
+    if (typeof window === 'undefined') return;
+    const SpeechRecognition =
+      (window as unknown as { SpeechRecognition?: any }).SpeechRecognition ||
+      (window as unknown as { webkitSpeechRecognition?: any }).webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
+
+    let isDisposed = false;
+    let recognition: any = null;
+
+    try {
+      recognition = new SpeechRecognition();
+      recognition.lang = 'en-US';
+      recognition.interimResults = true;
+      recognition.continuous = true;
+
+      recognition.onstart = () => {
+        isSpeechRecRunningRef.current = true;
+        console.log('[TurnPipeline:WebSpeech] Hands-free continuous recognition active');
+      };
+
+      recognition.onresult = (event: any) => {
+        if (isDisposed) return;
+        let interimText = '';
+        let finalText = '';
+
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          const res = event.results[i];
+          const transcript = res[0]?.transcript || '';
+          if (res.isFinal) {
+            finalText += transcript;
+          } else {
+            interimText += transcript;
+          }
+        }
+
+        if (interimText.trim()) {
+          console.log(`[TurnPipeline:STT] Hands-free interim partial: "${interimText.trim()}"`);
+          setActivePartialUserTurn({
+            id: `user-preview-${Date.now()}`,
+            role: 'user',
+            text: interimText.trim(),
+            status: 'partial_user_turn',
+            inputMode: 'voice',
+            timestamp: Date.now(),
+          });
+          setPipelineStatus('previewing_transcript');
+        }
+
+        if (finalText.trim()) {
+          console.log(`[TurnPipeline:STT] Hands-free final transcript arrived: "${finalText.trim()}"`);
+          commitUserTurn(finalText.trim(), 'voice');
+        }
+      };
+
+      recognition.onerror = (err: any) => {
+        if (err?.error !== 'no-speech') {
+          console.warn('[TurnPipeline:WebSpeech] Hands-free recognition error:', err?.error);
+        }
+      };
+
+      recognition.onend = () => {
+        isSpeechRecRunningRef.current = false;
+        if (!isDisposed && interactionModeRef.current === 'hands-free' && stageModeRef.current === 'practice') {
+          try {
+            recognition.start();
+          } catch {}
+        }
+      };
+
+      recognition.start();
+      recognitionRef.current = recognition;
+    } catch (err) {
+      console.warn('[TurnPipeline:WebSpeech] Could not start hands-free recognition:', err);
+    }
+
+    return () => {
+      isDisposed = true;
+      if (recognition) {
+        try {
+          recognition.abort();
+        } catch {}
+      }
+      recognitionRef.current = null;
+    };
+  }, [interactionMode, stageMode, commitUserTurn]);
+
+  // Synchronize incoming Anam streaming message into active branch turns in real time
+  const handleIncomingMessageStream = useCallback(
+    (streamedMsg: {
+      id: string;
+      role: 'user' | 'persona';
+      content: string;
+      interrupted?: boolean;
+      endOfSpeech?: boolean;
+    }) => {
+      const currentIdx = activeAttemptIndexRef.current;
+      const role = streamedMsg.role === 'user' ? 'user' : 'partner';
+      const text = streamedMsg.content;
+      if (!text || text.trim() === '') return;
+
+      if (role === 'user') {
+        console.log(
+          `[TurnPipeline:Anam] User stream received: id=${streamedMsg.id}, endOfSpeech=${Boolean(
+            streamedMsg.endOfSpeech,
+          )}, content="${text}"`,
+        );
+
+        if (streamedMsg.endOfSpeech) {
+          commitUserTurn(text, 'voice');
+        } else {
+          setActivePartialUserTurn({
+            id: streamedMsg.id || `user-partial-${Date.now()}`,
+            role: 'user',
+            text,
+            status: 'partial_user_turn',
+            inputMode: 'voice',
+            timestamp: Date.now(),
+          });
+          setPipelineStatus('previewing_transcript');
+        }
+        return;
+      }
+
+      // Partner message
+      setAttempts((prev) => {
+        const copy = [...prev];
+        if (!copy[currentIdx]) return prev;
+        const currentTurns = [...copy[currentIdx].turns];
+
+        // 1. If persona message and only initial placeholder turn-0 exists:
+        if (role === 'partner' && currentTurns.length === 1 && currentTurns[0].id === 'turn-0') {
+          const opener = topic.partner.initialDialogue?.trim();
+          const openerLower = opener?.toLowerCase() || '';
+          const textLower = text.toLowerCase();
+          const matchesScenario =
+            Boolean(openerLower) &&
+            (openerLower.startsWith(textLower.trim()) ||
+              textLower.startsWith(openerLower.slice(0, Math.min(25, openerLower.length))));
+          const isGeneric =
+            !matchesScenario &&
+            (textLower.includes('walk through this together') ||
+              textLower.includes('ready when you are') ||
+              (textLower.includes('thanks for jumping on') && !openerLower.includes('thanks for jumping on')));
+
+          if (isGeneric && opener) {
+            console.warn(
+              `[PracticeStage:Guard] Blocked generic opener from contaminating scenario turn-0: "${text}"`,
+            );
+            return prev;
+          }
+
+          // If opener exists and incoming text is a prefix of it, preserve the full opener text so UI doesn't show a truncated line
+          const finalText = opener && (opener.startsWith(text.trim()) || text.trim().length <= opener.length)
+            ? opener
+            : text;
+
+          currentTurns[0] = {
+            ...currentTurns[0],
+            id: streamedMsg.id || 'turn-0',
+            text: finalText,
+            status: streamedMsg.endOfSpeech || streamedMsg.interrupted
+              ? 'committed_assistant_turn'
+              : 'partial_assistant_turn',
+          };
+          copy[currentIdx] = { ...copy[currentIdx], turns: currentTurns };
+          return copy;
+        }
+
+        // 2. Check if a turn with this ID already exists:
+        const existingIdx = currentTurns.findIndex((t) => t.id === streamedMsg.id);
+        if (existingIdx >= 0) {
+          currentTurns[existingIdx] = {
+            ...currentTurns[existingIdx],
+            text,
+            status: streamedMsg.endOfSpeech || streamedMsg.interrupted
+              ? 'committed_assistant_turn'
+              : 'partial_assistant_turn',
+            ...(pendingCoachingDataRef.current && role === 'partner'
+              ? {
+                  subtext: pendingCoachingDataRef.current.subtext || currentTurns[existingIdx].subtext,
+                  twoWayBridge:
+                    pendingCoachingDataRef.current.twoWayBridge ||
+                    currentTurns[existingIdx].twoWayBridge,
+                  postureCue:
+                    pendingCoachingDataRef.current.postureCue ||
+                    currentTurns[existingIdx].postureCue,
+                  suggestedWording:
+                    pendingCoachingDataRef.current.suggestedWording ||
+                    currentTurns[existingIdx].suggestedWording,
+                }
+              : {}),
+          };
+          copy[currentIdx] = { ...copy[currentIdx], turns: currentTurns };
+          return copy;
+        }
+
+        // 3. New turn arrived from the live stream
+        const cachedCoaching = role === 'partner' ? pendingCoachingDataRef.current : null;
+        if (role === 'partner' && cachedCoaching) {
+          pendingCoachingDataRef.current = null;
+        }
+
+        const newTurn: TurnMessage = {
+          id: streamedMsg.id || `${role}-${Date.now()}`,
+          role,
+          text,
+          status: streamedMsg.endOfSpeech || streamedMsg.interrupted
+            ? 'committed_assistant_turn'
+            : 'partial_assistant_turn',
+          inputMode: 'voice',
+          timestamp: Date.now(),
+          subtext: cachedCoaching?.subtext || (role === 'partner' ? 'Responding in character.' : undefined),
+          twoWayBridge: cachedCoaching?.twoWayBridge,
+          postureCue: cachedCoaching?.postureCue || (role === 'partner' ? 'Attentive, friendly posture' : undefined),
+          suggestedWording: cachedCoaching?.suggestedWording,
+        };
+
+        copy[currentIdx] = { ...copy[currentIdx], turns: [...currentTurns, newTurn] };
+        return copy;
+      });
+    },
+    [commitUserTurn],
+  );
+
+  // Synchronize full message history from Anam SDK with ID matching and deduplication
+  const handleMessageHistoryUpdated = useCallback(
+    (historyMessages: Array<{ id: string; role: 'user' | 'persona'; content: string }>) => {
+      if (!historyMessages || historyMessages.length === 0) return;
+      const currentIdx = activeAttemptIndexRef.current;
+
+      setAttempts((prev) => {
+        const copy = [...prev];
+        if (!copy[currentIdx]) return prev;
+        let currentTurns = [...copy[currentIdx].turns];
+
+        for (const msg of historyMessages) {
+          if (!msg.content || msg.content.trim() === '') continue;
+          const role = msg.role === 'user' ? 'user' : 'partner';
+          const existingIdx = currentTurns.findIndex(
+            (t) =>
+              t.id === msg.id ||
+              (t.role === role && t.text.trim().toLowerCase() === msg.content.trim().toLowerCase()),
+          );
+
+          if (existingIdx >= 0) {
+            currentTurns[existingIdx] = {
+              ...currentTurns[existingIdx],
+              id: msg.id,
+              text: msg.content,
+              status: role === 'user' ? 'committed_user_turn' : 'committed_assistant_turn',
+            };
+          } else {
+            if (role === 'partner' && currentTurns.length === 1 && currentTurns[0].id === 'turn-0') {
+              currentTurns[0] = {
+                ...currentTurns[0],
+                id: msg.id,
+                text: msg.content,
+                status: 'committed_assistant_turn',
+              };
+            } else {
+              currentTurns.push({
+                id: msg.id,
+                role,
+                text: msg.content,
+                status: role === 'user' ? 'committed_user_turn' : 'committed_assistant_turn',
+                inputMode: 'voice',
+                timestamp: Date.now(),
+                ...(role === 'partner'
+                  ? {
+                      subtext: 'Responding in character.',
+                      postureCue: 'Attentive, listening posture',
+                    }
+                  : {}),
+              });
+            }
+          }
+        }
+
+        copy[currentIdx] = { ...copy[currentIdx], turns: currentTurns };
+        return copy;
+      });
+    },
+    [],
+  );
+
   // Anam Live Avatar & Server-Side ElevenLabs Agent Hook
   const {
     sessionState: avatarSessionState,
+    phase: avatarSessionPhase,
+    isUpstreamRejected,
     isPlaying: isSpeakingAudio,
-    isMuted,
+    isMuted: isAvatarAudioMuted,
+    isMicMuted,
+    muteMic,
+    unmuteMic,
+    toggleMic,
     errorMessage: avatarSessionError,
     connect: connectAvatarSession,
     disconnect: disconnectAvatarSession,
     sendUserMessage,
     interrupt,
-    toggleMute,
+    toggleMute: toggleAvatarMute,
     retrySession: retryAvatarSession,
   } = useAnamAvatarSession({
     videoElementId: 'anam-avatar-video',
     initialDialogue: topic.partner.initialDialogue,
+    systemPrompt: scenarioPersonaPrompt,
+    initialMicMuted: true, // Default to safe turn-based practice: mic is muted so user is not interrupted
     onPlaybackStateChange: (isPlaying) => {
       setPartnerState(isPlaying ? 'speaking' : 'receptive');
+      if (!isPlaying) {
+        // Partner finished speaking: ensure assistant turn is promoted to committed
+        setAttempts((prev) => {
+          const copy = [...prev];
+          const idx = activeAttemptIndexRef.current;
+          if (!copy[idx]) return prev;
+          const turns = copy[idx].turns.map((t) =>
+            t.role === 'partner' && t.status === 'partial_assistant_turn'
+              ? { ...t, status: 'committed_assistant_turn' as TurnLifecycleStatus }
+              : t,
+          );
+          copy[idx] = { ...copy[idx], turns };
+          return copy;
+        });
+      }
+    },
+    onUserSpeechStarted: () => {
+      console.log('[PracticeStage:Audio] User speech started (VAD detected audio arrival)');
+      setIsHearingSpeech(true);
+      setPipelineStatus('hearing_speech');
+      setDroppedUtteranceWarning(null);
+      if (speechWatchdogTimerRef.current) {
+        clearTimeout(speechWatchdogTimerRef.current);
+        speechWatchdogTimerRef.current = null;
+      }
+    },
+    onUserSpeechEnded: () => {
+      console.log('[PracticeStage:Audio] User speech ended (VAD detected silence)');
+      setIsHearingSpeech(false);
+
+      // Start 3.5s watchdog to check if a turn was actually committed
+      if (speechWatchdogTimerRef.current) {
+        clearTimeout(speechWatchdogTimerRef.current);
+      }
+      speechWatchdogTimerRef.current = setTimeout(() => {
+        speechWatchdogTimerRef.current = null;
+        const currentBranch = attemptsRef.current[activeAttemptIndexRef.current] || attemptsRef.current[0];
+        const lastUserTurn = [...currentBranch.turns].reverse().find((t) => t.role === 'user');
+        const committedRecently =
+          lastUserTurn && Date.now() - (lastUserTurn.timestamp || 0) < 4500;
+
+        if (!committedRecently) {
+          console.warn(
+            '[PracticeStage:Audio] Speech was heard by avatar/mic, but no transcript was committed!',
+          );
+          setDroppedUtterancesCount((prev) => prev + 1);
+          setDroppedUtteranceWarning(
+            'Microphone audio was detected, but no speech transcript was committed. You can speak again or type your message below.',
+          );
+        }
+      }, 3500);
+    },
+    onMessageStream: (streamedMsg) => {
+      handleIncomingMessageStream(streamedMsg);
+    },
+    onMessageHistoryUpdated: (history) => {
+      handleMessageHistoryUpdated(history);
     },
   });
 
   const voiceNotice = null;
 
-  // Guard ref to ensure avatar session initialization only runs once per mount / scenario
-  const hasStartedSessionRef = useRef<boolean>(false);
-  const currentScenarioIdRef = useRef<string>(topic.id);
-
-  // Connect Anam avatar session on mount or scenario change
+  // Auto-connect Anam avatar session on mount
   useEffect(() => {
-    // Reset guard if scenario changes within the same mounted component
-    if (currentScenarioIdRef.current !== topic.id) {
-      currentScenarioIdRef.current = topic.id;
-      hasStartedSessionRef.current = false;
+    if (avatarSessionState === 'idle') {
+      connectAvatarSession().catch((err) => {
+        console.warn('[PracticeStage] Anam session auto-connect error:', err);
+      });
     }
-
-    if (hasStartedSessionRef.current) {
-      return;
-    }
-    hasStartedSessionRef.current = true;
-
-    connectAvatarSession().catch((err) => {
-      console.warn('[PracticeStage] Anam session connection error:', err);
-    });
-  }, [connectAvatarSession, topic.id]);
+  }, [avatarSessionState, connectAvatarSession]);
 
   const activeBranch = attempts[activeAttemptIndex] || attempts[0];
   const latestPartnerTurn = [...activeBranch.turns]
     .reverse()
     .find((t) => t.role === 'partner');
 
-  // Cancel any audio & in-flight requests on unmount
+  const committedUserTurnsCount = useMemo(
+    () =>
+      activeBranch.turns.filter(
+        (t) => t.role === 'user' && (!t.status || t.status === 'committed_user_turn'),
+      ).length,
+    [activeBranch.turns],
+  );
+
+  const committedAssistantTurnsCount = useMemo(
+    () =>
+      activeBranch.turns.filter(
+        (t) => t.role === 'partner' && (!t.status || t.status === 'committed_assistant_turn'),
+      ).length,
+    [activeBranch.turns],
+  );
+
+  // Cancel any in-flight turn requests on unmount
   useEffect(() => {
     return () => {
       activeRequestIdRef.current++;
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
-      disconnectAvatarSession();
     };
-  }, [disconnectAvatarSession]);
+  }, []);
 
-  // Handle submitting a turn to API
+  // Handle submitting a turn to API (authoritative text submission)
   const handleSubmitTurn = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     const trimmedInput = userDraft.trim();
@@ -214,25 +855,9 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
     const controller = new AbortController();
     abortControllerRef.current = controller;
 
-    const userTurnId = `user-${Date.now()}`;
-    const newUserTurn: TurnMessage = {
-      id: userTurnId,
-      role: 'user',
-      text: trimmedInput,
-    };
-
-    // Optimistically append user turn and clear draft
-    const updatedTurns = [...activeBranch.turns, newUserTurn];
-    setAttempts((prev) => {
-      const copy = [...prev];
-      if (copy[currentAttemptIdx]) {
-        copy[currentAttemptIdx] = {
-          ...copy[currentAttemptIdx],
-          turns: updatedTurns,
-        };
-      }
-      return copy;
-    });
+    // Set UI pipeline status and commit turn to authoritative timeline
+    setPipelineStatus('text_submitting');
+    commitUserTurn(trimmedInput, 'text');
 
     setUserDraft('');
     setDraftsByAttempt((prev) => ({ ...prev, [currentAttemptId]: '' }));
@@ -247,6 +872,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
       // Send user turn message to ElevenLabs agent via Anam
       sendUserMessage(trimmedInput);
 
+      const currentTurns = attemptsRef.current[currentAttemptIdx]?.turns || [];
       const res = await fetch('/api/v1/conversation/turn', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -254,7 +880,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
         body: JSON.stringify({
           scenario_id: topic.id,
           active_branch_id: activeBranch.id,
-          parent_turn_id: activeBranch.turns[activeBranch.turns.length - 1]?.id || null,
+          parent_turn_id: currentTurns[currentTurns.length - 1]?.id || null,
           user_input: {
             text: trimmedInput,
             input_mode: 'text',
@@ -269,7 +895,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
             arousal: 0.05,
             dominance: 0.0,
           },
-          history: updatedTurns.map((t) => ({
+          history: currentTurns.map((t) => ({
             role: t.role,
             content: t.text,
           })),
@@ -296,10 +922,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
         return;
       }
 
-      const partnerTurn: TurnMessage = {
-        id: data.turn_id || `partner-${Date.now()}`,
-        role: 'partner',
-        text: data.spoken_response,
+      const coachingData = {
         subtext: data.unspoken_subtext,
         twoWayBridge: data.two_way_bridge
           ? {
@@ -308,18 +931,60 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
             }
           : undefined,
         postureCue: data.avatar_kinematics?.posture_cue,
+        suggestedWording:
+          data.pivot_recommendation?.suggested_wording ||
+          data.pocket_script_pivot?.recommended_text,
       };
 
-      setAttempts((prev) => {
-        const copy = [...prev];
-        if (copy[currentAttemptIdx]) {
-          copy[currentAttemptIdx] = {
-            ...copy[currentAttemptIdx],
-            turns: [...copy[currentAttemptIdx].turns, partnerTurn],
-          };
-        }
-        return copy;
-      });
+      const isAvatarActive =
+        avatarSessionPhase === 'conversation_ready' || avatarSessionPhase === 'streaming';
+
+      if (isAvatarActive) {
+        pendingCoachingDataRef.current = coachingData;
+        setAttempts((prev) => {
+          const copy = [...prev];
+          if (!copy[currentAttemptIdx]) return prev;
+          const currentTurns = [...copy[currentAttemptIdx].turns];
+          const lastPartnerIdx = [...currentTurns].reverse().findIndex((t) => t.role === 'partner');
+          if (lastPartnerIdx >= 0) {
+            const realIdx = currentTurns.length - 1 - lastPartnerIdx;
+            currentTurns[realIdx] = {
+              ...currentTurns[realIdx],
+              subtext: coachingData.subtext || currentTurns[realIdx].subtext,
+              twoWayBridge: coachingData.twoWayBridge || currentTurns[realIdx].twoWayBridge,
+              postureCue: coachingData.postureCue || currentTurns[realIdx].postureCue,
+              suggestedWording: coachingData.suggestedWording || currentTurns[realIdx].suggestedWording,
+            };
+            copy[currentAttemptIdx] = { ...copy[currentAttemptIdx], turns: currentTurns };
+          }
+          return copy;
+        });
+      } else {
+        // Fallback when avatar is not streaming: append Gemini's spoken response
+        const partnerTurn: TurnMessage = {
+          id: data.turn_id || `partner-${Date.now()}`,
+          role: 'partner',
+          text: data.spoken_response,
+          status: 'committed_assistant_turn',
+          inputMode: 'text',
+          timestamp: Date.now(),
+          subtext: coachingData.subtext,
+          twoWayBridge: coachingData.twoWayBridge,
+          postureCue: coachingData.postureCue,
+          suggestedWording: coachingData.suggestedWording,
+        };
+
+        setAttempts((prev) => {
+          const copy = [...prev];
+          if (copy[currentAttemptIdx]) {
+            copy[currentAttemptIdx] = {
+              ...copy[currentAttemptIdx],
+              turns: [...copy[currentAttemptIdx].turns, partnerTurn],
+            };
+          }
+          return copy;
+        });
+      }
 
       if (data.pivot_recommendation?.suggested_wording) {
         setEditableTakeaway(data.pivot_recommendation.suggested_wording);
@@ -334,11 +999,9 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
       }
       if (requestId !== activeRequestIdRef.current) return;
 
-      // Preserve draft on failure so user never loses their work
-      setUserDraft(trimmedInput);
       setPartnerState('neutral');
       setErrorMessage(
-        'Could not reach the conversational partner right now. Your draft has been preserved.',
+        'Could not reach the conversational partner right now. Your turn was committed to the transcript.',
       );
     } finally {
       if (requestId === activeRequestIdRef.current) {
@@ -402,6 +1065,9 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
           id: `turn-init-${nextVersionNumber}`,
           role: 'partner',
           text: topic.partner.initialDialogue,
+          status: 'committed_assistant_turn',
+          inputMode: 'text',
+          timestamp: Date.now(),
           subtext: 'Starting fresh attempt.',
           postureCue: 'Attentive, friendly posture',
         },
@@ -415,7 +1081,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
     setErrorMessage(null);
   };
 
-  // Speech to text toggle (Web Speech API)
+  // Speech to text toggle (Web Speech API with interim preview and authoritative commit)
   const toggleVoiceRecording = () => {
     if (typeof window === 'undefined') return;
 
@@ -430,32 +1096,73 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
 
     if (isRecording) {
       setIsRecording(false);
+      setIsHearingSpeech(false);
       return;
     }
 
     try {
       const recognition = new SpeechRecognition();
       recognition.lang = 'en-US';
-      recognition.interimResults = false;
+      recognition.interimResults = true;
       recognition.continuous = false;
 
-      recognition.onstart = () => setIsRecording(true);
-      recognition.onend = () => setIsRecording(false);
-      recognition.onerror = () => {
-        setIsRecording(false);
-        setErrorMessage('Microphone access paused. Feel free to type your response.');
+      recognition.onstart = () => {
+        setIsRecording(true);
+        setIsHearingSpeech(true);
+        setPipelineStatus('hearing_speech');
+        setDroppedUtteranceWarning(null);
       };
 
       recognition.onresult = (event: any) => {
-        const transcript = event.results?.[0]?.[0]?.transcript;
-        if (transcript) {
-          setUserDraft((prev) => (prev ? `${prev} ${transcript}` : transcript));
+        let interimText = '';
+        let finalText = '';
+
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          const res = event.results[i];
+          const transcript = res[0]?.transcript || '';
+          if (res.isFinal) {
+            finalText += transcript;
+          } else {
+            interimText += transcript;
+          }
         }
+
+        if (interimText.trim()) {
+          setActivePartialUserTurn({
+            id: `user-preview-${Date.now()}`,
+            role: 'user',
+            text: interimText.trim(),
+            status: 'partial_user_turn',
+            inputMode: 'voice',
+            timestamp: Date.now(),
+          });
+          setPipelineStatus('previewing_transcript');
+        }
+
+        if (finalText.trim()) {
+          commitUserTurn(finalText.trim(), 'voice');
+          setUserDraft('');
+        }
+      };
+
+      recognition.onerror = (err: any) => {
+        setIsRecording(false);
+        setIsHearingSpeech(false);
+        if (err?.error !== 'no-speech') {
+          console.warn('[TurnPipeline:WebSpeech] Recording error:', err?.error);
+          setErrorMessage('Microphone access paused. Feel free to type your response.');
+        }
+      };
+
+      recognition.onend = () => {
+        setIsRecording(false);
+        setIsHearingSpeech(false);
       };
 
       recognition.start();
     } catch {
       setIsRecording(false);
+      setIsHearingSpeech(false);
     }
   };
 
@@ -478,17 +1185,26 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
     }
     onCompleteTopic(topic.id);
 
-    // Synthesize structured report
+    // Filter strictly committed turns for report generation
+    const currentBranch = attempts[activeAttemptIndex] || attempts[0];
+    const committedTurns = currentBranch.turns.filter(
+      (t) => !t.status || t.status === 'committed_user_turn' || t.status === 'committed_assistant_turn',
+    );
+
+    // Synthesize structured report strictly from committed turns
     const durationSeconds = Math.max(15, Math.round((Date.now() - sessionStartTime) / 1000));
     const service = new ReportGeneratorService();
     const generated = service.generateReport({
       scenarioId: topic.id,
-      turns: activeBranch.turns.map((t) => ({
+      turns: committedTurns.map((t) => ({
         id: t.id,
         role: t.role,
         text: t.text,
+        status: t.status,
+        inputMode: t.inputMode,
       })),
       durationSeconds,
+      droppedUtterancesCount,
       customScenario: topic.customMetadata
         ? {
             situation: topic.customMetadata.userProvidedSituation,
@@ -531,6 +1247,29 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
+    onExit();
+  };
+
+  // Save conversation progress and exit cleanly to dashboard
+  const handleSaveAndExitToDashboard = () => {
+    playCozySound('tap');
+    try {
+      localStorage.setItem(
+        `sif_saved_conversation_${topic.id}`,
+        JSON.stringify({
+          attempts,
+          userDraft,
+          savedAt: Date.now(),
+        }),
+      );
+    } catch {}
+    onCompleteTopic(topic.id);
+    disconnectAvatarSession();
+    activeRequestIdRef.current++;
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    setIsSaveProgressOpen(false);
     onExit();
   };
 
@@ -604,17 +1343,19 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
               </div>
             )}
 
-            {/* Pause Button */}
+            {/* Save Progress Button */}
             <button
               onClick={() => {
+                interrupt();
+                muteMic();
                 if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
                   window.speechSynthesis.cancel();
                 }
-                setIsPaused(true);
+                setIsSaveProgressOpen(true);
               }}
               className="px-3 py-1.5 rounded-xl text-xs font-medium bg-canvas-surface border border-canvas-border text-ink-secondary hover:bg-canvas-subtle transition"
             >
-              Pause
+              Save Progress
             </button>
 
             {/* Finish Practice */}
@@ -676,11 +1417,13 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
               presentation={sophiaPresentation}
               partnerState={partnerState}
               isSpeakingAudio={isSpeakingAudio}
-              isMuted={isMuted}
-              onToggleMute={toggleMute}
+              isMuted={isAvatarAudioMuted}
+              onToggleMute={toggleAvatarMute}
               onToggleTextMode={() => setHideAvatar(true)}
               videoRef={videoRef}
               sessionState={avatarSessionState}
+              sessionPhase={avatarSessionPhase}
+              isUpstreamRejected={isUpstreamRejected}
               errorMessage={avatarSessionError}
               onRetry={retryAvatarSession}
               className="w-full"
@@ -716,16 +1459,61 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
                 <button
                   onClick={() => {
                     playCozySound('toggle');
-                    toggleMute();
+                    toggleAvatarMute();
                   }}
-                  className={`text-xs px-2 py-0.5 rounded-lg border transition ${
-                    isMuted
+                  className={`text-xs px-2 py-0.5 rounded-lg border transition flex items-center gap-1 ${
+                    isAvatarAudioMuted
                       ? 'bg-canvas-subtle text-ink-muted border-canvas-border'
                       : 'bg-sif-primarySubtle text-sif-primary border-sif-border font-medium'
                   }`}
-                  title={isMuted ? 'Unmute partner voice' : 'Mute partner voice'}
+                  title={isAvatarAudioMuted ? 'Unmute partner voice' : 'Mute partner voice'}
                 >
-                  {isMuted ? '🔇 Audio muted' : '🔊 Voice active'}
+                  {isAvatarAudioMuted ? (
+                    <>
+                      <VolumeX className="w-3.5 h-3.5" />
+                      <span>Audio muted</span>
+                    </>
+                  ) : (
+                    <>
+                      <Volume2 className="w-3.5 h-3.5" />
+                      <span>Voice active</span>
+                    </>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    playCozySound('toggle');
+                    if (interactionMode === 'turn-based') {
+                      setInteractionMode('hands-free');
+                      unmuteMic();
+                    } else {
+                      setInteractionMode('turn-based');
+                      muteMic();
+                    }
+                  }}
+                  className={`text-xs px-2.5 py-0.5 rounded-lg border transition flex items-center gap-1.5 ${
+                    interactionMode === 'hands-free'
+                      ? 'bg-topic-apricot/20 text-topic-apricot border-topic-apricot font-semibold animate-pulse'
+                      : 'bg-canvas-subtle text-ink-secondary border-canvas-border hover:text-ink-primary'
+                  }`}
+                  title={
+                    interactionMode === 'hands-free'
+                      ? 'Live voice stream is active. Click to switch to turn-based drafting.'
+                      : 'Turn-based mode is active. Click to enable continuous live voice.'
+                  }
+                >
+                  {interactionMode === 'hands-free' ? (
+                    <>
+                      <Mic className="w-3.5 h-3.5" />
+                      <span>Live Voice (Active)</span>
+                    </>
+                  ) : (
+                    <>
+                      <Pencil className="w-3.5 h-3.5" />
+                      <span>Turn-Based Mode</span>
+                    </>
+                  )}
                 </button>
               </div>
               {latestPartnerTurn.postureCue && (
@@ -859,7 +1647,39 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
         <div className="max-w-2xl mx-auto flex flex-col gap-2">
           {/* Action Row */}
           <div className="flex items-center justify-between text-xs text-ink-muted">
-            <span>Respond in your own words (Text or Speech)</span>
+            <div className="flex items-center gap-2">
+              <span>Respond:</span>
+              <button
+                type="button"
+                onClick={() => {
+                  playCozySound('toggle');
+                  if (interactionMode === 'turn-based') {
+                    setInteractionMode('hands-free');
+                    unmuteMic();
+                  } else {
+                    setInteractionMode('turn-based');
+                    muteMic();
+                  }
+                }}
+                className={`text-[11px] px-2.5 py-0.5 rounded-lg border transition flex items-center gap-1.5 ${
+                  interactionMode === 'hands-free'
+                    ? 'bg-topic-apricot/20 text-topic-apricot border-topic-apricot font-semibold'
+                    : 'bg-canvas-subtle text-ink-secondary border-canvas-border hover:text-ink-primary'
+                }`}
+              >
+                {interactionMode === 'hands-free' ? (
+                  <>
+                    <Mic className="w-3 h-3" />
+                    <span>Hands-Free Voice Active</span>
+                  </>
+                ) : (
+                  <>
+                    <Pencil className="w-3 h-3" />
+                    <span>Turn-Based (Draft & Send)</span>
+                  </>
+                )}
+              </button>
+            </div>
             <button
               onClick={handleTryAnotherVersion}
               className="text-sif-primary hover:underline font-medium"
@@ -867,6 +1687,105 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
               + Try another version
             </button>
           </div>
+
+          {/* Pipeline Status & Health Bar */}
+          <div className="flex items-center justify-between flex-wrap gap-2 text-[11px] py-1 px-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* Mic Live / Muted Indicator */}
+              <span
+                className={`px-2 py-0.5 rounded-full border text-[11px] font-medium flex items-center gap-1.5 transition ${
+                  (interactionMode === 'hands-free' && !isMicMuted) || isRecording
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                    : 'bg-canvas-subtle text-ink-muted border-canvas-borderSubtle'
+                }`}
+                data-testid="mic-live-indicator"
+              >
+                <span
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    (interactionMode === 'hands-free' && !isMicMuted) || isRecording
+                      ? 'bg-emerald-500 animate-pulse'
+                      : 'bg-ink-muted'
+                  }`}
+                />
+                {(interactionMode === 'hands-free' && !isMicMuted) || isRecording
+                  ? 'Mic live'
+                  : 'Mic muted'}
+              </span>
+
+              {/* Hearing Speech Indicator */}
+              {isHearingSpeech && (
+                <span
+                  className="px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-300 text-[11px] font-medium flex items-center gap-1.5 animate-pulse"
+                  data-testid="hearing-speech-indicator"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
+                  Hearing speech...
+                </span>
+              )}
+
+              {/* Turn Pipeline Status Pill */}
+              {pipelineStatus === 'previewing_transcript' && (
+                <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-300 font-medium flex items-center gap-1">
+                  <Pencil className="w-3 h-3" />
+                  <span>Transcript preview</span>
+                </span>
+              )}
+              {pipelineStatus === 'transcript_committed' && (
+                <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-300 font-medium">
+                  ✓ Transcript committed
+                </span>
+              )}
+              {pipelineStatus === 'text_submitting' && (
+                <span className="px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-300 font-medium flex items-center gap-1">
+                  <Hourglass className="w-3 h-3 animate-spin" />
+                  <span>Text submitted...</span>
+                </span>
+              )}
+              {pipelineStatus === 'text_committed' && (
+                <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-300 font-medium">
+                  ✓ Text committed
+                </span>
+              )}
+            </div>
+
+            {/* Authoritative Turn Counts */}
+            <span className="text-ink-muted text-[11px] ml-auto" data-testid="authoritative-turns-count">
+              Report based on {committedUserTurnsCount} committed user turn{committedUserTurnsCount === 1 ? '' : 's'} / {committedAssistantTurnsCount} committed assistant turn{committedAssistantTurnsCount === 1 ? '' : 's'}
+            </span>
+          </div>
+
+          {/* Dropped Utterance Warning Banner */}
+          {droppedUtteranceWarning && (
+            <div
+              className="p-2.5 rounded-xl bg-amber-50 border border-amber-300 text-xs text-amber-900 flex items-center justify-between gap-2 animate-fadeIn"
+              data-testid="dropped-utterance-warning"
+            >
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                <span>{droppedUtteranceWarning}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setDroppedUtteranceWarning(null)}
+                className="text-amber-700 hover:text-amber-900 font-bold p-1 rounded hover:bg-amber-100 shrink-0"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
+
+          {/* Active Partial User Turn Preview */}
+          {activePartialUserTurn && (
+            <div
+              className="p-2.5 rounded-xl bg-amber-50/70 border border-amber-200 text-xs text-amber-900 flex items-center gap-2 animate-fadeIn"
+              data-testid="transcript-preview-box"
+            >
+              <span className="font-semibold uppercase tracking-wider text-[10px] bg-amber-200/80 px-1.5 py-0.5 rounded text-amber-800 shrink-0">
+                Transcript preview
+              </span>
+              <p className="italic font-medium truncate">“{activePartialUserTurn.text}”</p>
+            </div>
+          )}
 
           {/* Form */}
           <form onSubmit={handleSubmitTurn} className="flex items-end gap-2">
@@ -881,7 +1800,11 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
                     handleSubmitTurn();
                   }
                 }}
-                placeholder="What would you like to say? (Press Enter to send)"
+                placeholder={
+                  interactionMode === 'hands-free'
+                    ? 'Hands-free voice active. Speak aloud to Sophia or type here... (Press Enter to send)'
+                    : 'What would you like to say? (Press Enter to send)'
+                }
                 rows={2}
                 disabled={isLoading}
                 className="w-full resize-none rounded-2xl bg-canvas-light border border-canvas-border px-4 py-3 text-sm text-ink-primary placeholder-ink-muted focus:outline-none focus:ring-2 focus:ring-sif-primary focus:border-transparent transition"
@@ -891,16 +1814,31 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
             {/* Voice Input Button */}
             <button
               type="button"
-              onClick={toggleVoiceRecording}
+              onClick={() => {
+                if (interactionMode === 'hands-free') {
+                  setInteractionMode('turn-based');
+                  muteMic();
+                } else {
+                  toggleVoiceRecording();
+                }
+              }}
               className={`p-3 rounded-2xl border transition focus:outline-none focus:ring-2 focus:ring-sif-primary ${
-                isRecording
+                interactionMode === 'hands-free'
                   ? 'bg-topic-apricot text-white border-topic-apricot animate-pulse'
-                  : 'bg-canvas-light border-canvas-border text-ink-muted hover:text-ink-primary hover:bg-canvas-subtle'
+                  : isRecording
+                    ? 'bg-topic-apricot text-white border-topic-apricot animate-pulse'
+                    : 'bg-canvas-light border-canvas-border text-ink-muted hover:text-ink-primary hover:bg-canvas-subtle'
               }`}
-              title={isRecording ? 'Stop recording' : 'Speak your response'}
+              title={
+                interactionMode === 'hands-free'
+                  ? 'Hands-free voice active. Click to switch to turn-based drafting.'
+                  : isRecording
+                    ? 'Stop recording voice to draft'
+                    : 'Speak your response into the draft box'
+              }
               aria-label="Microphone input"
             >
-              🎤
+              <Mic className="w-5 h-5" />
             </button>
 
             {/* Send Button */}
@@ -919,8 +1857,8 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
         </div>
       </footer>
 
-      {/* ── PAUSE / CO-REGULATION MODAL ─────────────────────────────────────── */}
-      {isPaused && (
+      {/* ── SAVE PROGRESS CONFIRMATION MODAL ────────────────────────────────── */}
+      {isSaveProgressOpen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-primary/30 backdrop-blur-xs"
           role="dialog"
@@ -928,47 +1866,29 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
         >
           <div className="bg-canvas-surface border border-canvas-border rounded-3xl p-6 shadow-xl max-w-md w-full text-center space-y-5 animate-fadeIn">
             <div className="w-16 h-16 rounded-full bg-sif-primarySubtle text-sif-primary flex items-center justify-center mx-auto text-2xl font-light">
-              ☕
+              <Bookmark className="w-8 h-8 text-sif-primary" />
             </div>
 
             <div>
-              <h2 className="text-xl font-semibold text-ink-primary">Taking a quiet moment</h2>
+              <h2 className="text-xl font-semibold text-ink-primary">Save conversation progress</h2>
               <p className="text-xs text-ink-secondary mt-1 max-w-xs mx-auto">
-                The conversation is paused. Your draft and timeline are completely preserved.
+                This will save your conversation progress and drafts so you can revisit and continue practicing later.
               </p>
-            </div>
-
-            {/* Gentle Optional Breathing Cue */}
-            <div className="p-4 rounded-2xl bg-canvas-subtle border border-canvas-borderSubtle flex flex-col items-center">
-              <span className="text-xs text-ink-muted mb-2 font-medium">Take a calm breath</span>
-              <div className="w-12 h-12 rounded-full border-2 border-sif-primary flex items-center justify-center animate-calm-pulse">
-                <span className="text-[10px] text-sif-primary font-medium">Breathe</span>
-              </div>
             </div>
 
             <div className="flex flex-col gap-2 pt-2">
               <button
-                onClick={() => setIsPaused(false)}
+                onClick={() => setIsSaveProgressOpen(false)}
                 className="w-full py-2.5 rounded-xl bg-sif-primary text-canvas-surface text-sm font-medium hover:bg-sif-primaryHover transition shadow-xs"
               >
-                Resume conversation
+                Continue Practicing
               </button>
 
               <button
-                onClick={() => {
-                  setIsPaused(false);
-                  handleTryAnotherVersion();
-                }}
-                className="w-full py-2 rounded-xl bg-canvas-subtle text-ink-secondary text-xs font-medium hover:bg-canvas-border transition"
+                onClick={handleSaveAndExitToDashboard}
+                className="w-full py-2 rounded-xl bg-canvas-subtle text-ink-primary border border-canvas-border text-xs font-medium hover:bg-canvas-border transition"
               >
-                Try a different approach
-              </button>
-
-              <button
-                onClick={handleExitStage}
-                className="w-full py-2 text-xs text-ink-muted hover:text-ink-primary transition"
-              >
-                Exit to dashboard
+                Save and Exit to Dashboard
               </button>
             </div>
           </div>

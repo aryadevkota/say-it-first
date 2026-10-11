@@ -6,6 +6,7 @@
  */
 
 import React, { useState } from 'react';
+import { Copy, Check } from 'lucide-react';
 import type { PocketScriptResult } from '../../application/use-cases/GeneratePocketScriptUseCase';
 
 export interface PostSessionDebriefProps {
@@ -67,7 +68,17 @@ export const PostSessionDebrief: React.FC<PostSessionDebriefProps> = ({
           className="mt-4 px-4 py-2 bg-[#8B5CF6] hover:bg-[#7C3AED] text-white rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5"
           data-testid="copy-script-btn"
         >
-          <span>{copied ? '✓ Copied to Clipboard!' : '📋 Copy to Clipboard'}</span>
+          {copied ? (
+            <>
+              <Check className="w-3.5 h-3.5 text-emerald-300" />
+              <span>Copied to Clipboard!</span>
+            </>
+          ) : (
+            <>
+              <Copy className="w-3.5 h-3.5" />
+              <span>Copy to Clipboard</span>
+            </>
+          )}
         </button>
       </div>
 

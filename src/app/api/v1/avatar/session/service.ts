@@ -24,11 +24,11 @@ export function isKeyConfigured(key?: string): boolean {
   return true;
 }
 
-// In-flight token creation promise deduplication for concurrent requests (e.g. React Strict Mode)
-let inFlightSessionPromise: Promise<AnamSessionResult> | null = null;
+// In-flight token creation promise deduplication map for concurrent requests (e.g. React Strict Mode)
+const inFlightSessionPromises = new Map<string, Promise<AnamSessionResult>>();
 
 export function resetInFlightSessionPromiseForTesting(): void {
-  inFlightSessionPromise = null;
+  inFlightSessionPromises.clear();
 }
 
 export interface AnamSessionOptions {
@@ -38,6 +38,8 @@ export interface AnamSessionOptions {
   avatarId?: string;
   firstMessage?: string;
   systemPrompt?: string;
+  forceFresh?: boolean;
+  disableOverrides?: boolean;
 }
 
 export interface AnamSessionResult {
@@ -45,6 +47,8 @@ export interface AnamSessionResult {
   avatarId: string;
   agentId: string;
   deduplicated?: boolean;
+  overridesApplied?: boolean;
+  conversationFresh?: boolean;
 }
 
 export async function requestAnamSessionToken(
@@ -87,15 +91,22 @@ export async function requestAnamSessionToken(
     throw error;
   }
 
-  // Coalesce rapid concurrent requests (e.g. React Strict Mode)
-  if (inFlightSessionPromise) {
+  // Deduplication cache key scoped strictly to this specific scenario and configuration
+  const cacheKey = `${agentId}::${avatarId}::${firstMessage?.trim() || ''}::${options.disableOverrides ? 'clean' : systemPrompt?.trim() || ''}`;
+
+  // If a brand-new conversation is requested (e.g. manual retry after rejection), bypass deduplication
+  if (options.forceFresh) {
+    inFlightSessionPromises.delete(cacheKey);
+  } else if (inFlightSessionPromises.has(cacheKey)) {
+    // Coalesce rapid concurrent requests matching the exact same scenario
     try {
-      const shared = await inFlightSessionPromise;
+      const shared = await inFlightSessionPromises.get(cacheKey)!;
       return {
         ...shared,
         deduplicated: true,
       };
     } catch {
+      inFlightSessionPromises.delete(cacheKey);
       // Fall through to retry on fresh call
     }
   }
@@ -133,18 +144,37 @@ export async function requestAnamSessionToken(
     }
 
     // Build optional conversationConfigOverride if customized
+    // Documented Anam schema:
+    // conversationConfigOverride.agent.firstMessage (string)
+    // conversationConfigOverride.agent.prompt.prompt (string)
     const conversationConfigOverride: Record<string, any> = {};
     const agentOverride: Record<string, any> = {};
 
-    if (firstMessage && firstMessage.trim()) {
-      agentOverride.firstMessage = firstMessage.trim();
+    const overridesDisabled =
+      Boolean(options.disableOverrides) ||
+      process.env.DISABLE_AVATAR_CONFIG_OVERRIDES === 'true' ||
+      process.env.ELEVENLABS_ENABLE_CONVERSATION_OVERRIDES === 'false';
+
+    if (!overridesDisabled) {
+      if (firstMessage && firstMessage.trim()) {
+        agentOverride.firstMessage = firstMessage.trim();
+      }
+      if (systemPrompt && systemPrompt.trim()) {
+        agentOverride.prompt = { prompt: systemPrompt.trim() };
+      }
+      if (Object.keys(agentOverride).length > 0) {
+        conversationConfigOverride.agent = agentOverride;
+      }
+    } else {
+      console.log(
+        '[Anam:Server] Overrides disabled for this session: minting clean agent conversation',
+      );
     }
-    if (systemPrompt && systemPrompt.trim()) {
-      agentOverride.prompt = { prompt: systemPrompt.trim() };
-    }
-    if (Object.keys(agentOverride).length > 0) {
-      conversationConfigOverride.agent = agentOverride;
-    }
+
+    const hasOverrides = Object.keys(conversationConfigOverride).length > 0;
+    console.log(
+      `[Anam:Server] Minting session token | agent: ${agentId} | scenarioOpener: "${firstMessage?.trim() || 'none'}" | hasOverrides: ${hasOverrides} | overridesDisabled: ${overridesDisabled}`,
+    );
 
     // 2. Create Anam session token with ElevenLabs agent settings
     const anamRes = await fetch('https://api.anam.ai/v1/auth/session-token', {
@@ -198,15 +228,18 @@ export async function requestAnamSessionToken(
       sessionToken: anamData.sessionToken,
       avatarId,
       agentId,
+      overridesApplied: Object.keys(conversationConfigOverride).length > 0,
+      conversationFresh: Boolean(options.forceFresh),
     };
   };
 
-  inFlightSessionPromise = executeSessionCreation();
+  const sessionPromise = executeSessionCreation();
+  inFlightSessionPromises.set(cacheKey, sessionPromise);
 
   try {
-    const result = await inFlightSessionPromise;
+    const result = await sessionPromise;
     return result;
   } finally {
-    inFlightSessionPromise = null;
+    inFlightSessionPromises.delete(cacheKey);
   }
 }

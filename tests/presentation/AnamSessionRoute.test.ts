@@ -241,6 +241,55 @@ describe('Anam Avatar Session Route (POST /api/v1/avatar/session)', () => {
     expect(data.error.code).toBe('ANAM_SESSION_FAILED');
   });
 
+  it('omits conversationConfigOverride completely when disableOverrides is true', async () => {
+    process.env.ANAM_API_KEY = 'valid-test-anam-api-key';
+    process.env.ELEVENLABS_API_KEY = 'valid-test-elevenlabs-key';
+    process.env.ELEVENLABS_AGENT_ID = 'test-agent-12345';
+
+    let anamRequestBody: any = null;
+
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async (url, init) => {
+      if (String(url).includes('elevenlabs.io')) {
+        return new Response(
+          JSON.stringify({
+            signed_url: 'wss://api.elevenlabs.io/v1/convai/conversation?test_signature=clean',
+          }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } },
+        );
+      }
+
+      if (String(url).includes('anam.ai')) {
+        anamRequestBody = JSON.parse(String(init?.body));
+        return new Response(
+          JSON.stringify({
+            sessionToken: 'clean-mock-session-token',
+          }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } },
+        );
+      }
+
+      return new Response('Not found', { status: 404 });
+    });
+
+    const req = new Request('http://localhost:3000/api/v1/avatar/session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        initialDialogue: 'Some dialogue',
+        systemPrompt: 'Some prompt',
+        disableOverrides: true,
+      }),
+    });
+
+    const res = await POST(req);
+    expect(res.status).toBe(200);
+
+    expect(anamRequestBody).toBeDefined();
+    expect(
+      anamRequestBody.environment.elevenLabsAgentSettings.conversationConfigOverride,
+    ).toBeUndefined();
+  });
+
   it('DELETE route returns 200 success', async () => {
     const res = await DELETE();
     expect(res.status).toBe(200);
