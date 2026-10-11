@@ -205,16 +205,16 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
             </p>
           </div>
 
-          {/* Right: Live Practice Partner (Eva) Feature Card */}
+          {/* Right: Live Practice Partner (Sophia) Feature Card */}
           <div className="md:col-span-5 flex flex-col items-center justify-center">
             <div className="w-full max-w-sm rounded-3xl bg-canvas-surface border border-canvas-border p-5 shadow-sm relative overflow-hidden flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-950/80 text-emerald-300 border border-emerald-500/40 flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  Eva Live Avatar
+                  Sophia Live Avatar
                 </span>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-900 text-slate-200 border border-slate-700">
-                  Simli WebRTC • 16kHz
+                  LiveAvatar WebRTC • 24kHz
                 </span>
               </div>
 
@@ -226,7 +226,7 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
                   <span className="text-[11px] font-mono text-teal-300 bg-black/60 px-2 py-0.5 rounded-md border border-white/10">
                     Live Video Stage
                   </span>
-                  <span className="text-[11px] text-white/70">Alexandra Voice</span>
+                  <span className="text-[11px] text-white/70">Sophia Voice</span>
                 </div>
 
                 <div className="relative z-10 space-y-1.5 bg-black/70 backdrop-blur-md p-3 rounded-xl border border-white/15">
@@ -235,7 +235,7 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
                     <span className="text-xs font-semibold text-white">Scenario-Adaptive Presence</span>
                   </div>
                   <p className="text-[11px] text-slate-300 leading-snug">
-                    Eva adapts attire and setting to your scenario (Interview business attire, coffee chat turtleneck, quiet study, clinical office).
+                    Sophia adapts attire and setting to your scenario (Interview business attire, coffee chat turtleneck, quiet study, clinical office).
                   </p>
                 </div>
 

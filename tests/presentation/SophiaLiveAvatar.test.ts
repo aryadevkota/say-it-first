@@ -1,11 +1,11 @@
 /**
- * EvaLiveAvatar.test.ts — Unit & Integration Tests for Eva Live Avatar (Simli WebRTC)
+ * SophiaLiveAvatar.test.ts — Unit & Integration Tests for Sophia Live Avatar (Simli WebRTC)
  *
  * Verifies:
  * 1. Session API (/api/v1/avatar/session) validates SIMLI_API_KEY with fail-fast error envelopes.
  * 2. Simli initiation payload contract matches { apiKey, faceId, ttsProvider: 'ElevenLabs', language: 'en' }.
  * 3. 16kHz linear PCM audio contract (pcm_16000) is returned downstream to client.
- * 4. EvaLiveAvatar component renders dedicated HTML5 <video> stream with scenario-specific outfit & background.
+ * 4. SophiaLiveAvatar component renders dedicated HTML5 <video> stream with scenario-specific outfit & background.
  * 5. Fail-fast error boundary UI surfaces connection/handshake diagnostics without silent vector fallbacks.
  * 6. Speaking state activates real-time lip-sync visualization.
  * 7. Accessible interactive controls (text mode, mute toggle) function for neurodiverse users.
@@ -16,23 +16,23 @@ import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { POST } from '../../src/app/api/v1/avatar/session/route';
 import {
-  EvaLiveAvatar,
-  type EvaLiveAvatarProps,
-} from '../../src/presentation/components/EvaLiveAvatar';
+  SophiaLiveAvatar,
+  type SophiaLiveAvatarProps,
+} from '../../src/presentation/components/SophiaLiveAvatar';
 import {
   LOCKED_VOICE_ID,
   LOCKED_VOICE_NAME,
   LOCKED_MODEL_ID,
   SIMLI_TARGET_AUDIO_FORMAT,
   SIMLI_DEFAULT_FACE_ID,
-  getEvaPresentationForScenario,
+  getSophiaPresentationForScenario,
   EVA_CORE_IDENTITY,
   EVA_PRESENTATION_CONFIGS,
-  type EvaScenarioPresentation,
-} from '../../src/domain/entities/EvaScenarioPresentation';
+  type SophiaScenarioPresentation,
+} from '../../src/domain/entities/SophiaScenarioPresentation';
 import type { ScenarioDefinition } from '../../src/domain/scenarios/topics';
 
-describe('Eva Live Avatar Integration Suite (Simli WebRTC)', () => {
+describe('Sophia Live Avatar Integration Suite (Simli WebRTC)', () => {
   const originalEnv = process.env;
 
   beforeEach(() => {
@@ -129,7 +129,7 @@ describe('Eva Live Avatar Integration Suite (Simli WebRTC)', () => {
       expect(data.status).toBe('ready');
       expect(data.face_id).toBe(SIMLI_DEFAULT_FACE_ID);
       expect(data.audio_format).toBe('pcm_16000');
-      expect(data.avatar.name).toBe('Eva');
+      expect(data.avatar.name).toBe('Sophia');
       expect(data.avatar.voice_id).toBe(LOCKED_VOICE_ID);
       expect(data.voice_contract.voice_name).toBe(LOCKED_VOICE_NAME);
       expect(data.voice_contract.model_id).toBe(LOCKED_MODEL_ID);
@@ -212,7 +212,7 @@ describe('Eva Live Avatar Integration Suite (Simli WebRTC)', () => {
   });
 
   // ── 2. Component Scenario-Specific Rendering Tests ────────────────────────
-  describe('EvaLiveAvatar Presentation & Consistency', () => {
+  describe('SophiaLiveAvatar Presentation & Consistency', () => {
     const mockInterviewScenario: ScenarioDefinition = {
       id: 'mock-interview',
       category: 'work-school',
@@ -230,7 +230,7 @@ describe('Eva Live Avatar Integration Suite (Simli WebRTC)', () => {
         examplePhrases: { gentle: 'I contributed...', direct: 'My role was...' },
       },
       partner: {
-        name: 'Eva',
+        name: 'Sophia',
         role: 'Hiring Director',
         avatarVariant: 'eva',
         defaultTone: 'Professional',
@@ -256,7 +256,7 @@ describe('Eva Live Avatar Integration Suite (Simli WebRTC)', () => {
         examplePhrases: { gentle: 'Good to see you!', direct: 'Thanks for meeting.' },
       },
       partner: {
-        name: 'Eva',
+        name: 'Sophia',
         role: 'Colleague',
         avatarVariant: 'eva',
         defaultTone: 'Warm and friendly',
@@ -266,10 +266,10 @@ describe('Eva Live Avatar Integration Suite (Simli WebRTC)', () => {
     };
 
     it('renders scenario-specific outfit and background metadata for interview archetype', () => {
-      const presentation = getEvaPresentationForScenario(mockInterviewScenario);
+      const presentation = getSophiaPresentationForScenario(mockInterviewScenario);
 
       const html = renderToString(
-        React.createElement(EvaLiveAvatar, {
+        React.createElement(SophiaLiveAvatar, {
           presentation,
           partnerState: 'listening',
           isSpeakingAudio: false,
@@ -288,7 +288,7 @@ describe('Eva Live Avatar Integration Suite (Simli WebRTC)', () => {
 
       // Scenario metadata badges
       expect(html).toContain(presentation.badgeText || presentation.visualSummary);
-      expect(html).toContain('Eva • Professional Business Attire • Office Background');
+      expect(html).toContain('Sophia • Professional Business Attire • Office Background');
       expect(html).toContain('Professional Business Attire');
       expect(html).toContain('Office Background');
 
@@ -301,10 +301,10 @@ describe('Eva Live Avatar Integration Suite (Simli WebRTC)', () => {
     });
 
     it('renders scenario-specific outfit and background metadata for coffee shop archetype', () => {
-      const presentation = getEvaPresentationForScenario(mockCoffeeScenario);
+      const presentation = getSophiaPresentationForScenario(mockCoffeeScenario);
 
       const html = renderToString(
-        React.createElement(EvaLiveAvatar, {
+        React.createElement(SophiaLiveAvatar, {
           presentation,
           partnerState: 'listening',
           isSpeakingAudio: false,
@@ -313,7 +313,7 @@ describe('Eva Live Avatar Integration Suite (Simli WebRTC)', () => {
         }),
       );
 
-      expect(html).toContain('Eva • Turtleneck • Coffee Shop');
+      expect(html).toContain('Sophia • Turtleneck • Coffee Shop');
       expect(html).toContain('Turtleneck');
       expect(html).toContain('Coffee Shop');
       expect(html).toContain('● Alexandra Voice (16kHz PCM)');
@@ -322,7 +322,7 @@ describe('Eva Live Avatar Integration Suite (Simli WebRTC)', () => {
 
   // ── 3. Fail-Fast Diagnostic Error Boundary Tests ──────────────────────────
   describe('Fail-Fast Diagnostic Error Boundary', () => {
-    const interviewPresentation = getEvaPresentationForScenario({
+    const interviewPresentation = getSophiaPresentationForScenario({
       id: 'test-scenario',
       category: 'work-school',
       categoryLabel: 'Work',
@@ -339,7 +339,7 @@ describe('Eva Live Avatar Integration Suite (Simli WebRTC)', () => {
         examplePhrases: { gentle: 'G', direct: 'D' },
       },
       partner: {
-        name: 'Eva',
+        name: 'Sophia',
         role: 'Partner',
         avatarVariant: 'eva',
         defaultTone: 'Tone',
@@ -350,7 +350,7 @@ describe('Eva Live Avatar Integration Suite (Simli WebRTC)', () => {
 
     it('renders diagnostic error UI when Simli connection fails without silent vector fallback', () => {
       const html = renderToString(
-        React.createElement(EvaLiveAvatar, {
+        React.createElement(SophiaLiveAvatar, {
           presentation: interviewPresentation,
           partnerState: 'listening',
           isSpeakingAudio: false,
@@ -382,7 +382,7 @@ describe('Eva Live Avatar Integration Suite (Simli WebRTC)', () => {
 
   // ── 4. Speaking State & Audio Lip-Sync Visualization Tests ─────────────────
   describe('Speaking State & Audio Lip-Sync Visualization', () => {
-    const interviewPresentation = getEvaPresentationForScenario({
+    const interviewPresentation = getSophiaPresentationForScenario({
       id: 'test-scenario',
       category: 'work-school',
       categoryLabel: 'Work',
@@ -399,7 +399,7 @@ describe('Eva Live Avatar Integration Suite (Simli WebRTC)', () => {
         examplePhrases: { gentle: 'G', direct: 'D' },
       },
       partner: {
-        name: 'Eva',
+        name: 'Sophia',
         role: 'Partner',
         avatarVariant: 'eva',
         defaultTone: 'Tone',
@@ -410,7 +410,7 @@ describe('Eva Live Avatar Integration Suite (Simli WebRTC)', () => {
 
     it('activates audio lip-sync visualization when isSpeakingAudio is true', () => {
       const html = renderToString(
-        React.createElement(EvaLiveAvatar, {
+        React.createElement(SophiaLiveAvatar, {
           presentation: interviewPresentation,
           partnerState: 'speaking',
           isSpeakingAudio: true,
@@ -431,7 +431,7 @@ describe('Eva Live Avatar Integration Suite (Simli WebRTC)', () => {
 
     it('keeps audio lip-sync visualization in idle state when isSpeakingAudio is false', () => {
       const html = renderToString(
-        React.createElement(EvaLiveAvatar, {
+        React.createElement(SophiaLiveAvatar, {
           presentation: interviewPresentation,
           partnerState: 'listening',
           isSpeakingAudio: false,
@@ -450,7 +450,7 @@ describe('Eva Live Avatar Integration Suite (Simli WebRTC)', () => {
 
     it('displays thinking / reflecting state when partnerState is thinking', () => {
       const html = renderToString(
-        React.createElement(EvaLiveAvatar, {
+        React.createElement(SophiaLiveAvatar, {
           presentation: interviewPresentation,
           partnerState: 'thinking',
           isSpeakingAudio: false,
@@ -466,7 +466,7 @@ describe('Eva Live Avatar Integration Suite (Simli WebRTC)', () => {
 
   // ── 5. Accessible Controls for Neurodiverse Users ─────────────────────────
   describe('Accessible Interactive Controls', () => {
-    const presentation = getEvaPresentationForScenario({
+    const presentation = getSophiaPresentationForScenario({
       id: 'accessibility-test',
       category: 'everyday',
       categoryLabel: 'Everyday',
@@ -483,7 +483,7 @@ describe('Eva Live Avatar Integration Suite (Simli WebRTC)', () => {
         examplePhrases: { gentle: 'G', direct: 'D' },
       },
       partner: {
-        name: 'Eva',
+        name: 'Sophia',
         role: 'Neighbor',
         avatarVariant: 'eva',
         defaultTone: 'Warm',
@@ -495,7 +495,7 @@ describe('Eva Live Avatar Integration Suite (Simli WebRTC)', () => {
     it('renders accessible text mode button and invokes onToggleTextMode callback', () => {
       const mockToggleTextMode = vi.fn();
 
-      const props: EvaLiveAvatarProps = {
+      const props: SophiaLiveAvatarProps = {
         presentation,
         partnerState: 'listening',
         isSpeakingAudio: false,
@@ -504,7 +504,7 @@ describe('Eva Live Avatar Integration Suite (Simli WebRTC)', () => {
         onToggleTextMode: mockToggleTextMode,
       };
 
-      const html = renderToString(React.createElement(EvaLiveAvatar, props));
+      const html = renderToString(React.createElement(SophiaLiveAvatar, props));
 
       expect(html).toContain('data-testid="toggle-text-mode-btn"');
       expect(html).toContain('Switch to Text Mode');
@@ -519,7 +519,7 @@ describe('Eva Live Avatar Integration Suite (Simli WebRTC)', () => {
 
       // Unmuted state
       const unmutedHtml = renderToString(
-        React.createElement(EvaLiveAvatar, {
+        React.createElement(SophiaLiveAvatar, {
           presentation,
           partnerState: 'listening',
           isSpeakingAudio: false,
@@ -535,7 +535,7 @@ describe('Eva Live Avatar Integration Suite (Simli WebRTC)', () => {
 
       // Muted state (high-contrast alert style)
       const mutedHtml = renderToString(
-        React.createElement(EvaLiveAvatar, {
+        React.createElement(SophiaLiveAvatar, {
           presentation,
           partnerState: 'listening',
           isSpeakingAudio: false,
@@ -556,7 +556,7 @@ describe('Eva Live Avatar Integration Suite (Simli WebRTC)', () => {
 
     it('omits controls gracefully when callbacks are not provided', () => {
       const html = renderToString(
-        React.createElement(EvaLiveAvatar, {
+        React.createElement(SophiaLiveAvatar, {
           presentation,
           partnerState: 'listening',
           isSpeakingAudio: false,

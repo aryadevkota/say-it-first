@@ -8,7 +8,7 @@
  * 2. Skippable Onboarding (Interests, Goals, Guidance & Comfort)
  * 3. Personalized Topic Dashboard (Home, Explore, My progress)
  * 4. "Understand the idea" bite-sized learning & Double Empathy perspectives
- * 5. Focused Practice Stage with realistic conversation partner (Eva)
+ * 5. Focused Practice Stage with realistic conversation partner (Sophia)
  * 6. Non-destructive "Try another version" retries
  * 7. "Words to take with you" editable pocket script takeaways
  *

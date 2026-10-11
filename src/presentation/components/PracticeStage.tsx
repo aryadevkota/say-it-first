@@ -4,7 +4,7 @@
  * PracticeStage.tsx — Focused Conversational Practice Stage
  *
  * Implements:
- * - Realistic practice partner Eva (EvaLiveAvatar) with scenario-adaptive presentation and dynamic states
+ * - Realistic practice partner Sophia (SophiaLiveAvatar) with scenario-adaptive presentation and dynamic states
  * - Readable spoken dialogue captions
  * - Accessible user goal summary & scenario context
  * - Clean response dock (typing + optional voice input)
@@ -20,12 +20,12 @@
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import type { ScenarioDefinition } from '../../domain/scenarios/topics';
-import { getEvaPresentationForScenario } from '../../domain/entities/EvaScenarioPresentation';
-import { EvaLiveAvatar } from './EvaLiveAvatar';
+import { getSophiaPresentationForScenario } from '../../domain/entities/SophiaScenarioPresentation';
+import { SophiaLiveAvatar } from './SophiaLiveAvatar';
 import type { UserPreferences } from './WelcomeOnboarding';
 type AvatarState = 'listening' | 'speaking' | 'thinking' | 'neutral' | 'receptive';
 import type { SavedTakeaway } from './MyProgress';
-import { usePartnerVoice } from '../hooks/usePartnerVoice';
+import { useLiveAvatarSession } from '../hooks/useLiveAvatarSession';
 import { playCozySound } from '../utils/cozyAudio';
 
 interface TurnMessage {
@@ -82,7 +82,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
   // Character state & scenario presentation
   const [partnerState, setPartnerState] = useState<AvatarState>('listening');
   const [hideAvatar, setHideAvatar] = useState<boolean>(preferences.hideAvatar);
-  const evaPresentation = useMemo(() => getEvaPresentationForScenario(topic), [topic]);
+  const sophiaPresentation = useMemo(() => getSophiaPresentationForScenario(topic), [topic]);
 
   // Response input draft & state
   const [userDraft, setUserDraft] = useState<string>('');
@@ -116,20 +116,49 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
   const abortControllerRef = useRef<AbortController | null>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // Two-person stage & user avatar customization
+  // Media Refs for LiveKit Video/Audio
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
+
   // ElevenLabs Voice Hook
   const {
     isPlaying: isSpeakingAudio,
     voiceNotice,
     isMuted,
     toggleMute,
-    speak: speakVoice,
-    stop: stopVoice,
-  } = usePartnerVoice({
-    allowBrowserSpeechFallback: preferences.spokenPartnerAudio,
+    sendText,
+    disconnect,
+    connect,
+  } = useLiveAvatarSession({
+    mediaRefs: { video: videoRef, audio: audioRef },
     onPlaybackStateChange: (isPlaying) => {
       setPartnerState(isPlaying ? 'speaking' : 'receptive');
     },
+    onTranscription: (role, text) => {
+      setAttempts((prev) => {
+        const copy = [...prev];
+        const currentAttemptIdx = activeAttemptIndex;
+        if (copy[currentAttemptIdx]) {
+          // If the role is 'user', the user's turn was already appended optimistically in handleSubmitTurn
+          // So we only append 'agent' turns to avoid duplicates for user.
+          if (role === 'agent') {
+             const partnerTurn: TurnMessage = {
+               id: `partner-${Date.now()}`,
+               role: 'partner',
+               text: text,
+             };
+             copy[currentAttemptIdx] = {
+               ...copy[currentAttemptIdx],
+               turns: [...copy[currentAttemptIdx].turns, partnerTurn],
+             };
+          }
+        }
+        return copy;
+      });
+      if (role === 'agent') {
+        setPartnerState('receptive');
+      }
+    }
   });
 
   const activeBranch = attempts[activeAttemptIndex] || attempts[0];
@@ -138,6 +167,41 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
     .find((t) => t.role === 'partner');
 
   const lastSpokenTurnIdRef = useRef<string | null>(null);
+  const [conversationUrl, setConversationUrl] = useState<string | null>(null);
+  const conversationIdRef = useRef<string | null>(null);
+
+  // Fetch session and connect
+  useEffect(() => {
+    let mounted = true;
+    const initSession = async () => {
+      try {
+        const res = await fetch('/api/v1/avatar/session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            scenarioId: topic.id,
+            partnerName: topic.partner.name,
+            partnerRole: topic.partner.role,
+            userGoal: topic.userGoal,
+            initialDialogue: topic.partner.initialDialogue
+          })
+        });
+        const data = await res.json();
+        if (mounted) {
+          if (data.conversation_url) {
+            setConversationUrl(data.conversation_url);
+            conversationIdRef.current = data.conversation_id || null;
+          } else if (data.session_token) {
+            connect(data.session_token, data.ws_url || 'wss://agent.heygen.com');
+          }
+        }
+      } catch (err) {
+        console.error('Failed to init session', err);
+      }
+    };
+    initSession();
+    return () => { mounted = false; };
+  }, [topic.id, topic.partner.name, topic.partner.role, topic.userGoal, topic.partner.initialDialogue, connect]);
 
   // Cancel any audio & in-flight requests on unmount
   useEffect(() => {
@@ -146,22 +210,18 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
-      stopVoice();
-    };
-  }, [stopVoice]);
+      disconnect();
 
-  // Partner speech synthesis when latest partner turn changes
-  useEffect(() => {
-    if (
-      preferences.spokenPartnerAudio &&
-      latestPartnerTurn?.id &&
-      latestPartnerTurn.text &&
-      lastSpokenTurnIdRef.current !== latestPartnerTurn.id
-    ) {
-      lastSpokenTurnIdRef.current = latestPartnerTurn.id;
-      speakVoice(latestPartnerTurn.text);
-    }
-  }, [latestPartnerTurn?.id, latestPartnerTurn?.text, preferences.spokenPartnerAudio, speakVoice]);
+      // End Tavus conversation if active
+      if (conversationIdRef.current) {
+        fetch('/api/v1/avatar/session', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ conversationId: conversationIdRef.current })
+        }).catch(() => {});
+      }
+    };
+  }, [disconnect]);
 
   // Handle submitting a turn to API
   const handleSubmitTurn = async (e?: React.FormEvent) => {
@@ -170,7 +230,6 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
     if (!trimmedInput || isLoading) return;
 
     playCozySound('tap');
-    stopVoice();
 
     const currentAttemptId = activeBranch.id;
     const currentAttemptIdx = activeAttemptIndex;
@@ -210,7 +269,16 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
     setPartnerState('thinking');
 
     try {
-      const response = await fetch('/api/v1/conversation/turn', {
+      // Send the user's text directly to the ElevenLabs Agent
+      sendText(trimmedInput);
+
+      // We no longer block on Gemini inference. The ElevenLabs Agent will
+      // process the text and respond via the LiveKit data channel (agent_response).
+      setIsLoading(false);
+
+      // We still asynchronously call Gemini to get the educational subtext and twoWayBridge
+      // This is background guidance and should not block the conversation.
+      fetch('/api/v1/conversation/turn', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         signal: controller.signal,
@@ -246,58 +314,19 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
               }
             : undefined,
         }),
-      });
+      }).then(res => res.json()).then(data => {
+        if (requestId !== activeRequestIdRef.current || controller.signal.aborted) return;
+        
+        // Update the guidance metadata for the latest turn (which will be generated by ElevenLabs)
+        // Note: we can store this guidance in state to be displayed alongside the ElevenLabs response
+        if (data.pivot_recommendation?.suggested_wording) {
+          setEditableTakeaway(data.pivot_recommendation.suggested_wording);
+        }
+      }).catch(err => console.warn('Background guidance fetch failed', err));
 
       // Discard response if cancelled or user changed attempt/reset
       if (requestId !== activeRequestIdRef.current || controller.signal.aborted) {
         return;
-      }
-
-      if (!response.ok) {
-        throw new Error(`Inference returned status ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      if (requestId !== activeRequestIdRef.current || controller.signal.aborted) {
-        return;
-      }
-
-      // Partner response
-      const partnerTurn: TurnMessage = {
-        id: data.turn_id || `partner-${Date.now()}`,
-        role: 'partner',
-        text: data.spoken_response || "I hear where you're coming from.",
-        subtext: data.unspoken_subtext || '',
-        twoWayBridge: {
-          userIntent: data.two_way_bridge?.user_intent || 'Expressing functional need clearly.',
-          receivedImpact: data.two_way_bridge?.received_as || 'Received and understood.',
-        },
-        postureCue: data.posture_cue || 'Open relaxed posture',
-        suggestedWording: data.pivot_recommendation?.suggested_wording || '',
-      };
-
-      if (partnerTurn.text && preferences.spokenPartnerAudio) {
-        lastSpokenTurnIdRef.current = partnerTurn.id;
-        speakVoice(partnerTurn.text);
-      } else {
-        setPartnerState('receptive');
-      }
-
-      // Append partner turn to the specific attempt branch that made the request
-      setAttempts((prev) => {
-        const copy = [...prev];
-        if (copy[currentAttemptIdx]) {
-          copy[currentAttemptIdx] = {
-            ...copy[currentAttemptIdx],
-            turns: [...copy[currentAttemptIdx].turns, partnerTurn],
-          };
-        }
-        return copy;
-      });
-
-      if (data.pivot_recommendation?.suggested_wording) {
-        setEditableTakeaway(data.pivot_recommendation.suggested_wording);
       }
     } catch (err: unknown) {
       if (controller.signal.aborted || (err as any)?.name === 'AbortError') {
@@ -323,7 +352,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
     if (targetIndex === activeAttemptIndex) return;
 
     playCozySound('pop');
-    stopVoice();
+    disconnect();
 
     activeRequestIdRef.current++;
     if (abortControllerRef.current) {
@@ -349,7 +378,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
   // Branch a non-destructive new version ("Try another version")
   const handleTryAnotherVersion = () => {
     playCozySound('branch');
-    stopVoice();
+    disconnect();
 
     activeRequestIdRef.current++;
     if (abortControllerRef.current) {
@@ -442,7 +471,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
   // Finish practice session and show takeaways
   const handleFinishPractice = () => {
     playCozySound('tap');
-    stopVoice();
+    disconnect();
     activeRequestIdRef.current++;
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -471,7 +500,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
   // Clean exit
   const handleExitStage = () => {
     playCozySound('tap');
-    stopVoice();
+    disconnect();
     activeRequestIdRef.current++;
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -589,16 +618,19 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
           </div>
         )}
 
-        {/* Eva Live Avatar Presentation */}
+        {/* Sophia Live Avatar Presentation */}
         {!hideAvatar ? (
           <div className="w-full max-w-3xl flex flex-col items-center">
-            <EvaLiveAvatar
-              presentation={evaPresentation}
+            <SophiaLiveAvatar
+              presentation={sophiaPresentation}
               partnerState={partnerState}
               isSpeakingAudio={isSpeakingAudio}
               isMuted={isMuted}
               onToggleMute={toggleMute}
               onToggleTextMode={() => setHideAvatar(true)}
+              conversationUrl={conversationUrl || undefined}
+              videoRef={videoRef}
+              audioRef={audioRef}
               className="w-full"
             />
           </div>
@@ -608,7 +640,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
             <div className="flex flex-col gap-0.5">
               <span>Visual avatar hidden (Accessible text mode)</span>
               <span className="text-[11px] text-ink-muted">
-                {evaPresentation.visualSummary}
+                {sophiaPresentation.visualSummary}
               </span>
             </div>
             <button

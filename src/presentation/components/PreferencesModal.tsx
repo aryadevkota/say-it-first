@@ -108,7 +108,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({
             <div className="flex items-center justify-between">
               <div>
                 <span className="text-sm font-medium text-ink-primary block">Partner Avatar</span>
-                <span className="text-xs text-ink-muted">Display realistic conversational practice partner (Eva)</span>
+                <span className="text-xs text-ink-muted">Display realistic conversational practice partner (Sophia)</span>
               </div>
               <button
                 onClick={() =>

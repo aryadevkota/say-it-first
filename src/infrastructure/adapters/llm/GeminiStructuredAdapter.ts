@@ -161,7 +161,7 @@ export class GeminiStructuredAdapter implements LLMInferencePort {
   }
 
   private resolvePersonaName(_scenarioId: string): string {
-    return 'Eva';
+    return 'Sophia';
   }
 
   private resolveSystemContext(scenarioId: string): string {

@@ -119,7 +119,7 @@ export class ScenarioGenerator {
       partner: {
         name: partnerName,
         role: partnerRole,
-        avatarVariant: 'eva',
+        avatarVariant: 'sophia',
         defaultTone: partnerStyle,
         initialDialogue: plausibleOpening,
       },

@@ -1,0 +1,3254 @@
+{
+  "version": "1.0.0",
+  "gitCommitHash": "latest",
+  "generatedAt": "2026-10-11T02:30:09.991Z",
+  "files": {
+    ".github/workflows/ci.yml": {
+      "filePath": ".github/workflows/ci.yml",
+      "contentHash": "d1b30309333d4c7c9b6d12f3aa41ca715daf1ddc4c4271db84d6695bca664d25",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 49,
+      "hasStructuralAnalysis": false
+    },
+    ".env.example": {
+      "filePath": ".env.example",
+      "contentHash": "cba9e5ff821951283f4bf1542f6dec46ed7168c1aee7a6fef014d4c45578d11d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 32,
+      "hasStructuralAnalysis": false
+    },
+    "CODE_OF_CONDUCT.md": {
+      "filePath": "CODE_OF_CONDUCT.md",
+      "contentHash": "528d4cf67a61f42373d2cb5a23bf8f5ada400d94b43c614d1c5939ff3a5ba493",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 58,
+      "hasStructuralAnalysis": false
+    },
+    "CONTRIBUTING.md": {
+      "filePath": "CONTRIBUTING.md",
+      "contentHash": "47c0e953934777151da8a3e7ef158342a4ee337f035dce3af4532aba08541f19",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 75,
+      "hasStructuralAnalysis": false
+    },
+    "README.md": {
+      "filePath": "README.md",
+      "contentHash": "d9958cb307b9ce12462b194cec07602915d7baf5bd3849b9bdd356d46b16f346",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 298,
+      "hasStructuralAnalysis": false
+    },
+    "SECURITY.md": {
+      "filePath": "SECURITY.md",
+      "contentHash": "12567d1eaa3254fddfbc824173ff73d7fe80b44de426bf3682d029112e0e53a1",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 34,
+      "hasStructuralAnalysis": false
+    },
+    "package.json": {
+      "filePath": "package.json",
+      "contentHash": "439049cd6408fdb973d2168fc9dd57d7bd4d67cd8a800cb98139e99da839f415",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 51,
+      "hasStructuralAnalysis": false
+    },
+    "tsconfig.json": {
+      "filePath": "tsconfig.json",
+      "contentHash": "b2550a84fb50c462c38b7245c9755cdf1943bac210c19193a9c83ab08aadc78a",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 28,
+      "hasStructuralAnalysis": false
+    },
+    ".github/ISSUE_TEMPLATE/bug_report.yml": {
+      "filePath": ".github/ISSUE_TEMPLATE/bug_report.yml",
+      "contentHash": "16fed01eb17a46ea906c44a069ff9afd3051fed1e88dd42229b4acdb47e57d87",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 61,
+      "hasStructuralAnalysis": false
+    },
+    ".github/ISSUE_TEMPLATE/config.yml": {
+      "filePath": ".github/ISSUE_TEMPLATE/config.yml",
+      "contentHash": "0f76677023913b1f188630605052dbb5110d88540f02b92b6bc1b94f9d780162",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 6,
+      "hasStructuralAnalysis": false
+    },
+    ".github/ISSUE_TEMPLATE/feature_request.yml": {
+      "filePath": ".github/ISSUE_TEMPLATE/feature_request.yml",
+      "contentHash": "2ed3281276c673640a9c6cb1a43dd971bd4fcbff6f17e74047fe7177751a2f43",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 48,
+      "hasStructuralAnalysis": false
+    },
+    ".github/PULL_REQUEST_TEMPLATE.md": {
+      "filePath": ".github/PULL_REQUEST_TEMPLATE.md",
+      "contentHash": "7f918c40dbe19c6ebeedd1db45a195c813e8851628325b5ef1a85e37ce6e824a",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 24,
+      "hasStructuralAnalysis": false
+    },
+    "postcss.config.js": {
+      "filePath": "postcss.config.js",
+      "contentHash": "fa650b380adfabb151a0b352f7135e107e6352345f899060f1c5c231228f94bf",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 7,
+      "hasStructuralAnalysis": true
+    },
+    "src/app/api/v1/avatar/session/route.ts": {
+      "filePath": "src/app/api/v1/avatar/session/route.ts",
+      "contentHash": "d02b9e9ade091ce3e8be530d1b2dc78e2349eadb61561901c406a5a10dafb6f3",
+      "functions": [
+        {
+          "name": "isKeyConfigured",
+          "params": [
+            "key"
+          ],
+          "returnType": "boolean",
+          "exported": false,
+          "lineCount": 7
+        },
+        {
+          "name": "POST",
+          "params": [
+            "request"
+          ],
+          "exported": true,
+          "lineCount": 195
+        },
+        {
+          "name": "DELETE",
+          "params": [
+            "request"
+          ],
+          "exported": true,
+          "lineCount": 23
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "next/server",
+          "specifiers": [
+            "NextResponse"
+          ]
+        }
+      ],
+      "exports": [
+        "runtime",
+        "POST",
+        "DELETE"
+      ],
+      "totalLines": 232,
+      "hasStructuralAnalysis": true
+    },
+    "src/app/api/v1/conversation/turn/route.ts": {
+      "filePath": "src/app/api/v1/conversation/turn/route.ts",
+      "contentHash": "146588e35023db391c9fc9758a4c27565fc541d9ad3edfa13950f02dc27c96a5",
+      "functions": [
+        {
+          "name": "POST",
+          "params": [
+            "request"
+          ],
+          "exported": true,
+          "lineCount": 17
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "next/server",
+          "specifiers": [
+            "NextResponse"
+          ]
+        },
+        {
+          "source": "../../../../../presentation/api/routes/conversation",
+          "specifiers": [
+            "handleTurnRequest"
+          ]
+        }
+      ],
+      "exports": [
+        "POST"
+      ],
+      "totalLines": 25,
+      "hasStructuralAnalysis": true
+    },
+    "src/app/api/v1/voice/synthesize/route.ts": {
+      "filePath": "src/app/api/v1/voice/synthesize/route.ts",
+      "contentHash": "8befa5adaf3fef6ff2d5baf5c088b9595cd1b9fde4354f25f5111419b94831f4",
+      "functions": [
+        {
+          "name": "POST",
+          "params": [
+            "request"
+          ],
+          "exported": true,
+          "lineCount": 129
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "next/server",
+          "specifiers": [
+            "NextResponse"
+          ]
+        }
+      ],
+      "exports": [
+        "runtime",
+        "POST"
+      ],
+      "totalLines": 150,
+      "hasStructuralAnalysis": true
+    },
+    "src/app/layout.tsx": {
+      "filePath": "src/app/layout.tsx",
+      "contentHash": "ad0b8a0fc404877e3cc0a107c4589a67af48862df2b46586acbdf5a8f34788cd",
+      "functions": [
+        {
+          "name": "RootLayout",
+          "params": [
+            "{\n  children,\n}"
+          ],
+          "exported": true,
+          "lineCount": 13
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React"
+          ]
+        },
+        {
+          "source": "./globals.css",
+          "specifiers": []
+        }
+      ],
+      "exports": [
+        "metadata",
+        "RootLayout"
+      ],
+      "totalLines": 22,
+      "hasStructuralAnalysis": true
+    },
+    "src/app/page.tsx": {
+      "filePath": "src/app/page.tsx",
+      "contentHash": "00834f3bdc9d485b0a82efe6f9e9265b98fd44d6e61f067f8c046c3d9fc76192",
+      "functions": [
+        {
+          "name": "SayItFirstRoot",
+          "params": [],
+          "exported": true,
+          "lineCount": 256
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "useState",
+            "useEffect"
+          ]
+        },
+        {
+          "source": "../presentation/components/WelcomeOnboarding",
+          "specifiers": [
+            "WelcomeOnboarding",
+            "DEFAULT_PREFERENCES",
+            "UserPreferences"
+          ]
+        },
+        {
+          "source": "../presentation/components/TopicDashboard",
+          "specifiers": [
+            "TopicDashboard"
+          ]
+        },
+        {
+          "source": "../presentation/components/PracticeStage",
+          "specifiers": [
+            "PracticeStage"
+          ]
+        },
+        {
+          "source": "../presentation/components/PreferencesModal",
+          "specifiers": [
+            "PreferencesModal"
+          ]
+        },
+        {
+          "source": "../presentation/components/ScenarioCreator",
+          "specifiers": [
+            "ScenarioCreator"
+          ]
+        },
+        {
+          "source": "../domain/scenarios/topics",
+          "specifiers": [
+            "TOPICS",
+            "ScenarioDefinition",
+            "TopicProgressStatus"
+          ]
+        },
+        {
+          "source": "../presentation/components/MyProgress",
+          "specifiers": [
+            "SavedTakeaway"
+          ]
+        }
+      ],
+      "exports": [
+        "SayItFirstRoot"
+      ],
+      "totalLines": 298,
+      "hasStructuralAnalysis": true
+    },
+    "src/application/ports/in/ProcessTurnCommand.ts": {
+      "filePath": "src/application/ports/in/ProcessTurnCommand.ts",
+      "contentHash": "87c7a2bcb1682f307f169c572546e8107d68394b602e2bd389b177518b5e9dd7",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "../../../domain/entities/AffectVector",
+          "specifiers": [
+            "AffectVector"
+          ]
+        },
+        {
+          "source": "../../../domain/value-objects/ProsodyMetrics",
+          "specifiers": [
+            "ProsodyMetrics"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 40,
+      "hasStructuralAnalysis": true
+    },
+    "src/application/use-cases/BranchConversationUseCase.ts": {
+      "filePath": "src/application/use-cases/BranchConversationUseCase.ts",
+      "contentHash": "34b942fe34fb766ce8712154f9b0594494cdaf9824064efc750c1016e203a3a4",
+      "functions": [],
+      "classes": [
+        {
+          "name": "BranchConversationUseCase",
+          "methods": [
+            "constructor",
+            "execute"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 18
+        }
+      ],
+      "imports": [
+        {
+          "source": "../ports/out/SessionRepositoryPort",
+          "specifiers": [
+            "SessionRepositoryPort"
+          ]
+        },
+        {
+          "source": "../../domain/entities/ConversationNode",
+          "specifiers": [
+            "ConversationNode"
+          ]
+        }
+      ],
+      "exports": [
+        "BranchConversationUseCase"
+      ],
+      "totalLines": 39,
+      "hasStructuralAnalysis": true
+    },
+    "src/application/use-cases/GeneratePocketScriptUseCase.ts": {
+      "filePath": "src/application/use-cases/GeneratePocketScriptUseCase.ts",
+      "contentHash": "e3ab34f1afd44109623576102fc585fcf581860452c274c9ae0af7da9573a806",
+      "functions": [],
+      "classes": [
+        {
+          "name": "GeneratePocketScriptUseCase",
+          "methods": [
+            "constructor",
+            "execute"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 43
+        }
+      ],
+      "imports": [
+        {
+          "source": "../ports/out/SessionRepositoryPort",
+          "specifiers": [
+            "SessionRepositoryPort"
+          ]
+        }
+      ],
+      "exports": [
+        "GeneratePocketScriptUseCase"
+      ],
+      "totalLines": 66,
+      "hasStructuralAnalysis": true
+    },
+    "src/application/use-cases/ProcessTurnUseCase.ts": {
+      "filePath": "src/application/use-cases/ProcessTurnUseCase.ts",
+      "contentHash": "0d40f0f39ea53ffb4dd7c8d3ba83ca68f149389cd7cd7121704036654a7fc14f",
+      "functions": [],
+      "classes": [
+        {
+          "name": "ProcessTurnUseCase",
+          "methods": [
+            "constructor",
+            "execute"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 154
+        }
+      ],
+      "imports": [
+        {
+          "source": "../ports/in/ProcessTurnCommand",
+          "specifiers": [
+            "ProcessTurnCommand"
+          ]
+        },
+        {
+          "source": "../ports/out/LLMInferencePort",
+          "specifiers": [
+            "LLMInferencePort"
+          ]
+        },
+        {
+          "source": "../ports/out/SessionRepositoryPort",
+          "specifiers": [
+            "SessionRepositoryPort"
+          ]
+        },
+        {
+          "source": "../../domain/entities/ConversationTimelineGraph",
+          "specifiers": [
+            "ConversationTimelineGraph"
+          ]
+        },
+        {
+          "source": "../../domain/services/AffectDynamicsService",
+          "specifiers": [
+            "applyEmotionalDamping",
+            "INERTIA_PEER"
+          ]
+        },
+        {
+          "source": "../../domain/services/TensionEvaluatorService",
+          "specifiers": [
+            "evaluateSafetyGate"
+          ]
+        },
+        {
+          "source": "../../domain/services/AvatarKinematicsService",
+          "specifiers": [
+            "computeAvatarKinematics"
+          ]
+        },
+        {
+          "source": "../../domain/entities/TwoWayBridge",
+          "specifiers": [
+            "createTwoWayBridge"
+          ]
+        },
+        {
+          "source": "../../domain/entities/AffectVector",
+          "specifiers": [
+            "AffectVector"
+          ]
+        }
+      ],
+      "exports": [
+        "ProcessTurnUseCase"
+      ],
+      "totalLines": 218,
+      "hasStructuralAnalysis": true
+    },
+    "src/domain/entities/AffectVector.ts": {
+      "filePath": "src/domain/entities/AffectVector.ts",
+      "contentHash": "b35723281672e0f64c4aefa79380f716b16c09bec10778765e06194d1e028091",
+      "functions": [
+        {
+          "name": "clampComponent",
+          "params": [
+            "x"
+          ],
+          "returnType": "number",
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "createAffectVector",
+          "params": [
+            "v",
+            "a",
+            "d"
+          ],
+          "returnType": "AffectVector",
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "isValidAffectVector",
+          "params": [
+            "vec"
+          ],
+          "returnType": "boolean",
+          "exported": true,
+          "lineCount": 10
+        },
+        {
+          "name": "addAffectVectors",
+          "params": [
+            "a",
+            "b"
+          ],
+          "returnType": "AffectVector",
+          "exported": true,
+          "lineCount": 10
+        },
+        {
+          "name": "scaleAffectVector",
+          "params": [
+            "vec",
+            "scalar"
+          ],
+          "returnType": "AffectVector",
+          "exported": true,
+          "lineCount": 10
+        },
+        {
+          "name": "affectDistance",
+          "params": [
+            "a",
+            "b"
+          ],
+          "returnType": "number",
+          "exported": true,
+          "lineCount": 9
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "exports": [
+        "ZERO_AFFECT",
+        "clampComponent",
+        "createAffectVector",
+        "isValidAffectVector",
+        "addAffectVectors",
+        "scaleAffectVector",
+        "affectDistance"
+      ],
+      "totalLines": 122,
+      "hasStructuralAnalysis": true
+    },
+    "src/domain/entities/ConversationNode.ts": {
+      "filePath": "src/domain/entities/ConversationNode.ts",
+      "contentHash": "9db4a1d511edc5a990c475c922a2f958ac65b164a9b48a13174d36675ff922f5",
+      "functions": [
+        {
+          "name": "createConversationNode",
+          "params": [
+            "params"
+          ],
+          "returnType": "ConversationNode",
+          "exported": true,
+          "lineCount": 29
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "./AffectVector",
+          "specifiers": [
+            "AffectVector"
+          ]
+        },
+        {
+          "source": "./TwoWayBridge",
+          "specifiers": [
+            "TwoWayBridge"
+          ]
+        }
+      ],
+      "exports": [
+        "createConversationNode"
+      ],
+      "totalLines": 85,
+      "hasStructuralAnalysis": true
+    },
+    "src/domain/entities/ConversationTimelineGraph.ts": {
+      "filePath": "src/domain/entities/ConversationTimelineGraph.ts",
+      "contentHash": "074b801e4a01b9b00c5f8b3ac985417f8e0be94061e405f4b9e52899871cbe09",
+      "functions": [],
+      "classes": [
+        {
+          "name": "ConversationTimelineGraph",
+          "methods": [
+            "constructor",
+            "appendTurn",
+            "rewindTo",
+            "getActiveHeadId",
+            "getNode",
+            "getAllNodes",
+            "getLinearHistory"
+          ],
+          "properties": [
+            "nodes",
+            "activeHeadId"
+          ],
+          "exported": true,
+          "lineCount": 69
+        }
+      ],
+      "imports": [
+        {
+          "source": "./ConversationNode",
+          "specifiers": [
+            "ConversationNode"
+          ]
+        }
+      ],
+      "exports": [
+        "ConversationTimelineGraph"
+      ],
+      "totalLines": 83,
+      "hasStructuralAnalysis": true
+    },
+    "src/domain/entities/SophiaScenarioPresentation.ts": {
+      "filePath": "src/domain/entities/SophiaScenarioPresentation.ts",
+      "contentHash": "6100b2c40df16a03f4a043a545ec9b93a34fc517bf66a97b46e3857152325db5",
+      "functions": [
+        {
+          "name": "inferPresentationArchetype",
+          "params": [
+            "scenario"
+          ],
+          "returnType": "PresentationArchetype",
+          "exported": true,
+          "lineCount": 95
+        },
+        {
+          "name": "getSophiaPresentationForScenario",
+          "params": [
+            "scenario"
+          ],
+          "returnType": "SophiaScenarioPresentation",
+          "exported": true,
+          "lineCount": 19
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "../scenarios/topics",
+          "specifiers": [
+            "ScenarioDefinition",
+            "InterestCategory"
+          ]
+        }
+      ],
+      "exports": [
+        "SOPHIA_CORE_IDENTITY",
+        "LOCKED_VOICE_ID",
+        "LOCKED_VOICE_NAME",
+        "LOCKED_MODEL_ID",
+        "TARGET_AUDIO_FORMAT",
+        "SOPHIA_PRESENTATION_CONFIGS",
+        "inferPresentationArchetype",
+        "getSophiaPresentationForScenario"
+      ],
+      "totalLines": 330,
+      "hasStructuralAnalysis": true
+    },
+    "src/domain/entities/TwoWayBridge.ts": {
+      "filePath": "src/domain/entities/TwoWayBridge.ts",
+      "contentHash": "6ce3108cd25519606bfebfde10faa351fbcd1d4114eccda58d66027196a50e55",
+      "functions": [
+        {
+          "name": "isValidTwoWayBridge",
+          "params": [
+            "bridge"
+          ],
+          "returnType": "boolean",
+          "exported": true,
+          "lineCount": 8
+        },
+        {
+          "name": "createTwoWayBridge",
+          "params": [
+            "userIntent",
+            "receivedImpact"
+          ],
+          "returnType": "TwoWayBridge",
+          "exported": true,
+          "lineCount": 19
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "exports": [
+        "isValidTwoWayBridge",
+        "createTwoWayBridge"
+      ],
+      "totalLines": 62,
+      "hasStructuralAnalysis": true
+    },
+    "src/domain/scenarios/ScenarioGenerator.ts": {
+      "filePath": "src/domain/scenarios/ScenarioGenerator.ts",
+      "contentHash": "304104063717a81234bd8d5d7d9e14564dfe7ed82c53dcd71ce33589034f84d8",
+      "functions": [],
+      "classes": [
+        {
+          "name": "ScenarioGenerator",
+          "methods": [
+            "generate",
+            "inferRoleFromText",
+            "inferContextFromText",
+            "inferGoalFromText",
+            "inferPartnerName",
+            "inferPartnerConcerns",
+            "inferPartnerStyle",
+            "generatePlausibleOpening",
+            "generateTitle"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 229
+        }
+      ],
+      "imports": [
+        {
+          "source": "./topics",
+          "specifiers": [
+            "ScenarioDefinition",
+            "CustomScenarioMetadata"
+          ]
+        }
+      ],
+      "exports": [
+        "ScenarioGenerator"
+      ],
+      "totalLines": 270,
+      "hasStructuralAnalysis": true
+    },
+    "src/domain/scenarios/topics.ts": {
+      "filePath": "src/domain/scenarios/topics.ts",
+      "contentHash": "9992b944d64dfcb9eb1cb7fd087acf853144c498081298f1c5a26e1978ab870f",
+      "functions": [
+        {
+          "name": "registerCustomTopic",
+          "params": [
+            "topic"
+          ],
+          "returnType": "void",
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "getRegisteredCustomTopics",
+          "params": [],
+          "returnType": "ScenarioDefinition[]",
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "getTopicById",
+          "params": [
+            "id"
+          ],
+          "returnType": "ScenarioDefinition | undefined",
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "getTopicsByCategory",
+          "params": [
+            "category"
+          ],
+          "returnType": "ScenarioDefinition[]",
+          "exported": true,
+          "lineCount": 6
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "exports": [
+        "TOPICS",
+        "registerCustomTopic",
+        "getRegisteredCustomTopics",
+        "getTopicById",
+        "getTopicsByCategory"
+      ],
+      "totalLines": 319,
+      "hasStructuralAnalysis": true
+    },
+    "src/domain/services/AffectDynamicsService.ts": {
+      "filePath": "src/domain/services/AffectDynamicsService.ts",
+      "contentHash": "f91213ccf52a77ff6694bca7bd7a92d12cae2ff591fd8a0ae8fb60929cc06b5b",
+      "functions": [
+        {
+          "name": "applyEmotionalDamping",
+          "params": [
+            "current",
+            "delta",
+            "lambda"
+          ],
+          "returnType": "AffectVector",
+          "exported": true,
+          "lineCount": 19
+        },
+        {
+          "name": "applyPeerDamping",
+          "params": [
+            "current",
+            "delta"
+          ],
+          "returnType": "AffectVector",
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "applySupervisorDamping",
+          "params": [
+            "current",
+            "delta"
+          ],
+          "returnType": "AffectVector",
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "simulateTrajectory",
+          "params": [
+            "initial",
+            "constantDelta",
+            "lambda",
+            "steps"
+          ],
+          "returnType": "AffectVector[]",
+          "exported": true,
+          "lineCount": 20
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "../entities/AffectVector",
+          "specifiers": [
+            "AffectVector",
+            "createAffectVector",
+            "clampComponent"
+          ]
+        }
+      ],
+      "exports": [
+        "INERTIA_PEER",
+        "INERTIA_SUPERVISOR",
+        "applyEmotionalDamping",
+        "applyPeerDamping",
+        "applySupervisorDamping",
+        "simulateTrajectory"
+      ],
+      "totalLines": 117,
+      "hasStructuralAnalysis": true
+    },
+    "src/domain/services/AvatarKinematicsService.ts": {
+      "filePath": "src/domain/services/AvatarKinematicsService.ts",
+      "contentHash": "c001bd2757dc47a580ae628bbc4e8da9e0f83ef9c5f99abb1647342cd8d0cbc8",
+      "functions": [
+        {
+          "name": "computeAvatarKinematics",
+          "params": [
+            "vad",
+            "postureCue",
+            "stateLabel"
+          ],
+          "returnType": "AvatarKinematics",
+          "exported": true,
+          "lineCount": 36
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "../entities/AffectVector",
+          "specifiers": [
+            "AffectVector"
+          ]
+        }
+      ],
+      "exports": [
+        "computeAvatarKinematics"
+      ],
+      "totalLines": 62,
+      "hasStructuralAnalysis": true
+    },
+    "src/domain/services/TensionEvaluatorService.ts": {
+      "filePath": "src/domain/services/TensionEvaluatorService.ts",
+      "contentHash": "a02832a8431e247869f39ac1b8346aa0069b5fd8e952900c25a405515232d346",
+      "functions": [
+        {
+          "name": "calculateTensionIndex",
+          "params": [
+            "vad"
+          ],
+          "returnType": "number",
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "evaluateSafetyGate",
+          "params": [
+            "vad"
+          ],
+          "returnType": "SafetyGateResult",
+          "exported": true,
+          "lineCount": 31
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "../entities/AffectVector",
+          "specifiers": [
+            "AffectVector"
+          ]
+        }
+      ],
+      "exports": [
+        "SafetyTier",
+        "TIER_2_THRESHOLD",
+        "TIER_3_THRESHOLD",
+        "IMPACT_WARNING_MESSAGE",
+        "CURTAIN_DROP_MESSAGE",
+        "calculateTensionIndex",
+        "evaluateSafetyGate"
+      ],
+      "totalLines": 119,
+      "hasStructuralAnalysis": true
+    },
+    "src/domain/value-objects/ProsodyMetrics.ts": {
+      "filePath": "src/domain/value-objects/ProsodyMetrics.ts",
+      "contentHash": "cd0291c54b43d7d32a5b63563a04c90bfbc545240f681b24bb443e54ef104368",
+      "functions": [
+        {
+          "name": "isValidProsodyMetrics",
+          "params": [
+            "metrics"
+          ],
+          "returnType": "boolean",
+          "exported": true,
+          "lineCount": 16
+        },
+        {
+          "name": "createProsodyMetrics",
+          "params": [
+            "wordsPerMinute",
+            "volumeRms",
+            "pitchVarianceHz"
+          ],
+          "returnType": "ProsodyMetrics",
+          "exported": true,
+          "lineCount": 27
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "exports": [
+        "MAX_WPM",
+        "MAX_VOLUME_RMS",
+        "MAX_PITCH_VARIANCE_HZ",
+        "isValidProsodyMetrics",
+        "createProsodyMetrics",
+        "SILENT_PROSODY"
+      ],
+      "totalLines": 101,
+      "hasStructuralAnalysis": true
+    },
+    "src/domain/value-objects/ScaffoldingLevel.ts": {
+      "filePath": "src/domain/value-objects/ScaffoldingLevel.ts",
+      "contentHash": "07c830fb6419165e6a18d639302369b6e9f0746404ec12f4321a73e9ec98eeb1",
+      "functions": [
+        {
+          "name": "isValidScaffoldingLevel",
+          "params": [
+            "level"
+          ],
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "shouldShowSubtext",
+          "params": [
+            "level"
+          ],
+          "returnType": "boolean",
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "shouldShowNonverbalBadges",
+          "params": [
+            "level"
+          ],
+          "returnType": "boolean",
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "getScaffoldingLabel",
+          "params": [
+            "level"
+          ],
+          "returnType": "string",
+          "exported": true,
+          "lineCount": 10
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "exports": [
+        "ScaffoldingLevel",
+        "isValidScaffoldingLevel",
+        "shouldShowSubtext",
+        "shouldShowNonverbalBadges",
+        "getScaffoldingLabel"
+      ],
+      "totalLines": 77,
+      "hasStructuralAnalysis": true
+    },
+    "src/infrastructure/adapters/llm/GeminiStructuredAdapter.ts": {
+      "filePath": "src/infrastructure/adapters/llm/GeminiStructuredAdapter.ts",
+      "contentHash": "f9b38046fb3bc0eceab34a134316e911f54af36078d1cc129e266b864e7bfe6b",
+      "functions": [],
+      "classes": [
+        {
+          "name": "GeminiStructuredAdapter",
+          "methods": [
+            "constructor",
+            "inferTurn",
+            "resolvePersonaName",
+            "resolveSystemContext",
+            "generateContextualResponse",
+            "callGeminiLiveApi"
+          ],
+          "properties": [
+            "HYPERPARAMETERS"
+          ],
+          "exported": true,
+          "lineCount": 594
+        }
+      ],
+      "imports": [
+        {
+          "source": "zod",
+          "specifiers": [
+            "z"
+          ]
+        },
+        {
+          "source": "../../../application/ports/out/LLMInferencePort",
+          "specifiers": [
+            "LLMInferencePort",
+            "LLMInferenceParams",
+            "LLMInferenceResult"
+          ]
+        },
+        {
+          "source": "../../../domain/entities/AffectVector",
+          "specifiers": [
+            "createAffectVector"
+          ]
+        },
+        {
+          "source": "./PromptTemplates",
+          "specifiers": [
+            "buildSystemPrompt"
+          ]
+        },
+        {
+          "source": "../../../domain/scenarios/topics",
+          "specifiers": [
+            "getTopicById"
+          ]
+        }
+      ],
+      "exports": [
+        "RawLLMResponseSchema",
+        "FALLBACK_INFERENCE_RESULT",
+        "GeminiStructuredAdapter"
+      ],
+      "totalLines": 656,
+      "hasStructuralAnalysis": true
+    },
+    "src/infrastructure/adapters/llm/PromptTemplates.ts": {
+      "filePath": "src/infrastructure/adapters/llm/PromptTemplates.ts",
+      "contentHash": "48da78ca5d5f3c1f388542bde92b49a58a0db97a6bedaf270f6c055b91212150",
+      "functions": [
+        {
+          "name": "buildSystemPrompt",
+          "params": [
+            "params"
+          ],
+          "returnType": "string",
+          "exported": true,
+          "lineCount": 9
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "../../../domain/entities/AffectVector",
+          "specifiers": [
+            "AffectVector"
+          ]
+        }
+      ],
+      "exports": [
+        "CONVERSATION_SYSTEM_PROMPT",
+        "buildSystemPrompt"
+      ],
+      "totalLines": 80,
+      "hasStructuralAnalysis": true
+    },
+    "src/infrastructure/adapters/storage/InMemorySessionRepo.ts": {
+      "filePath": "src/infrastructure/adapters/storage/InMemorySessionRepo.ts",
+      "contentHash": "cbb2d610799fdbfeb617f7906706102dadf42c8add7c75195e2fc9ff12772330",
+      "functions": [],
+      "classes": [
+        {
+          "name": "InMemorySessionRepo",
+          "methods": [
+            "getGraph",
+            "saveGraph",
+            "deleteGraph",
+            "clearAll",
+            "hasSession"
+          ],
+          "properties": [
+            "sessions"
+          ],
+          "exported": true,
+          "lineCount": 30
+        }
+      ],
+      "imports": [
+        {
+          "source": "../../../application/ports/out/SessionRepositoryPort",
+          "specifiers": [
+            "SessionRepositoryPort"
+          ]
+        },
+        {
+          "source": "../../../domain/entities/ConversationTimelineGraph",
+          "specifiers": [
+            "ConversationTimelineGraph"
+          ]
+        }
+      ],
+      "exports": [
+        "InMemorySessionRepo"
+      ],
+      "totalLines": 43,
+      "hasStructuralAnalysis": true
+    },
+    "src/infrastructure/web-audio/AudioProcessor.ts": {
+      "filePath": "src/infrastructure/web-audio/AudioProcessor.ts",
+      "contentHash": "7ef514e0a75cfc6651446156437692c22067dbfe348e141de15026b91d12e013",
+      "functions": [],
+      "classes": [
+        {
+          "name": "AudioProcessor",
+          "methods": [
+            "initialize",
+            "getAnalyzer",
+            "getSampleRate",
+            "close"
+          ],
+          "properties": [
+            "audioContext",
+            "analyserNode",
+            "sourceNode",
+            "analyzer"
+          ],
+          "exported": true,
+          "lineCount": 45
+        }
+      ],
+      "imports": [
+        {
+          "source": "./ProsodyExtractor",
+          "specifiers": [
+            "AudioProsodyAnalyzer"
+          ]
+        }
+      ],
+      "exports": [
+        "AudioProcessor"
+      ],
+      "totalLines": 55,
+      "hasStructuralAnalysis": true
+    },
+    "src/infrastructure/web-audio/ProsodyExtractor.ts": {
+      "filePath": "src/infrastructure/web-audio/ProsodyExtractor.ts",
+      "contentHash": "b72b569c9be7ef6374fa8a69cabfa349a985e2eaf8e6454bdac9a5627df05a29",
+      "functions": [],
+      "classes": [
+        {
+          "name": "AudioProsodyAnalyzer",
+          "methods": [
+            "constructor",
+            "calculateRmsVolume",
+            "detectFundamentalPitch"
+          ],
+          "properties": [
+            "analyser",
+            "buffer"
+          ],
+          "exported": true,
+          "lineCount": 69
+        }
+      ],
+      "imports": [],
+      "exports": [
+        "AudioProsodyAnalyzer"
+      ],
+      "totalLines": 86,
+      "hasStructuralAnalysis": true
+    },
+    "src/presentation/api/routes/conversation.ts": {
+      "filePath": "src/presentation/api/routes/conversation.ts",
+      "contentHash": "46afbb9cd76f398c418df3aaef6d46b67dc377b1d882bcd989b419f4af2f8715",
+      "functions": [
+        {
+          "name": "createProcessTurnUseCase",
+          "params": [],
+          "returnType": "ProcessTurnUseCase",
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "handleTurnRequest",
+          "params": [
+            "body",
+            "useCase"
+          ],
+          "returnType": "Promise<RouteHandlerResult>",
+          "exported": true,
+          "lineCount": 80
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "zod",
+          "specifiers": [
+            "z"
+          ]
+        },
+        {
+          "source": "../../../application/use-cases/ProcessTurnUseCase",
+          "specifiers": [
+            "ProcessTurnUseCase"
+          ]
+        },
+        {
+          "source": "../../../infrastructure/adapters/llm/GeminiStructuredAdapter",
+          "specifiers": [
+            "GeminiStructuredAdapter"
+          ]
+        },
+        {
+          "source": "../../../infrastructure/adapters/storage/InMemorySessionRepo",
+          "specifiers": [
+            "InMemorySessionRepo"
+          ]
+        },
+        {
+          "source": "../../../domain/entities/AffectVector",
+          "specifiers": [
+            "createAffectVector"
+          ]
+        },
+        {
+          "source": "../../../domain/value-objects/ProsodyMetrics",
+          "specifiers": [
+            "createProsodyMetrics"
+          ]
+        }
+      ],
+      "exports": [
+        "TurnRequestSchema",
+        "createProcessTurnUseCase",
+        "handleTurnRequest"
+      ],
+      "totalLines": 154,
+      "hasStructuralAnalysis": true
+    },
+    "src/presentation/components/AffectRadarCanvas.tsx": {
+      "filePath": "src/presentation/components/AffectRadarCanvas.tsx",
+      "contentHash": "97c2ab3fb9e00bcf04b805835e026dfdc656c1ca2989cea6d903089574980638",
+      "functions": [
+        {
+          "name": "AffectRadarCanvas",
+          "params": [
+            "{\n  currentVad,\n  historyCoordinates = [],\n  width = 240,\n  height = 240,\n}"
+          ],
+          "exported": true,
+          "lineCount": 105
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "useEffect",
+            "useRef"
+          ]
+        },
+        {
+          "source": "../../domain/entities/AffectVector",
+          "specifiers": [
+            "AffectVector"
+          ]
+        }
+      ],
+      "exports": [
+        "AffectRadarCanvas"
+      ],
+      "totalLines": 123,
+      "hasStructuralAnalysis": true
+    },
+    "src/presentation/components/CoRegulationModal.tsx": {
+      "filePath": "src/presentation/components/CoRegulationModal.tsx",
+      "contentHash": "c68c48e8252458037646b863201246f8dc8155d98e76a0755cf367d9eae42ffa",
+      "functions": [
+        {
+          "name": "CoRegulationModal",
+          "params": [
+            "{\n  isOpen,\n  onComplete,\n  onExitScenario,\n}"
+          ],
+          "exported": true,
+          "lineCount": 115
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "useState",
+            "useEffect"
+          ]
+        }
+      ],
+      "exports": [
+        "CoRegulationModal"
+      ],
+      "totalLines": 133,
+      "hasStructuralAnalysis": true
+    },
+    "src/presentation/components/InputDock.tsx": {
+      "filePath": "src/presentation/components/InputDock.tsx",
+      "contentHash": "e1b9dd868cc874ad28e2285de1e7cbaea5eca691b2e53a77c6d5b8be9319ea43",
+      "functions": [
+        {
+          "name": "InputDock",
+          "params": [
+            "{\n  onSubmit,\n  onRewind,\n  isListening,\n  onStartListening,\n  onStopListening,\n  canRewind = false,\n  disabled = false,\n}"
+          ],
+          "exported": true,
+          "lineCount": 106
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "useState"
+          ]
+        },
+        {
+          "source": "../../domain/value-objects/ProsodyMetrics",
+          "specifiers": [
+            "ProsodyMetrics"
+          ]
+        }
+      ],
+      "exports": [
+        "InputDock"
+      ],
+      "totalLines": 127,
+      "hasStructuralAnalysis": true
+    },
+    "src/presentation/components/MyProgress.tsx": {
+      "filePath": "src/presentation/components/MyProgress.tsx",
+      "contentHash": "1f9ed3de0e464d251db70fd9364a5e91b2ce6499372e5992469c749a91e4846d",
+      "functions": [
+        {
+          "name": "MyProgress",
+          "params": [
+            "{\n  progressMap,\n  savedTakeaways,\n  onSelectTopic,\n  onDeleteTakeaway,\n}"
+          ],
+          "exported": true,
+          "lineCount": 167
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "useState"
+          ]
+        },
+        {
+          "source": "../../domain/scenarios/topics",
+          "specifiers": [
+            "TOPICS",
+            "ScenarioDefinition",
+            "TopicProgressStatus"
+          ]
+        }
+      ],
+      "exports": [
+        "MyProgress"
+      ],
+      "totalLines": 198,
+      "hasStructuralAnalysis": true
+    },
+    "src/presentation/components/MyScenarios.tsx": {
+      "filePath": "src/presentation/components/MyScenarios.tsx",
+      "contentHash": "706d02e683735fa17dd7d8b3f7afa1eff4c6e5bb70eaa0d934e42707c5e59860",
+      "functions": [
+        {
+          "name": "MyScenarios",
+          "params": [
+            "{\n  customScenarios,\n  onCreateNew,\n  onPracticeScenario,\n  onDeleteScenario,\n}"
+          ],
+          "exported": true,
+          "lineCount": 115
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React"
+          ]
+        },
+        {
+          "source": "../../domain/scenarios/topics",
+          "specifiers": [
+            "ScenarioDefinition"
+          ]
+        }
+      ],
+      "exports": [
+        "MyScenarios"
+      ],
+      "totalLines": 138,
+      "hasStructuralAnalysis": true
+    },
+    "src/presentation/components/PostSessionDebrief.tsx": {
+      "filePath": "src/presentation/components/PostSessionDebrief.tsx",
+      "contentHash": "713ed2e3901f9fa23859e2119cb09cc71d2d8962110306908570f3bb0e5f1ba4",
+      "functions": [
+        {
+          "name": "PostSessionDebrief",
+          "params": [
+            "{\n  pocketScript,\n  onRestart,\n}"
+          ],
+          "exported": true,
+          "lineCount": 93
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "useState"
+          ]
+        },
+        {
+          "source": "../../application/use-cases/GeneratePocketScriptUseCase",
+          "specifiers": [
+            "PocketScriptResult"
+          ]
+        }
+      ],
+      "exports": [
+        "PostSessionDebrief"
+      ],
+      "totalLines": 109,
+      "hasStructuralAnalysis": true
+    },
+    "src/presentation/components/PracticeStage.tsx": {
+      "filePath": "src/presentation/components/PracticeStage.tsx",
+      "contentHash": "7c10d6c0461cd636b8b3b34ecf3459606f4e3ccd599a4f7f217851d65f122774",
+      "functions": [
+        {
+          "name": "PracticeStage",
+          "params": [
+            "{\n  topic,\n  preferences,  onExit,\n  onSaveTakeaway,\n  onCompleteTopic,\n}"
+          ],
+          "exported": true,
+          "lineCount": 945
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "useState",
+            "useEffect",
+            "useRef",
+            "useMemo"
+          ]
+        },
+        {
+          "source": "../../domain/scenarios/topics",
+          "specifiers": [
+            "ScenarioDefinition"
+          ]
+        },
+        {
+          "source": "../../domain/entities/SophiaScenarioPresentation",
+          "specifiers": [
+            "getSophiaPresentationForScenario"
+          ]
+        },
+        {
+          "source": "./SophiaLiveAvatar",
+          "specifiers": [
+            "SophiaLiveAvatar"
+          ]
+        },
+        {
+          "source": "./WelcomeOnboarding",
+          "specifiers": [
+            "UserPreferences"
+          ]
+        },
+        {
+          "source": "./MyProgress",
+          "specifiers": [
+            "SavedTakeaway"
+          ]
+        },
+        {
+          "source": "../hooks/useLiveAvatarSession",
+          "specifiers": [
+            "useLiveAvatarSession"
+          ]
+        },
+        {
+          "source": "../utils/cozyAudio",
+          "specifiers": [
+            "playCozySound"
+          ]
+        }
+      ],
+      "exports": [
+        "PracticeStage"
+      ],
+      "totalLines": 1002,
+      "hasStructuralAnalysis": true
+    },
+    "src/presentation/components/PreferencesModal.tsx": {
+      "filePath": "src/presentation/components/PreferencesModal.tsx",
+      "contentHash": "21c68a0e8750d22593d2dbdf6917522b9f59f93ec5c394535225775a0a31e946",
+      "functions": [
+        {
+          "name": "PreferencesModal",
+          "params": [
+            "{\n  preferences,\n  onUpdatePreferences,\n  onClose,\n  onClearSavedWording,\n}"
+          ],
+          "exported": true,
+          "lineCount": 217
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "useState"
+          ]
+        },
+        {
+          "source": "./WelcomeOnboarding",
+          "specifiers": [
+            "UserPreferences"
+          ]
+        },
+        {
+          "source": "../utils/cozyAudio",
+          "specifiers": [
+            "isUiSoundEnabled",
+            "setUiSoundEnabled",
+            "playCozySound"
+          ]
+        }
+      ],
+      "exports": [
+        "PreferencesModal"
+      ],
+      "totalLines": 243,
+      "hasStructuralAnalysis": true
+    },
+    "src/presentation/components/ScenarioCreator.tsx": {
+      "filePath": "src/presentation/components/ScenarioCreator.tsx",
+      "contentHash": "6ca976123571395e16b9e1687708f4899df761df7423efe891dd9bbedc9fc7eb",
+      "functions": [
+        {
+          "name": "ScenarioCreator",
+          "params": [
+            "{\n  onStartPractice,\n  onSaveScenario,\n  onCancel,\n}"
+          ],
+          "exported": true,
+          "lineCount": 530
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "useState",
+            "useRef"
+          ]
+        },
+        {
+          "source": "../../domain/scenarios/ScenarioGenerator",
+          "specifiers": [
+            "ScenarioGenerator",
+            "ScenarioGenerationResult"
+          ]
+        },
+        {
+          "source": "../../domain/scenarios/topics",
+          "specifiers": [
+            "ScenarioDefinition"
+          ]
+        }
+      ],
+      "exports": [
+        "ScenarioCreator"
+      ],
+      "totalLines": 558,
+      "hasStructuralAnalysis": true
+    },
+    "src/presentation/components/SophiaLiveAvatar.tsx": {
+      "filePath": "src/presentation/components/SophiaLiveAvatar.tsx",
+      "contentHash": "8b05ceb1a774e4d430f722af6d0a1c4055105d23b5c65621dc086b0b90c7ca41",
+      "functions": [
+        {
+          "name": "SophiaLiveAvatar",
+          "params": [
+            "{\n  presentation,\n  partnerState,\n  isSpeakingAudio,\n  isMuted,\n  onToggleMute,\n  onToggleTextMode,\n  className = '',\n  sessionToken,\n  wsUrl,\n  conversationUrl,\n  videoRef,\n  audioRef,\n}"
+          ],
+          "exported": true,
+          "lineCount": 99
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "useEffect",
+            "useRef",
+            "useState"
+          ]
+        },
+        {
+          "source": "../../domain/entities/SophiaScenarioPresentation",
+          "specifiers": [
+            "SophiaScenarioPresentation"
+          ]
+        },
+        {
+          "source": "../hooks/useLiveAvatarSession",
+          "specifiers": [
+            "useLiveAvatarSession"
+          ]
+        }
+      ],
+      "exports": [
+        "SophiaLiveAvatar"
+      ],
+      "totalLines": 121,
+      "hasStructuralAnalysis": true
+    },
+    "src/presentation/components/SubtextHud.tsx": {
+      "filePath": "src/presentation/components/SubtextHud.tsx",
+      "contentHash": "ebfad13b7f74fa8c1077896e7fd6e44cd04256c708cdd37264eb4d7038c4922a",
+      "functions": [
+        {
+          "name": "SubtextHud",
+          "params": [
+            "{\n  twoWayBridge,\n  unspokenSubtext,\n  postureCue = 'Neutral grounded posture',\n  scaffoldingLevel,\n  onScaffoldingChange,\n}"
+          ],
+          "exported": true,
+          "lineCount": 130
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React"
+          ]
+        },
+        {
+          "source": "../../domain/entities/TwoWayBridge",
+          "specifiers": [
+            "TwoWayBridge"
+          ]
+        },
+        {
+          "source": "../../domain/value-objects/ScaffoldingLevel",
+          "specifiers": [
+            "ScaffoldingLevel",
+            "ScaffoldingLevelEnum",
+            "shouldShowSubtext",
+            "shouldShowNonverbalBadges"
+          ]
+        }
+      ],
+      "exports": [
+        "SubtextHud"
+      ],
+      "totalLines": 155,
+      "hasStructuralAnalysis": true
+    },
+    "src/presentation/components/TopicDashboard.tsx": {
+      "filePath": "src/presentation/components/TopicDashboard.tsx",
+      "contentHash": "f30d667de50a89cf355790bd51818875a8af21dd6814603a23b07b38845b201d",
+      "functions": [
+        {
+          "name": "TopicDashboard",
+          "params": [
+            "{\n  preferences,\n  progressMap,\n  savedTakeaways,\n  activeTopicId,\n  customScenarios = [],\n  onStartPractice,\n  onOpenPreferences,  onMarkExplored,\n  onDeleteTakeaway,\n  onCreateCustomScenario,\n  onDeleteCustomScenario,\n}"
+          ],
+          "exported": true,
+          "lineCount": 377
+        },
+        {
+          "name": "TopicCard",
+          "params": [
+            "{ topic, progress, onOpen, onPractice }"
+          ],
+          "exported": false,
+          "lineCount": 54
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "useState"
+          ]
+        },
+        {
+          "source": "../../domain/scenarios/topics",
+          "specifiers": [
+            "TOPICS",
+            "ScenarioDefinition",
+            "InterestCategory",
+            "TopicProgressStatus"
+          ]
+        },
+        {
+          "source": "./WelcomeOnboarding",
+          "specifiers": [
+            "UserPreferences"
+          ]
+        },
+        {
+          "source": "./TopicDetailModal",
+          "specifiers": [
+            "TopicDetailModal"
+          ]
+        },
+        {
+          "source": "./MyProgress",
+          "specifiers": [
+            "MyProgress",
+            "SavedTakeaway"
+          ]
+        },
+        {
+          "source": "./MyScenarios",
+          "specifiers": [
+            "MyScenarios"
+          ]
+        },
+        {
+          "source": "../utils/cozyAudio",
+          "specifiers": [
+            "playCozySound"
+          ]
+        }
+      ],
+      "exports": [
+        "TopicDashboard"
+      ],
+      "totalLines": 483,
+      "hasStructuralAnalysis": true
+    },
+    "src/presentation/components/TopicDetailModal.tsx": {
+      "filePath": "src/presentation/components/TopicDetailModal.tsx",
+      "contentHash": "d002fc589576f96eb0961080b2ebd6f98194cf69fb3161a1db94669a97c6f3ac",
+      "functions": [
+        {
+          "name": "TopicDetailModal",
+          "params": [
+            "{\n  topic,\n  onClose,\n  onStartPractice,\n  onMarkExplored,\n}"
+          ],
+          "exported": true,
+          "lineCount": 212
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "useState",
+            "useMemo"
+          ]
+        },
+        {
+          "source": "../../domain/scenarios/topics",
+          "specifiers": [
+            "ScenarioDefinition"
+          ]
+        },
+        {
+          "source": "../../domain/entities/SophiaScenarioPresentation",
+          "specifiers": [
+            "getSophiaPresentationForScenario"
+          ]
+        }
+      ],
+      "exports": [
+        "TopicDetailModal"
+      ],
+      "totalLines": 237,
+      "hasStructuralAnalysis": true
+    },
+    "src/presentation/components/WelcomeOnboarding.tsx": {
+      "filePath": "src/presentation/components/WelcomeOnboarding.tsx",
+      "contentHash": "219efe16e22dcb5a4f65dc7cfb723b61621ab5b9430bb63e1483f846114af1d1",
+      "functions": [
+        {
+          "name": "WelcomeOnboarding",
+          "params": [
+            "{\n  onComplete,\n  onExploreDirectly,\n  isReturningUser = false,\n}"
+          ],
+          "exported": true,
+          "lineCount": 520
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "useState"
+          ]
+        },
+        {
+          "source": "../utils/cozyAudio",
+          "specifiers": [
+            "playCozySound"
+          ]
+        }
+      ],
+      "exports": [
+        "DEFAULT_PREFERENCES",
+        "WelcomeOnboarding"
+      ],
+      "totalLines": 568,
+      "hasStructuralAnalysis": true
+    },
+    "src/presentation/hooks/useLiveAvatarSession.ts": {
+      "filePath": "src/presentation/hooks/useLiveAvatarSession.ts",
+      "contentHash": "7b2497977dfbfb2e0e632b9d758f896452e9de1a4f31cff90d3db57b0a164e81",
+      "functions": [
+        {
+          "name": "useLiveAvatarSession",
+          "params": [
+            "options"
+          ],
+          "exported": true,
+          "lineCount": 117
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState",
+            "useRef",
+            "useEffect",
+            "useCallback"
+          ]
+        },
+        {
+          "source": "livekit-client",
+          "specifiers": [
+            "Room",
+            "RoomEvent",
+            "DataPacket_Kind"
+          ]
+        }
+      ],
+      "exports": [
+        "useLiveAvatarSession"
+      ],
+      "totalLines": 131,
+      "hasStructuralAnalysis": true
+    },
+    "src/presentation/hooks/useTimelineBranching.ts": {
+      "filePath": "src/presentation/hooks/useTimelineBranching.ts",
+      "contentHash": "8f29d29b889512da8d3258e98ad03ad85e42bbee60dd1e3dcb33919d7d8688d5",
+      "functions": [
+        {
+          "name": "useTimelineBranching",
+          "params": [
+            "initialGraph",
+            "initialLevel"
+          ],
+          "returnType": "UseTimelineBranchingResult",
+          "exported": true,
+          "lineCount": 49
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState",
+            "useCallback"
+          ]
+        },
+        {
+          "source": "../../domain/entities/ConversationTimelineGraph",
+          "specifiers": [
+            "ConversationTimelineGraph"
+          ]
+        },
+        {
+          "source": "../../domain/entities/ConversationNode",
+          "specifiers": [
+            "ConversationNode"
+          ]
+        },
+        {
+          "source": "../../domain/entities/AffectVector",
+          "specifiers": [
+            "AffectVector",
+            "ZERO_AFFECT"
+          ]
+        },
+        {
+          "source": "../../domain/value-objects/ScaffoldingLevel",
+          "specifiers": [
+            "ScaffoldingLevel",
+            "ScaffoldingLevelEnum"
+          ]
+        }
+      ],
+      "exports": [
+        "useTimelineBranching"
+      ],
+      "totalLines": 81,
+      "hasStructuralAnalysis": true
+    },
+    "src/presentation/hooks/useWebAudioProsody.ts": {
+      "filePath": "src/presentation/hooks/useWebAudioProsody.ts",
+      "contentHash": "8a3c12f5469b819c7b1e5f003261f7db2b449a75c99752bf3aec6a4e0810735e",
+      "functions": [
+        {
+          "name": "useWebAudioProsody",
+          "params": [],
+          "returnType": "UseWebAudioProsodyResult",
+          "exported": true,
+          "lineCount": 85
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState",
+            "useRef",
+            "useCallback"
+          ]
+        },
+        {
+          "source": "../../infrastructure/web-audio/AudioProcessor",
+          "specifiers": [
+            "AudioProcessor"
+          ]
+        },
+        {
+          "source": "../../domain/value-objects/ProsodyMetrics",
+          "specifiers": [
+            "ProsodyMetrics",
+            "SILENT_PROSODY",
+            "createProsodyMetrics"
+          ]
+        }
+      ],
+      "exports": [
+        "useWebAudioProsody"
+      ],
+      "totalLines": 110,
+      "hasStructuralAnalysis": true
+    },
+    "src/presentation/theme/tokens.ts": {
+      "filePath": "src/presentation/theme/tokens.ts",
+      "contentHash": "9c52060aceb11625e94d546efc2e23d09dff99f203c1174d63f797bcd27d217a",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [
+        "designTokens"
+      ],
+      "totalLines": 96,
+      "hasStructuralAnalysis": true
+    },
+    "src/presentation/utils/cozyAudio.ts": {
+      "filePath": "src/presentation/utils/cozyAudio.ts",
+      "contentHash": "458c4caf69e8f02c3622b1d0d7a18050b68ad477b41ce52a2b309c86493a1835",
+      "functions": [
+        {
+          "name": "getAudioContext",
+          "params": [],
+          "returnType": "AudioContext | null",
+          "exported": false,
+          "lineCount": 17
+        },
+        {
+          "name": "isUiSoundEnabled",
+          "params": [],
+          "returnType": "boolean",
+          "exported": true,
+          "lineCount": 8
+        },
+        {
+          "name": "setUiSoundEnabled",
+          "params": [
+            "enabled"
+          ],
+          "returnType": "void",
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "playCozySound",
+          "params": [
+            "type"
+          ],
+          "returnType": "void",
+          "exported": true,
+          "lineCount": 69
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "exports": [
+        "isUiSoundEnabled",
+        "setUiSoundEnabled",
+        "playCozySound"
+      ],
+      "totalLines": 129,
+      "hasStructuralAnalysis": true
+    },
+    "tailwind.config.js": {
+      "filePath": "tailwind.config.js",
+      "contentHash": "7ad761c29a403b58073b21be0c3ece2de0012725408e230d4c773b001c2b304d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 60,
+      "hasStructuralAnalysis": true
+    },
+    "tests/application/use-cases/BranchConversationUseCase.test.ts": {
+      "filePath": "tests/application/use-cases/BranchConversationUseCase.test.ts",
+      "contentHash": "a353dcb96ab8d1ed5d1b48ee9e18b29e2508657c7006f62499e8246484208aca",
+      "functions": [],
+      "classes": [
+        {
+          "name": "MockSessionRepo",
+          "methods": [
+            "getGraph",
+            "saveGraph",
+            "deleteGraph"
+          ],
+          "properties": [
+            "store"
+          ],
+          "exported": false,
+          "lineCount": 12
+        }
+      ],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect"
+          ]
+        },
+        {
+          "source": "../../../src/application/use-cases/BranchConversationUseCase",
+          "specifiers": [
+            "BranchConversationUseCase"
+          ]
+        },
+        {
+          "source": "../../../src/application/ports/out/SessionRepositoryPort",
+          "specifiers": [
+            "SessionRepositoryPort"
+          ]
+        },
+        {
+          "source": "../../../src/domain/entities/ConversationTimelineGraph",
+          "specifiers": [
+            "ConversationTimelineGraph"
+          ]
+        },
+        {
+          "source": "../../../src/domain/entities/AffectVector",
+          "specifiers": [
+            "createAffectVector"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 77,
+      "hasStructuralAnalysis": true
+    },
+    "tests/application/use-cases/ConversationalContinuityAndSemantics.test.ts": {
+      "filePath": "tests/application/use-cases/ConversationalContinuityAndSemantics.test.ts",
+      "contentHash": "91d4f29d9ba01086de4710f8ace04311a37154124b014aadb822b326cefa042b",
+      "functions": [],
+      "classes": [
+        {
+          "name": "MemorySessionRepo",
+          "methods": [
+            "getGraph",
+            "saveGraph",
+            "deleteGraph"
+          ],
+          "properties": [
+            "store"
+          ],
+          "exported": false,
+          "lineCount": 13
+        }
+      ],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect",
+            "vi"
+          ]
+        },
+        {
+          "source": "../../../src/application/use-cases/ProcessTurnUseCase",
+          "specifiers": [
+            "ProcessTurnUseCase"
+          ]
+        },
+        {
+          "source": "../../../src/infrastructure/adapters/llm/GeminiStructuredAdapter",
+          "specifiers": [
+            "GeminiStructuredAdapter"
+          ]
+        },
+        {
+          "source": "../../../src/application/ports/out/SessionRepositoryPort",
+          "specifiers": [
+            "SessionRepositoryPort"
+          ]
+        },
+        {
+          "source": "../../../src/domain/entities/ConversationTimelineGraph",
+          "specifiers": [
+            "ConversationTimelineGraph"
+          ]
+        },
+        {
+          "source": "../../../src/domain/entities/AffectVector",
+          "specifiers": [
+            "createAffectVector"
+          ]
+        },
+        {
+          "source": "../../../src/domain/value-objects/ProsodyMetrics",
+          "specifiers": [
+            "createProsodyMetrics"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 207,
+      "hasStructuralAnalysis": true
+    },
+    "tests/application/use-cases/GeneratePocketScriptUseCase.test.ts": {
+      "filePath": "tests/application/use-cases/GeneratePocketScriptUseCase.test.ts",
+      "contentHash": "c8d4cb14f5ac66294b0b73db9e3d02d60b8cdbf50af62a45314c29fab1c147a4",
+      "functions": [],
+      "classes": [
+        {
+          "name": "MockSessionRepo",
+          "methods": [
+            "getGraph",
+            "saveGraph",
+            "deleteGraph"
+          ],
+          "properties": [
+            "store"
+          ],
+          "exported": false,
+          "lineCount": 12
+        }
+      ],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect"
+          ]
+        },
+        {
+          "source": "../../../src/application/use-cases/GeneratePocketScriptUseCase",
+          "specifiers": [
+            "GeneratePocketScriptUseCase"
+          ]
+        },
+        {
+          "source": "../../../src/application/ports/out/SessionRepositoryPort",
+          "specifiers": [
+            "SessionRepositoryPort"
+          ]
+        },
+        {
+          "source": "../../../src/domain/entities/ConversationTimelineGraph",
+          "specifiers": [
+            "ConversationTimelineGraph"
+          ]
+        },
+        {
+          "source": "../../../src/domain/entities/AffectVector",
+          "specifiers": [
+            "createAffectVector"
+          ]
+        },
+        {
+          "source": "../../../src/domain/entities/TwoWayBridge",
+          "specifiers": [
+            "createTwoWayBridge"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 82,
+      "hasStructuralAnalysis": true
+    },
+    "tests/application/use-cases/ProcessTurnUseCase.test.ts": {
+      "filePath": "tests/application/use-cases/ProcessTurnUseCase.test.ts",
+      "contentHash": "55601ae349ac216f1412face174c87ce5a2126128d88f7fcb0527559f947c020",
+      "functions": [],
+      "classes": [
+        {
+          "name": "MockSessionRepo",
+          "methods": [
+            "getGraph",
+            "saveGraph",
+            "deleteGraph"
+          ],
+          "properties": [
+            "store"
+          ],
+          "exported": false,
+          "lineCount": 13
+        }
+      ],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect",
+            "vi"
+          ]
+        },
+        {
+          "source": "../../../src/application/use-cases/ProcessTurnUseCase",
+          "specifiers": [
+            "ProcessTurnUseCase"
+          ]
+        },
+        {
+          "source": "../../../src/application/ports/out/LLMInferencePort",
+          "specifiers": [
+            "LLMInferencePort",
+            "LLMInferenceResult"
+          ]
+        },
+        {
+          "source": "../../../src/application/ports/out/SessionRepositoryPort",
+          "specifiers": [
+            "SessionRepositoryPort"
+          ]
+        },
+        {
+          "source": "../../../src/domain/entities/ConversationTimelineGraph",
+          "specifiers": [
+            "ConversationTimelineGraph"
+          ]
+        },
+        {
+          "source": "../../../src/domain/entities/AffectVector",
+          "specifiers": [
+            "createAffectVector"
+          ]
+        },
+        {
+          "source": "../../../src/domain/value-objects/ProsodyMetrics",
+          "specifiers": [
+            "createProsodyMetrics"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 102,
+      "hasStructuralAnalysis": true
+    },
+    "tests/domain/AffectDynamicsService.test.ts": {
+      "filePath": "tests/domain/AffectDynamicsService.test.ts",
+      "contentHash": "0bacdef0321d26edb0c8339063eb2a64b2ee481fbbad6a6211022e6589c78aa0",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect"
+          ]
+        },
+        {
+          "source": "../../src/domain/services/AffectDynamicsService",
+          "specifiers": [
+            "applyEmotionalDamping",
+            "applyPeerDamping",
+            "applySupervisorDamping",
+            "simulateTrajectory",
+            "INERTIA_PEER",
+            "INERTIA_SUPERVISOR"
+          ]
+        },
+        {
+          "source": "../../src/domain/entities/AffectVector",
+          "specifiers": [
+            "createAffectVector",
+            "ZERO_AFFECT",
+            "isValidAffectVector"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 287,
+      "hasStructuralAnalysis": true
+    },
+    "tests/domain/AffectVector.test.ts": {
+      "filePath": "tests/domain/AffectVector.test.ts",
+      "contentHash": "ccb14ee46efd0221eef73dcc3eeb02358dd2bcf3af52ff9fa8f28dfb6d2496e4",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect"
+          ]
+        },
+        {
+          "source": "../../src/domain/entities/AffectVector",
+          "specifiers": [
+            "AffectVector",
+            "ZERO_AFFECT",
+            "clampComponent",
+            "createAffectVector",
+            "isValidAffectVector",
+            "addAffectVectors",
+            "scaleAffectVector",
+            "affectDistance"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 283,
+      "hasStructuralAnalysis": true
+    },
+    "tests/domain/ConversationNode.test.ts": {
+      "filePath": "tests/domain/ConversationNode.test.ts",
+      "contentHash": "35149ac2fb9e7f6627aa1a3888d0feeb169df566c6544b765ba06ba34277515a",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect"
+          ]
+        },
+        {
+          "source": "../../src/domain/entities/ConversationNode",
+          "specifiers": [
+            "createConversationNode"
+          ]
+        },
+        {
+          "source": "../../src/domain/entities/AffectVector",
+          "specifiers": [
+            "createAffectVector"
+          ]
+        },
+        {
+          "source": "../../src/domain/entities/TwoWayBridge",
+          "specifiers": [
+            "createTwoWayBridge"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 112,
+      "hasStructuralAnalysis": true
+    },
+    "tests/domain/ConversationTimelineGraph.test.ts": {
+      "filePath": "tests/domain/ConversationTimelineGraph.test.ts",
+      "contentHash": "206bf26eac4f8cb55355c52f14be8ae7acec5b1d3135c11a38849f9f6b5fadb0",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect"
+          ]
+        },
+        {
+          "source": "../../src/domain/entities/ConversationTimelineGraph",
+          "specifiers": [
+            "ConversationTimelineGraph"
+          ]
+        },
+        {
+          "source": "../../src/domain/entities/AffectVector",
+          "specifiers": [
+            "createAffectVector"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 105,
+      "hasStructuralAnalysis": true
+    },
+    "tests/domain/ProsodyMetrics.test.ts": {
+      "filePath": "tests/domain/ProsodyMetrics.test.ts",
+      "contentHash": "510be9206ea6ee6f07b9bb644585fe8943209a50ca293a518be8119a42c93829",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect"
+          ]
+        },
+        {
+          "source": "../../src/domain/value-objects/ProsodyMetrics",
+          "specifiers": [
+            "createProsodyMetrics",
+            "isValidProsodyMetrics",
+            "SILENT_PROSODY",
+            "MAX_WPM",
+            "MAX_VOLUME_RMS",
+            "MAX_PITCH_VARIANCE_HZ"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 47,
+      "hasStructuralAnalysis": true
+    },
+    "tests/domain/ScaffoldingLevel.test.ts": {
+      "filePath": "tests/domain/ScaffoldingLevel.test.ts",
+      "contentHash": "f60733feab228d88692b45387ffba3725fdefce011875529bb774e5198ba1dd8",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect"
+          ]
+        },
+        {
+          "source": "../../src/domain/value-objects/ScaffoldingLevel",
+          "specifiers": [
+            "ScaffoldingLevel",
+            "isValidScaffoldingLevel",
+            "shouldShowSubtext",
+            "shouldShowNonverbalBadges",
+            "getScaffoldingLabel"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 45,
+      "hasStructuralAnalysis": true
+    },
+    "tests/domain/ScenarioGenerator.test.ts": {
+      "filePath": "tests/domain/ScenarioGenerator.test.ts",
+      "contentHash": "6fc8edf0305940f71f7394abbd8c1652dbb7e0394440c0e68e539fef0aa0dda5",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect"
+          ]
+        },
+        {
+          "source": "../../src/domain/scenarios/ScenarioGenerator",
+          "specifiers": [
+            "ScenarioGenerator"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 60,
+      "hasStructuralAnalysis": true
+    },
+    "tests/domain/SophiaScenarioPresentation.test.ts": {
+      "filePath": "tests/domain/SophiaScenarioPresentation.test.ts",
+      "contentHash": "114dcf6cff842d0e0858d90a0f0bc8a03f2d6d1ba7c7dfd710ba6fc3f385ba36",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect"
+          ]
+        },
+        {
+          "source": "../../src/domain/entities/SophiaScenarioPresentation",
+          "specifiers": [
+            "getSophiaPresentationForScenario",
+            "inferPresentationArchetype",
+            "EVA_CORE_IDENTITY",
+            "EVA_PRESENTATION_CONFIGS",
+            "SophiaScenarioPresentation"
+          ]
+        },
+        {
+          "source": "../../src/domain/scenarios/topics",
+          "specifiers": [
+            "TOPICS",
+            "ScenarioDefinition"
+          ]
+        },
+        {
+          "source": "../../src/domain/scenarios/ScenarioGenerator",
+          "specifiers": [
+            "ScenarioGenerator"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 282,
+      "hasStructuralAnalysis": true
+    },
+    "tests/domain/TensionEvaluatorService.test.ts": {
+      "filePath": "tests/domain/TensionEvaluatorService.test.ts",
+      "contentHash": "d1cc534b01b48019645d27b639ee90ca6d2b4d03d227f04fef23991f947e0a9b",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect"
+          ]
+        },
+        {
+          "source": "../../src/domain/services/TensionEvaluatorService",
+          "specifiers": [
+            "calculateTensionIndex",
+            "evaluateSafetyGate",
+            "SafetyTier",
+            "TIER_2_THRESHOLD",
+            "TIER_3_THRESHOLD",
+            "IMPACT_WARNING_MESSAGE",
+            "CURTAIN_DROP_MESSAGE"
+          ]
+        },
+        {
+          "source": "../../src/domain/entities/AffectVector",
+          "specifiers": [
+            "createAffectVector"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 124,
+      "hasStructuralAnalysis": true
+    },
+    "tests/domain/TwoWayBridge.test.ts": {
+      "filePath": "tests/domain/TwoWayBridge.test.ts",
+      "contentHash": "fef590679ac09b76397cf7c10883f987d619338db5b0c70ccdf33d719facc040",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect"
+          ]
+        },
+        {
+          "source": "../../src/domain/entities/TwoWayBridge",
+          "specifiers": [
+            "createTwoWayBridge",
+            "isValidTwoWayBridge"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 44,
+      "hasStructuralAnalysis": true
+    },
+    "tests/infrastructure/AudioProsodyAnalyzer.test.ts": {
+      "filePath": "tests/infrastructure/AudioProsodyAnalyzer.test.ts",
+      "contentHash": "d7d62653cc1ec1ef41cbb6b10b3b1604cab43e8c95c67d79a8601cfe81b22e46",
+      "functions": [],
+      "classes": [
+        {
+          "name": "MockAnalyserNode",
+          "methods": [
+            "constructor",
+            "setData",
+            "getFloatTimeDomainData"
+          ],
+          "properties": [
+            "fftSize",
+            "syntheticData"
+          ],
+          "exported": false,
+          "lineCount": 16
+        }
+      ],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect"
+          ]
+        },
+        {
+          "source": "../../src/infrastructure/web-audio/ProsodyExtractor",
+          "specifiers": [
+            "AudioProsodyAnalyzer",
+            "AnalyserNodeLike"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 82,
+      "hasStructuralAnalysis": true
+    },
+    "tests/infrastructure/GeminiStructuredAdapter.test.ts": {
+      "filePath": "tests/infrastructure/GeminiStructuredAdapter.test.ts",
+      "contentHash": "35c143ae836df6573bf2f412ba5d7dbb3d1f384af44c38fef1ffe150503e9204",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect",
+            "vi"
+          ]
+        },
+        {
+          "source": "../../src/infrastructure/adapters/llm/GeminiStructuredAdapter",
+          "specifiers": [
+            "GeminiStructuredAdapter",
+            "RawLLMResponseSchema",
+            "FALLBACK_INFERENCE_RESULT",
+            "LLMCaller"
+          ]
+        },
+        {
+          "source": "../../src/domain/entities/AffectVector",
+          "specifiers": [
+            "createAffectVector"
+          ]
+        },
+        {
+          "source": "../../src/domain/value-objects/ProsodyMetrics",
+          "specifiers": [
+            "createProsodyMetrics"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 217,
+      "hasStructuralAnalysis": true
+    },
+    "tests/infrastructure/InMemorySessionRepo.test.ts": {
+      "filePath": "tests/infrastructure/InMemorySessionRepo.test.ts",
+      "contentHash": "af1eb9274f94414b48c814be997ff42ae652d217a3c6d6b4fb922d5a03a26b0f",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect"
+          ]
+        },
+        {
+          "source": "../../src/infrastructure/adapters/storage/InMemorySessionRepo",
+          "specifiers": [
+            "InMemorySessionRepo"
+          ]
+        },
+        {
+          "source": "../../src/domain/entities/ConversationTimelineGraph",
+          "specifiers": [
+            "ConversationTimelineGraph"
+          ]
+        },
+        {
+          "source": "../../src/domain/entities/AffectVector",
+          "specifiers": [
+            "createAffectVector"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 77,
+      "hasStructuralAnalysis": true
+    },
+    "tests/infrastructure/PromptTemplates.test.ts": {
+      "filePath": "tests/infrastructure/PromptTemplates.test.ts",
+      "contentHash": "64c41d5aebd85e38a1db1fcf5b2066f066c030f86083da5f3903a7d3cfbfeb70",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect"
+          ]
+        },
+        {
+          "source": "../../src/infrastructure/adapters/llm/PromptTemplates",
+          "specifiers": [
+            "CONVERSATION_SYSTEM_PROMPT",
+            "buildSystemPrompt"
+          ]
+        },
+        {
+          "source": "../../src/domain/entities/AffectVector",
+          "specifiers": [
+            "createAffectVector"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 33,
+      "hasStructuralAnalysis": true
+    },
+    "tests/presentation/LatencyReduction.test.ts": {
+      "filePath": "tests/presentation/LatencyReduction.test.ts",
+      "contentHash": "a5b7b5d6a5c62be62bde40f2c53ad7f0bd3d435f2fe7d892f0e2d727bc06b3e8",
+      "functions": [],
+      "classes": [
+        {
+          "name": "MockAudio",
+          "methods": [
+            "constructor",
+            "play",
+            "pause",
+            "removeAttribute"
+          ],
+          "properties": [
+            "src",
+            "preload",
+            "currentTime",
+            "paused",
+            "onplay",
+            "onended",
+            "onerror"
+          ],
+          "exported": false,
+          "lineCount": 27
+        }
+      ],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect",
+            "vi",
+            "beforeEach",
+            "afterEach"
+          ]
+        },
+        {
+          "source": "../../src/presentation/hooks/usePartnerVoice",
+          "specifiers": [
+            "splitIntoSentences",
+            "cleanSpokenText",
+            "VoicePipelineQueue"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 381,
+      "hasStructuralAnalysis": true
+    },
+    "tests/presentation/SophiaLiveAvatar.test.ts": {
+      "filePath": "tests/presentation/SophiaLiveAvatar.test.ts",
+      "contentHash": "c60357649377ca69ca905c1c15c42223a6fb0dc7354c938985674bcb0474161e",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect",
+            "vi",
+            "beforeEach",
+            "afterEach"
+          ]
+        },
+        {
+          "source": "react",
+          "specifiers": [
+            "React"
+          ]
+        },
+        {
+          "source": "react-dom/server",
+          "specifiers": [
+            "renderToString"
+          ]
+        },
+        {
+          "source": "../../src/app/api/v1/avatar/session/route",
+          "specifiers": [
+            "POST"
+          ]
+        },
+        {
+          "source": "../../src/presentation/components/SophiaLiveAvatar",
+          "specifiers": [
+            "SophiaLiveAvatar",
+            "SophiaLiveAvatarProps"
+          ]
+        },
+        {
+          "source": "../../src/domain/entities/SophiaScenarioPresentation",
+          "specifiers": [
+            "LOCKED_VOICE_ID",
+            "LOCKED_VOICE_NAME",
+            "LOCKED_MODEL_ID",
+            "SIMLI_TARGET_AUDIO_FORMAT",
+            "SIMLI_DEFAULT_FACE_ID",
+            "getSophiaPresentationForScenario",
+            "EVA_CORE_IDENTITY",
+            "EVA_PRESENTATION_CONFIGS",
+            "SophiaScenarioPresentation"
+          ]
+        },
+        {
+          "source": "../../src/domain/scenarios/topics",
+          "specifiers": [
+            "ScenarioDefinition"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 573,
+      "hasStructuralAnalysis": true
+    },
+    "tests/presentation/VoiceContractPreservation.test.ts": {
+      "filePath": "tests/presentation/VoiceContractPreservation.test.ts",
+      "contentHash": "ddcca483af3a8ffe5a286ea053bee4b4fe4f4e67d214bbf7f75b14fe871e40cd",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect",
+            "vi",
+            "beforeEach",
+            "afterEach"
+          ]
+        },
+        {
+          "source": "../../src/app/api/v1/voice/synthesize/route",
+          "specifiers": [
+            "POST"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 300,
+      "hasStructuralAnalysis": true
+    },
+    "tests/presentation/components/CoRegulationModal.test.ts": {
+      "filePath": "tests/presentation/components/CoRegulationModal.test.ts",
+      "contentHash": "6b425cb4f2d6e5c597972b09bfee57c9087f7e40a47a120094f53436b366f443",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect"
+          ]
+        },
+        {
+          "source": "../../../src/domain/services/TensionEvaluatorService",
+          "specifiers": [
+            "evaluateSafetyGate",
+            "SafetyTier"
+          ]
+        },
+        {
+          "source": "../../../src/domain/entities/AffectVector",
+          "specifiers": [
+            "createAffectVector"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 27,
+      "hasStructuralAnalysis": true
+    },
+    "tests/presentation/components/PostSessionDebrief.test.ts": {
+      "filePath": "tests/presentation/components/PostSessionDebrief.test.ts",
+      "contentHash": "97352024edb3413e272f25aeb0973f342963568c2a2a8303bba486f80689a001",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect"
+          ]
+        },
+        {
+          "source": "../../../src/application/use-cases/GeneratePocketScriptUseCase",
+          "specifiers": [
+            "PocketScriptResult"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 20,
+      "hasStructuralAnalysis": true
+    },
+    "tests/presentation/components/SubtextHud.test.ts": {
+      "filePath": "tests/presentation/components/SubtextHud.test.ts",
+      "contentHash": "5b5ec094852ccef477b2c34c8953b53501c3d051137ba727e7ce433fcbbf43e0",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect"
+          ]
+        },
+        {
+          "source": "../../../src/domain/value-objects/ScaffoldingLevel",
+          "specifiers": [
+            "ScaffoldingLevel",
+            "shouldShowSubtext",
+            "shouldShowNonverbalBadges"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 27,
+      "hasStructuralAnalysis": true
+    },
+    "tests/presentation/conversationRoute.test.ts": {
+      "filePath": "tests/presentation/conversationRoute.test.ts",
+      "contentHash": "9e99e0153196fa6d808ccb7e9c0e3b004abcea168492f10c64faa57d5bc5c2aa",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect",
+            "vi"
+          ]
+        },
+        {
+          "source": "../../src/presentation/api/routes/conversation",
+          "specifiers": [
+            "handleTurnRequest"
+          ]
+        },
+        {
+          "source": "../../src/application/use-cases/ProcessTurnUseCase",
+          "specifiers": [
+            "ProcessTurnUseCase",
+            "ProcessTurnResponse"
+          ]
+        },
+        {
+          "source": "../../src/domain/entities/AffectVector",
+          "specifiers": [
+            "createAffectVector"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 81,
+      "hasStructuralAnalysis": true
+    },
+    "tests/presentation/useTimelineBranching.test.ts": {
+      "filePath": "tests/presentation/useTimelineBranching.test.ts",
+      "contentHash": "9fb7722b19799bdba1cf3e3ec02208052780d02ad7337bd3254436799e98ef3d",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect"
+          ]
+        },
+        {
+          "source": "../../src/domain/entities/ConversationTimelineGraph",
+          "specifiers": [
+            "ConversationTimelineGraph"
+          ]
+        },
+        {
+          "source": "../../src/domain/entities/AffectVector",
+          "specifiers": [
+            "createAffectVector"
+          ]
+        },
+        {
+          "source": "../../src/domain/value-objects/ScaffoldingLevel",
+          "specifiers": [
+            "ScaffoldingLevel"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 71,
+      "hasStructuralAnalysis": true
+    },
+    "tests/presentation/useWebAudioProsody.test.ts": {
+      "filePath": "tests/presentation/useWebAudioProsody.test.ts",
+      "contentHash": "e0e3589968abc05d7b245a5072521ad1a4e57739d2b828c5e6d5375072037e53",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect"
+          ]
+        },
+        {
+          "source": "../../src/domain/value-objects/ProsodyMetrics",
+          "specifiers": [
+            "SILENT_PROSODY",
+            "createProsodyMetrics"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 18,
+      "hasStructuralAnalysis": true
+    },
+    "vitest.config.ts": {
+      "filePath": "vitest.config.ts",
+      "contentHash": "de574dfa1ef93cf9e9c57ffc82f26d75ad7fa6a4c3dd588d42ae07f06d80db2f",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest/config",
+          "specifiers": [
+            "defineConfig"
+          ]
+        },
+        {
+          "source": "path",
+          "specifiers": [
+            "path"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 16,
+      "hasStructuralAnalysis": true
+    }
+  }
+}

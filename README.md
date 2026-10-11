@@ -132,7 +132,7 @@ src/
 │   ├── services/
 │   │   ├── AffectDynamicsService.ts      # Exponential damping differential equations
 │   │   ├── AvatarKinematicsService.ts    # Deterministic Bezier/rotation mapping formulas
-│   │   └── TensionEvaluatorService.ts    # Mathematical safety gate computation
+│   │   └── TensionSophialuatorService.ts    # Mathematical safety gate computation
 │   └── value-objects/
 │       ├── ProsodyMetrics.ts             # WPM, RMS volume, F0 pitch variance
 │       └── ScaffoldingLevel.ts           # 0% (Reality), 50% (Hints), 100% (X-Ray)
@@ -196,13 +196,14 @@ Configure your environment variables:
 | Variable | Required | Description |
 | :--- | :---: | :--- |
 | `GEMINI_API_KEY` | **Yes** | Powers generative dialogue and intent translation ([Google AI Studio](https://aistudio.google.com/app/apikey)). |
-| `ELEVENLABS_API_KEY` | Optional | Powers natural conversational voice synthesis for Eva with the locked **Alexandra** voice (`kdmDKE6EkgrWrrykO9Qt`, `eleven_multilingual_v2`) and sub-second pipelined streaming ([ElevenLabs](https://elevenlabs.io)). |
-| `SIMLI_API_KEY` | Optional | Powers real-time WebRTC live video streaming via Simli's Speech-to-Video API ([Simli](https://simli.com)). |
-| `SIMLI_FACE_ID` | Optional | Simli Face ID identifier (defaults to `afdb6a3e-3939-40aa-92df-01604c23101c`). |
+| `ELEVENLABS_API_KEY` | **Yes** | Required for agent provisioning. |
+| `ELEVENLABS_AGENT_ID` | **Yes** | The ElevenLabs conversational agent ID configured for PCM 24000 Hz. |
+| `HEYGEN_API_KEY` | **Yes** | Powers real-time WebRTC live video streaming via HeyGen LiveAvatar's Speech-to-Video API. |
+| `HEYGEN_AVATAR_ID` | **Yes** | HeyGen LiveAvatar identifier (defaults to `Sophia`). |
 
 > **Note on Live Video Avatar Pipeline:**
-> - **With `SIMLI_API_KEY`**: Initiates a low-latency WebRTC video stream directly from Simli's Speech-to-Video servers, rendering the live animated avatar on an HTML5 `<video>` element with 16kHz linear PCM audio viseme synchronization.
-> - **Fail-Fast Diagnostics**: If `SIMLI_API_KEY` is not configured or connection drops, an explicit diagnostic error banner is surfaced with actionable troubleshooting details.
+> - **With HeyGen + ElevenLabs Agent**: Initiates a low-latency WebRTC video stream directly via LiveKit with 24kHz linear PCM audio viseme synchronization.
+> - **Fail-Fast Diagnostics**: If `HEYGEN_API_KEY` is not configured, the session endpoint safely returns a 503 instead of exposing credentials.
 
 ### 4. Run Development Server
 ```bash
@@ -225,7 +226,7 @@ npx vitest run
  ✓ tests/domain/ConversationTimelineGraph.test.ts (3 tests)
  ✓ tests/domain/ProsodyMetrics.test.ts (4 tests)
  ✓ tests/domain/ScaffoldingLevel.test.ts (4 tests)
- ✓ tests/domain/TensionEvaluatorService.test.ts (10 tests)
+ ✓ tests/domain/TensionSophialuatorService.test.ts (10 tests)
  ✓ tests/domain/TwoWayBridge.test.ts (4 tests)
  ✓ tests/application/use-cases/BranchConversationUseCase.test.ts (2 tests)
  ✓ tests/application/use-cases/GeneratePocketScriptUseCase.test.ts (2 tests)

@@ -1,21 +1,21 @@
 /**
- * EvaScenarioPresentation.test.ts — Unit tests for Eva Scenario-Aware Wardrobe & Background Presentation
+ * SophiaScenarioPresentation.test.ts — Unit tests for Sophia Scenario-Aware Wardrobe & Background Presentation
  */
 
 import { describe, it, expect } from 'vitest';
 import {
-  getEvaPresentationForScenario,
+  getSophiaPresentationForScenario,
   inferPresentationArchetype,
   EVA_CORE_IDENTITY,
   EVA_PRESENTATION_CONFIGS,
-  type EvaScenarioPresentation,
-} from '../../src/domain/entities/EvaScenarioPresentation';
+  type SophiaScenarioPresentation,
+} from '../../src/domain/entities/SophiaScenarioPresentation';
 import { TOPICS, type ScenarioDefinition } from '../../src/domain/scenarios/topics';
 import { ScenarioGenerator } from '../../src/domain/scenarios/ScenarioGenerator';
 
-describe('EvaScenarioPresentation Entity & Mapping Service', () => {
+describe('SophiaScenarioPresentation Entity & Mapping Service', () => {
   it('maintains a consistent core identity across all configurations', () => {
-    expect(EVA_CORE_IDENTITY.avatarName).toBe('Eva');
+    expect(EVA_CORE_IDENTITY.avatarName).toBe('Sophia');
     expect(EVA_CORE_IDENTITY.hairColorAndStyle).toContain('auburn-brown');
     expect(EVA_CORE_IDENTITY.eyeColor).toContain('hazel-brown');
     expect(EVA_CORE_IDENTITY.ageBracket).toBe('Early 30s');
@@ -40,7 +40,7 @@ describe('EvaScenarioPresentation Entity & Mapping Service', () => {
           examplePhrases: { gentle: 'I led...', direct: 'My role was...' },
         },
         partner: {
-          name: 'Eva',
+          name: 'Sophia',
           role: 'Hiring Manager',
           avatarVariant: 'eva',
           defaultTone: 'Formal, focused',
@@ -49,17 +49,17 @@ describe('EvaScenarioPresentation Entity & Mapping Service', () => {
         defaultTakeawayScript: 'I handled the conflict by aligning on shared goals.',
       };
 
-      const presentation = getEvaPresentationForScenario(interviewScenario);
+      const presentation = getSophiaPresentationForScenario(interviewScenario);
 
       expect(presentation.outfit).toBe('business-attire');
       expect(presentation.background).toBe('office');
       expect(presentation.outfitLabel).toBe('Professional Business Attire');
       expect(presentation.backgroundLabel).toBe('Office Background');
       expect(presentation.visualSummary).toBe(
-        'Eva • Professional Business Attire • Office Background',
+        'Sophia • Professional Business Attire • Office Background',
       );
       expect(presentation.detailedVisualDescription).toContain('business blazer');
-      expect(presentation.consistency.avatarName).toBe('Eva');
+      expect(presentation.consistency.avatarName).toBe('Sophia');
     });
   });
 
@@ -82,7 +82,7 @@ describe('EvaScenarioPresentation Entity & Mapping Service', () => {
           examplePhrases: { gentle: 'How have you been?', direct: 'Great to catch up.' },
         },
         partner: {
-          name: 'Eva',
+          name: 'Sophia',
           role: 'Close Friend',
           avatarVariant: 'eva',
           defaultTone: 'Warm and friendly',
@@ -91,13 +91,13 @@ describe('EvaScenarioPresentation Entity & Mapping Service', () => {
         defaultTakeawayScript: 'It was wonderful to catch up today.',
       };
 
-      const presentation = getEvaPresentationForScenario(coffeeScenario);
+      const presentation = getSophiaPresentationForScenario(coffeeScenario);
 
       expect(presentation.outfit).toBe('turtleneck');
       expect(presentation.background).toBe('coffee-shop');
       expect(presentation.outfitLabel).toBe('Turtleneck');
       expect(presentation.backgroundLabel).toBe('Coffee Shop');
-      expect(presentation.visualSummary).toBe('Eva • Turtleneck • Coffee Shop');
+      expect(presentation.visualSummary).toBe('Sophia • Turtleneck • Coffee Shop');
       expect(presentation.detailedVisualDescription).toContain('turtleneck');
     });
   });
@@ -107,13 +107,13 @@ describe('EvaScenarioPresentation Entity & Mapping Service', () => {
       const boundaryTopic = TOPICS.find((t) => t.id === 'boundary-saying-no')!;
       expect(boundaryTopic).toBeDefined();
 
-      const presentation = getEvaPresentationForScenario(boundaryTopic);
+      const presentation = getSophiaPresentationForScenario(boundaryTopic);
 
       expect(presentation.outfit).toBe('smart-casual');
       expect(presentation.background).toBe('quiet-study');
       expect(presentation.outfitLabel).toBe('Smart-Casual Blazer');
       expect(presentation.backgroundLabel).toBe('Calm Library/Study');
-      expect(presentation.visualSummary).toBe('Eva • Smart-Casual Blazer • Calm Library/Study');
+      expect(presentation.visualSummary).toBe('Sophia • Smart-Casual Blazer • Calm Library/Study');
       expect(presentation.detailedVisualDescription).toContain('smart-casual blazer');
     });
   });
@@ -123,14 +123,14 @@ describe('EvaScenarioPresentation Entity & Mapping Service', () => {
       const appointmentTopic = TOPICS.find((t) => t.id === 'appointments-clarification')!;
       expect(appointmentTopic).toBeDefined();
 
-      const presentation = getEvaPresentationForScenario(appointmentTopic);
+      const presentation = getSophiaPresentationForScenario(appointmentTopic);
 
       expect(presentation.outfit).toBe('clinical-professional');
       expect(presentation.background).toBe('consultation-room');
       expect(presentation.outfitLabel).toBe('Clinical & Professional Attire');
       expect(presentation.backgroundLabel).toBe('Consultation Room');
       expect(presentation.visualSummary).toBe(
-        'Eva • Clinical & Professional Attire • Consultation Room',
+        'Sophia • Clinical & Professional Attire • Consultation Room',
       );
       expect(presentation.detailedVisualDescription).toContain('clinical-professional');
     });
@@ -141,29 +141,29 @@ describe('EvaScenarioPresentation Entity & Mapping Service', () => {
       const everydayTopic = TOPICS.find((t) => t.id === 'everyday-smalltalk')!;
       expect(everydayTopic).toBeDefined();
 
-      const presentation = getEvaPresentationForScenario(everydayTopic);
+      const presentation = getSophiaPresentationForScenario(everydayTopic);
 
       expect(presentation.outfit).toBe('casual-knitwear');
       expect(presentation.background).toBe('warm-lounge');
       expect(presentation.outfitLabel).toBe('Comfortable Warm Knitwear');
       expect(presentation.backgroundLabel).toBe('Airy Lounge');
-      expect(presentation.visualSummary).toBe('Eva • Comfortable Warm Knitwear • Airy Lounge');
+      expect(presentation.visualSummary).toBe('Sophia • Comfortable Warm Knitwear • Airy Lounge');
     });
   });
 
   describe('All Standard TOPICS Catalog Mapping', () => {
-    it('maps every standard topic in TOPICS cleanly to an appropriate Eva presentation', () => {
+    it('maps every standard topic in TOPICS cleanly to an appropriate Sophia presentation', () => {
       for (const topic of TOPICS) {
-        const presentation = getEvaPresentationForScenario(topic);
+        const presentation = getSophiaPresentationForScenario(topic);
 
         expect(presentation.scenarioId).toBe(topic.id);
         expect(presentation.outfit).toBeDefined();
         expect(presentation.background).toBeDefined();
         expect(presentation.outfitLabel.length).toBeGreaterThan(0);
         expect(presentation.backgroundLabel.length).toBeGreaterThan(0);
-        expect(presentation.visualSummary).toContain('Eva');
-        expect(presentation.detailedVisualDescription).toContain('Eva');
-        expect(presentation.consistency.avatarName).toBe('Eva');
+        expect(presentation.visualSummary).toContain('Sophia');
+        expect(presentation.detailedVisualDescription).toContain('Sophia');
+        expect(presentation.consistency.avatarName).toBe('Sophia');
 
         // Verify specific standard topics
         if (topic.id === 'work-written-notes') {
@@ -196,7 +196,7 @@ describe('EvaScenarioPresentation Entity & Mapping Service', () => {
           'I need to practice my upcoming job interview with a senior engineering manager for a tech lead position.',
       });
 
-      const presentation = getEvaPresentationForScenario(generated.scenario);
+      const presentation = getSophiaPresentationForScenario(generated.scenario);
       expect(presentation.outfit).toBe('business-attire');
       expect(presentation.background).toBe('office');
       expect(presentation.outfitLabel).toBe('Professional Business Attire');
@@ -208,7 +208,7 @@ describe('EvaScenarioPresentation Entity & Mapping Service', () => {
           'Meeting my friend Maya for coffee and brunch to catch up on personal life after a busy month.',
       });
 
-      const presentation = getEvaPresentationForScenario(generated.scenario);
+      const presentation = getSophiaPresentationForScenario(generated.scenario);
       expect(presentation.outfit).toBe('turtleneck');
       expect(presentation.background).toBe('coffee-shop');
     });
@@ -219,7 +219,7 @@ describe('EvaScenarioPresentation Entity & Mapping Service', () => {
           'Having a difficult conversation with my roommate about quiet hours and setting boundaries regarding guests.',
       });
 
-      const presentation = getEvaPresentationForScenario(generated.scenario);
+      const presentation = getSophiaPresentationForScenario(generated.scenario);
       expect(presentation.outfit).toBe('smart-casual');
       expect(presentation.background).toBe('quiet-study');
     });
@@ -230,7 +230,7 @@ describe('EvaScenarioPresentation Entity & Mapping Service', () => {
           'Speaking with my doctor at the clinic to review medication side effects and ask clarification questions.',
       });
 
-      const presentation = getEvaPresentationForScenario(generated.scenario);
+      const presentation = getSophiaPresentationForScenario(generated.scenario);
       expect(presentation.outfit).toBe('clinical-professional');
       expect(presentation.background).toBe('consultation-room');
     });
@@ -241,7 +241,7 @@ describe('EvaScenarioPresentation Entity & Mapping Service', () => {
           'Making everyday casual small talk with my neighbor in the hallway about the weather and weekend plans.',
       });
 
-      const presentation = getEvaPresentationForScenario(generated.scenario);
+      const presentation = getSophiaPresentationForScenario(generated.scenario);
       expect(presentation.outfit).toBe('casual-knitwear');
       expect(presentation.background).toBe('warm-lounge');
     });
@@ -264,7 +264,7 @@ describe('EvaScenarioPresentation Entity & Mapping Service', () => {
           examplePhrases: { gentle: 'Hello', direct: 'Hi' },
         },
         partner: {
-          name: 'Eva',
+          name: 'Sophia',
           role: 'Conversational Partner',
           avatarVariant: 'eva',
           defaultTone: 'Calm',
@@ -273,7 +273,7 @@ describe('EvaScenarioPresentation Entity & Mapping Service', () => {
         defaultTakeawayScript: 'I appreciated our chat today.',
       };
 
-      const presentation = getEvaPresentationForScenario(genericScenario);
+      const presentation = getSophiaPresentationForScenario(genericScenario);
       expect(presentation.outfit).toBe('casual-knitwear');
       expect(presentation.background).toBe('warm-lounge');
     });

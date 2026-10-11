@@ -1,9 +1,9 @@
 /**
- * EvaScenarioPresentation.ts — Domain Entity & Presentation Model
+ * SophiaScenarioPresentation.ts — Domain Entity & Presentation Model
  *
- * Defines Eva's scenario-adaptive visual appearance configuration while enforcing
+ * Defines Sophia's scenario-adaptive visual appearance configuration while enforcing
  * strict visual identity consistency:
- * - Eva is the single avatar concept: realistic, friendly adult woman practice partner.
+ * - Sophia is the single avatar concept: realistic, friendly adult woman practice partner.
  * - Consistent identity markers: soft shoulder-length auburn-brown hair with gentle waves,
  *   warm hazel-brown eyes, natural skin tone, approachable presence, realistic 3-point lighting.
  * - Contextual wardrobe and environment adaptation:
@@ -17,22 +17,22 @@
 
 import type { ScenarioDefinition, InterestCategory } from '../scenarios/topics';
 
-export type EvaOutfit =
+export type SophiaOutfit =
   | 'business-attire'
   | 'turtleneck'
   | 'smart-casual'
   | 'clinical-professional'
   | 'casual-knitwear';
 
-export type EvaBackground =
+export type SophiaBackground =
   | 'office'
   | 'coffee-shop'
   | 'quiet-study'
   | 'consultation-room'
   | 'warm-lounge';
 
-export interface EvaIdentityConsistency {
-  readonly avatarName: 'Eva';
+export interface SophiaIdentityConsistency {
+  readonly avatarName: 'Sophia';
   readonly persona: string;
   readonly ageBracket: string;
   readonly facialStructure: string;
@@ -42,7 +42,7 @@ export interface EvaIdentityConsistency {
   readonly realisticLighting: string;
 }
 
-export interface EvaPresentationEnvironment {
+export interface SophiaPresentationEnvironment {
   readonly settingName: string;
   readonly atmosphericDetails: string;
   readonly lightingMood: string;
@@ -54,21 +54,21 @@ export interface EvaPresentationEnvironment {
   };
 }
 
-export interface EvaScenarioPresentation {
+export interface SophiaScenarioPresentation {
   readonly scenarioId: string;
-  readonly outfit: EvaOutfit;
-  readonly background: EvaBackground;
+  readonly outfit: SophiaOutfit;
+  readonly background: SophiaBackground;
   readonly outfitLabel: string;
   readonly backgroundLabel: string;
   readonly visualSummary: string;
   readonly badgeText?: string;
   readonly detailedVisualDescription: string;
-  readonly consistency: EvaIdentityConsistency;
-  readonly environment: EvaPresentationEnvironment;
+  readonly consistency: SophiaIdentityConsistency;
+  readonly environment: SophiaPresentationEnvironment;
 }
 
-export const EVA_CORE_IDENTITY: EvaIdentityConsistency = Object.freeze({
-  avatarName: 'Eva',
+export const SOPHIA_CORE_IDENTITY: SophiaIdentityConsistency = Object.freeze({
+  avatarName: 'Sophia',
   persona: 'Realistic, friendly, adult woman communication practice partner',
   ageBracket: 'Early 30s',
   facialStructure: 'Soft oval face shape with natural jawline, warm neutral undertone, gentle expressive brows',
@@ -78,13 +78,11 @@ export const EVA_CORE_IDENTITY: EvaIdentityConsistency = Object.freeze({
   realisticLighting: 'Subtle 3-point portrait illumination with soft ambient key light and warm fill',
 });
 
-// Locked voice contract — Alexandra (eleven_multilingual_v2)
+// Locked voice contract — Sophia (eleven_multilingual_v2)
 export const LOCKED_VOICE_ID = 'kdmDKE6EkgrWrrykO9Qt';
-export const LOCKED_VOICE_NAME = 'Alexandra — Conversational and Natural';
+export const LOCKED_VOICE_NAME = 'Sophia — Conversational and Natural';
 export const LOCKED_MODEL_ID = 'eleven_multilingual_v2';
-export const TARGET_AUDIO_FORMAT = 'pcm_16000';
-export const SIMLI_TARGET_AUDIO_FORMAT = 'pcm_16000';
-export const SIMLI_DEFAULT_FACE_ID = 'afdb6a3e-3939-40aa-92df-01604c23101c';
+export const TARGET_AUDIO_FORMAT = 'pcm_24000';
 
 export type PresentationArchetype =
   | 'interview-professional'
@@ -93,19 +91,19 @@ export type PresentationArchetype =
   | 'healthcare-appointment'
   | 'everyday-casual';
 
-export const EVA_PRESENTATION_CONFIGS: Record<
+export const SOPHIA_PRESENTATION_CONFIGS: Record<
   PresentationArchetype,
-  Omit<EvaScenarioPresentation, 'scenarioId'>
+  Omit<SophiaScenarioPresentation, 'scenarioId'>
 > = Object.freeze({
   'interview-professional': {
     outfit: 'business-attire',
     background: 'office',
     outfitLabel: 'Professional Business Attire',
     backgroundLabel: 'Office Background',
-    visualSummary: 'Eva • Professional Business Attire • Office Background',
+    visualSummary: 'Sophia • Professional Business Attire • Office Background',
     detailedVisualDescription:
-      'Eva is presented in a tailored deep navy-charcoal business blazer over a crisp ivory shell blouse with a discreet minimalist silver pendant. Her shoulder-length auburn-brown hair is smoothly styled behind one ear. She is seated in a modern architectural office setting with floor-to-ceiling glass partitions, subtle warm acoustic oak slats in soft focus, and soft daylight filtering through.',
-    consistency: EVA_CORE_IDENTITY,
+      'Sophia is presented in a tailored deep navy-charcoal business blazer over a crisp ivory shell blouse with a discreet minimalist silver pendant. Her shoulder-length auburn-brown hair is smoothly styled behind one ear. She is seated in a modern architectural office setting with floor-to-ceiling glass partitions, subtle warm acoustic oak slats in soft focus, and soft daylight filtering through.',
+    consistency: SOPHIA_CORE_IDENTITY,
     environment: {
       settingName: 'Contemporary Modern Office',
       atmosphericDetails: 'Soft-focus professional office suite with architectural glass walls and oak wood accents',
@@ -124,10 +122,10 @@ export const EVA_PRESENTATION_CONFIGS: Record<
     background: 'coffee-shop',
     outfitLabel: 'Turtleneck',
     backgroundLabel: 'Coffee Shop',
-    visualSummary: 'Eva • Turtleneck • Coffee Shop',
+    visualSummary: 'Sophia • Turtleneck • Coffee Shop',
     detailedVisualDescription:
-      'Eva wears a comfortable ribbed oatmeal-cream knit turtleneck sweater with soft textured collar folds. Her auburn-brown hair falls naturally around her shoulders in relaxed waves. She is framed against a warm neighborhood coffee shop with soft amber pendant lighting, blurred artisanal timber shelves, a potted monstera, and gentle golden ambient warmth.',
-    consistency: EVA_CORE_IDENTITY,
+      'Sophia wears a comfortable ribbed oatmeal-cream knit turtleneck sweater with soft textured collar folds. Her auburn-brown hair falls naturally around her shoulders in relaxed waves. She is framed against a warm neighborhood coffee shop with soft amber pendant lighting, blurred artisanal timber shelves, a potted monstera, and gentle golden ambient warmth.',
+    consistency: SOPHIA_CORE_IDENTITY,
     environment: {
       settingName: 'Artisanal Cafe Interior',
       atmosphericDetails: 'Warm ambient coffee house with soft-focus espresso bar, timber shelving, and leafy greenery',
@@ -146,10 +144,10 @@ export const EVA_PRESENTATION_CONFIGS: Record<
     background: 'quiet-study',
     outfitLabel: 'Smart-Casual Blazer',
     backgroundLabel: 'Calm Library/Study',
-    visualSummary: 'Eva • Smart-Casual Blazer • Calm Library/Study',
+    visualSummary: 'Sophia • Smart-Casual Blazer • Calm Library/Study',
     detailedVisualDescription:
-      'Eva is dressed in an unstructured earth-toned olive/camel smart-casual blazer over a soft heathered sand crewneck. Her hair is loosely gathered with natural framing tendrils. She is positioned in a serene library and study room lined with muted cedar bookshelves, soft matte sage walls, and warm desk-lamp luminescence creating a grounded, reflective atmosphere.',
-    consistency: EVA_CORE_IDENTITY,
+      'Sophia is dressed in an unstructured earth-toned olive/camel smart-casual blazer over a soft heathered sand crewneck. Her hair is loosely gathered with natural framing tendrils. She is positioned in a serene library and study room lined with muted cedar bookshelves, soft matte sage walls, and warm desk-lamp luminescence creating a grounded, reflective atmosphere.',
+    consistency: SOPHIA_CORE_IDENTITY,
     environment: {
       settingName: 'Serene Library & Study Room',
       atmosphericDetails: 'Quiet, acoustically balanced library setting with warm wood bookshelves and reading lamps',
@@ -168,10 +166,10 @@ export const EVA_PRESENTATION_CONFIGS: Record<
     background: 'consultation-room',
     outfitLabel: 'Clinical & Professional Attire',
     backgroundLabel: 'Consultation Room',
-    visualSummary: 'Eva • Clinical & Professional Attire • Consultation Room',
+    visualSummary: 'Sophia • Clinical & Professional Attire • Consultation Room',
     detailedVisualDescription:
-      'Eva wears clean, tailored clinical-professional attire featuring a muted eucalyptus-teal consultation coat over a soft linen blouse with a clean notched collar. Her hair is neatly styled back to keep her expressions clear and reassuring. The backdrop depicts a calm, spotless consultation room with soft vertical daylight blinds, a restful pastel backdrop, and a discreet indoor peace lily.',
-    consistency: EVA_CORE_IDENTITY,
+      'Sophia wears clean, tailored clinical-professional attire featuring a muted eucalyptus-teal consultation coat over a soft linen blouse with a clean notched collar. Her hair is neatly styled back to keep her expressions clear and reassuring. The backdrop depicts a calm, spotless consultation room with soft vertical daylight blinds, a restful pastel backdrop, and a discreet indoor peace lily.',
+    consistency: SOPHIA_CORE_IDENTITY,
     environment: {
       settingName: 'Private Medical & Consultation Office',
       atmosphericDetails: 'Orderly, bright, tranquil professional consultation suite with minimal visual distraction',
@@ -190,10 +188,10 @@ export const EVA_PRESENTATION_CONFIGS: Record<
     background: 'warm-lounge',
     outfitLabel: 'Comfortable Warm Knitwear',
     backgroundLabel: 'Airy Lounge',
-    visualSummary: 'Eva • Comfortable Warm Knitwear • Airy Lounge',
+    visualSummary: 'Sophia • Comfortable Warm Knitwear • Airy Lounge',
     detailedVisualDescription:
-      'Eva wears a relaxed, fine-gauge heathered sage knit sweater with soft drop shoulders and ribbed cuffs. Her auburn-brown hair is casually styled in loose, natural waves. She is seated in an airy sunlit lounge area with sheer white curtains catching afternoon breeze, warm timber floorboards, and comfortable neutral upholstery.',
-    consistency: EVA_CORE_IDENTITY,
+      'Sophia wears a relaxed, fine-gauge heathered sage knit sweater with soft drop shoulders and ribbed cuffs. Her auburn-brown hair is casually styled in loose, natural waves. She is seated in an airy sunlit lounge area with sheer white curtains catching afternoon breeze, warm timber floorboards, and comfortable neutral upholstery.',
+    consistency: SOPHIA_CORE_IDENTITY,
     environment: {
       settingName: 'Airy Daylight Living Lounge',
       atmosphericDetails: 'Sunlit, open residential lounge with sheer drapery and gentle natural light',
@@ -288,7 +286,7 @@ export function inferPresentationArchetype(scenario: ScenarioDefinition): Presen
   const everydayMatches = tokens.match(everydayRegex);
   if (everydayMatches) everydayScore += everydayMatches.length * 2;
 
-  // Evaluate highest score
+  // Sophialuate highest score
   const scores: [PresentationArchetype, number][] = [
     ['interview-professional', interviewScore],
     ['coffee-chat-social', coffeeScore],
@@ -308,13 +306,13 @@ export function inferPresentationArchetype(scenario: ScenarioDefinition): Presen
 }
 
 /**
- * Returns Eva's scenario-adaptive appearance and environment presentation.
+ * Returns Sophia's scenario-adaptive appearance and environment presentation.
  */
-export function getEvaPresentationForScenario(
+export function getSophiaPresentationForScenario(
   scenario: ScenarioDefinition,
-): EvaScenarioPresentation {
+): SophiaScenarioPresentation {
   const archetype = inferPresentationArchetype(scenario);
-  const baseConfig = EVA_PRESENTATION_CONFIGS[archetype];
+  const baseConfig = SOPHIA_PRESENTATION_CONFIGS[archetype];
 
   return {
     scenarioId: scenario.id,

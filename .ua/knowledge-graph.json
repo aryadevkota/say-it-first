@@ -1,0 +1,2738 @@
+{
+  "version": "1.0.0",
+  "project": {
+    "name": "SayItFirst",
+    "languages": [
+      "TypeScript",
+      "JavaScript",
+      "HTML",
+      "CSS"
+    ],
+    "frameworks": [
+      "Next.js",
+      "React",
+      "Tailwind CSS"
+    ],
+    "description": "Anxiety-reducing communication practice platform powered by Tavus CVI & ElevenLabs",
+    "analyzedAt": "2026-10-11T02:30:00.286Z",
+    "gitCommitHash": "latest"
+  },
+  "nodes": [
+    {
+      "id": "file:.github/workflows/ci.yml",
+      "name": "ci.yml",
+      "type": "file",
+      "filePath": ".github/workflows/ci.yml",
+      "summary": "File ci.yml in Say It First",
+      "description": "Implementation file .github/workflows/ci.yml",
+      "complexity": "moderate",
+      "tags": [
+        "infra"
+      ],
+      "language": "yaml"
+    },
+    {
+      "id": "file:.env.example",
+      "name": ".env.example",
+      "type": "file",
+      "filePath": ".env.example",
+      "summary": "File .env.example in Say It First",
+      "description": "Implementation file .env.example",
+      "complexity": "moderate",
+      "tags": [
+        "config"
+      ],
+      "language": "config"
+    },
+    {
+      "id": "file:CODE_OF_CONDUCT.md",
+      "name": "CODE_OF_CONDUCT.md",
+      "type": "file",
+      "filePath": "CODE_OF_CONDUCT.md",
+      "summary": "File CODE_OF_CONDUCT.md in Say It First",
+      "description": "Implementation file CODE_OF_CONDUCT.md",
+      "complexity": "moderate",
+      "tags": [
+        "docs"
+      ],
+      "language": "markdown"
+    },
+    {
+      "id": "file:CONTRIBUTING.md",
+      "name": "CONTRIBUTING.md",
+      "type": "file",
+      "filePath": "CONTRIBUTING.md",
+      "summary": "File CONTRIBUTING.md in Say It First",
+      "description": "Implementation file CONTRIBUTING.md",
+      "complexity": "moderate",
+      "tags": [
+        "docs"
+      ],
+      "language": "markdown"
+    },
+    {
+      "id": "file:README.md",
+      "name": "README.md",
+      "type": "file",
+      "filePath": "README.md",
+      "summary": "File README.md in Say It First",
+      "description": "Implementation file README.md",
+      "complexity": "moderate",
+      "tags": [
+        "docs"
+      ],
+      "language": "markdown"
+    },
+    {
+      "id": "file:SECURITY.md",
+      "name": "SECURITY.md",
+      "type": "file",
+      "filePath": "SECURITY.md",
+      "summary": "File SECURITY.md in Say It First",
+      "description": "Implementation file SECURITY.md",
+      "complexity": "moderate",
+      "tags": [
+        "docs"
+      ],
+      "language": "markdown"
+    },
+    {
+      "id": "file:package.json",
+      "name": "package.json",
+      "type": "file",
+      "filePath": "package.json",
+      "summary": "File package.json in Say It First",
+      "description": "Implementation file package.json",
+      "complexity": "moderate",
+      "tags": [
+        "config"
+      ],
+      "language": "json"
+    },
+    {
+      "id": "file:tsconfig.json",
+      "name": "tsconfig.json",
+      "type": "file",
+      "filePath": "tsconfig.json",
+      "summary": "File tsconfig.json in Say It First",
+      "description": "Implementation file tsconfig.json",
+      "complexity": "moderate",
+      "tags": [
+        "config"
+      ],
+      "language": "json"
+    },
+    {
+      "id": "file:.github/ISSUE_TEMPLATE/bug_report.yml",
+      "name": "bug_report.yml",
+      "type": "file",
+      "filePath": ".github/ISSUE_TEMPLATE/bug_report.yml",
+      "summary": "File bug_report.yml in Say It First",
+      "description": "Implementation file .github/ISSUE_TEMPLATE/bug_report.yml",
+      "complexity": "moderate",
+      "tags": [
+        "config"
+      ],
+      "language": "yaml"
+    },
+    {
+      "id": "file:.github/ISSUE_TEMPLATE/config.yml",
+      "name": "config.yml",
+      "type": "file",
+      "filePath": ".github/ISSUE_TEMPLATE/config.yml",
+      "summary": "File config.yml in Say It First",
+      "description": "Implementation file .github/ISSUE_TEMPLATE/config.yml",
+      "complexity": "moderate",
+      "tags": [
+        "config"
+      ],
+      "language": "yaml"
+    },
+    {
+      "id": "file:.github/ISSUE_TEMPLATE/feature_request.yml",
+      "name": "feature_request.yml",
+      "type": "file",
+      "filePath": ".github/ISSUE_TEMPLATE/feature_request.yml",
+      "summary": "File feature_request.yml in Say It First",
+      "description": "Implementation file .github/ISSUE_TEMPLATE/feature_request.yml",
+      "complexity": "moderate",
+      "tags": [
+        "config"
+      ],
+      "language": "yaml"
+    },
+    {
+      "id": "file:.github/PULL_REQUEST_TEMPLATE.md",
+      "name": "PULL_REQUEST_TEMPLATE.md",
+      "type": "file",
+      "filePath": ".github/PULL_REQUEST_TEMPLATE.md",
+      "summary": "File PULL_REQUEST_TEMPLATE.md in Say It First",
+      "description": "Implementation file .github/PULL_REQUEST_TEMPLATE.md",
+      "complexity": "moderate",
+      "tags": [
+        "docs"
+      ],
+      "language": "markdown"
+    },
+    {
+      "id": "file:postcss.config.js",
+      "name": "postcss.config.js",
+      "type": "file",
+      "filePath": "postcss.config.js",
+      "summary": "File postcss.config.js in Say It First",
+      "description": "Implementation file postcss.config.js",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "javascript"
+    },
+    {
+      "id": "file:src/app/api/v1/avatar/session/route.ts",
+      "name": "route.ts",
+      "type": "file",
+      "filePath": "src/app/api/v1/avatar/session/route.ts",
+      "summary": "File route.ts in Say It First",
+      "description": "Implementation file src/app/api/v1/avatar/session/route.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "function:src/app/api/v1/avatar/session/route.ts:isKeyConfigured",
+      "name": "isKeyConfigured",
+      "type": "function",
+      "filePath": "src/app/api/v1/avatar/session/route.ts",
+      "summary": "Function isKeyConfigured",
+      "description": "Function implementation for isKeyConfigured",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:src/app/api/v1/avatar/session/route.ts:POST",
+      "name": "POST",
+      "type": "function",
+      "filePath": "src/app/api/v1/avatar/session/route.ts",
+      "summary": "Function POST",
+      "description": "Function implementation for POST",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:src/app/api/v1/avatar/session/route.ts:DELETE",
+      "name": "DELETE",
+      "type": "function",
+      "filePath": "src/app/api/v1/avatar/session/route.ts",
+      "summary": "Function DELETE",
+      "description": "Function implementation for DELETE",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "file:src/app/api/v1/conversation/turn/route.ts",
+      "name": "route.ts",
+      "type": "file",
+      "filePath": "src/app/api/v1/conversation/turn/route.ts",
+      "summary": "File route.ts in Say It First",
+      "description": "Implementation file src/app/api/v1/conversation/turn/route.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "function:src/app/api/v1/conversation/turn/route.ts:POST",
+      "name": "POST",
+      "type": "function",
+      "filePath": "src/app/api/v1/conversation/turn/route.ts",
+      "summary": "Function POST",
+      "description": "Function implementation for POST",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "file:src/app/api/v1/voice/synthesize/route.ts",
+      "name": "route.ts",
+      "type": "file",
+      "filePath": "src/app/api/v1/voice/synthesize/route.ts",
+      "summary": "File route.ts in Say It First",
+      "description": "Implementation file src/app/api/v1/voice/synthesize/route.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "function:src/app/api/v1/voice/synthesize/route.ts:POST",
+      "name": "POST",
+      "type": "function",
+      "filePath": "src/app/api/v1/voice/synthesize/route.ts",
+      "summary": "Function POST",
+      "description": "Function implementation for POST",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "file:src/app/layout.tsx",
+      "name": "layout.tsx",
+      "type": "file",
+      "filePath": "src/app/layout.tsx",
+      "summary": "File layout.tsx in Say It First",
+      "description": "Implementation file src/app/layout.tsx",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "function:src/app/layout.tsx:RootLayout",
+      "name": "RootLayout",
+      "type": "function",
+      "filePath": "src/app/layout.tsx",
+      "summary": "Function RootLayout",
+      "description": "Function implementation for RootLayout",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "file:src/app/page.tsx",
+      "name": "page.tsx",
+      "type": "file",
+      "filePath": "src/app/page.tsx",
+      "summary": "File page.tsx in Say It First",
+      "description": "Implementation file src/app/page.tsx",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "function:src/app/page.tsx:SayItFirstRoot",
+      "name": "SayItFirstRoot",
+      "type": "function",
+      "filePath": "src/app/page.tsx",
+      "summary": "Function SayItFirstRoot",
+      "description": "Function implementation for SayItFirstRoot",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "file:src/application/ports/in/ProcessTurnCommand.ts",
+      "name": "ProcessTurnCommand.ts",
+      "type": "file",
+      "filePath": "src/application/ports/in/ProcessTurnCommand.ts",
+      "summary": "File ProcessTurnCommand.ts in Say It First",
+      "description": "Implementation file src/application/ports/in/ProcessTurnCommand.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "file:src/application/use-cases/BranchConversationUseCase.ts",
+      "name": "BranchConversationUseCase.ts",
+      "type": "file",
+      "filePath": "src/application/use-cases/BranchConversationUseCase.ts",
+      "summary": "File BranchConversationUseCase.ts in Say It First",
+      "description": "Implementation file src/application/use-cases/BranchConversationUseCase.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code",
+        "tested"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "class:src/application/use-cases/BranchConversationUseCase.ts:BranchConversationUseCase",
+      "name": "BranchConversationUseCase",
+      "type": "class",
+      "filePath": "src/application/use-cases/BranchConversationUseCase.ts",
+      "summary": "Class BranchConversationUseCase",
+      "description": "Class definition for BranchConversationUseCase",
+      "complexity": "moderate",
+      "tags": [
+        "class"
+      ]
+    },
+    {
+      "id": "file:src/application/use-cases/GeneratePocketScriptUseCase.ts",
+      "name": "GeneratePocketScriptUseCase.ts",
+      "type": "file",
+      "filePath": "src/application/use-cases/GeneratePocketScriptUseCase.ts",
+      "summary": "File GeneratePocketScriptUseCase.ts in Say It First",
+      "description": "Implementation file src/application/use-cases/GeneratePocketScriptUseCase.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code",
+        "tested"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "class:src/application/use-cases/GeneratePocketScriptUseCase.ts:GeneratePocketScriptUseCase",
+      "name": "GeneratePocketScriptUseCase",
+      "type": "class",
+      "filePath": "src/application/use-cases/GeneratePocketScriptUseCase.ts",
+      "summary": "Class GeneratePocketScriptUseCase",
+      "description": "Class definition for GeneratePocketScriptUseCase",
+      "complexity": "moderate",
+      "tags": [
+        "class"
+      ]
+    },
+    {
+      "id": "file:src/application/use-cases/ProcessTurnUseCase.ts",
+      "name": "ProcessTurnUseCase.ts",
+      "type": "file",
+      "filePath": "src/application/use-cases/ProcessTurnUseCase.ts",
+      "summary": "File ProcessTurnUseCase.ts in Say It First",
+      "description": "Implementation file src/application/use-cases/ProcessTurnUseCase.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code",
+        "tested"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "class:src/application/use-cases/ProcessTurnUseCase.ts:ProcessTurnUseCase",
+      "name": "ProcessTurnUseCase",
+      "type": "class",
+      "filePath": "src/application/use-cases/ProcessTurnUseCase.ts",
+      "summary": "Class ProcessTurnUseCase",
+      "description": "Class definition for ProcessTurnUseCase",
+      "complexity": "moderate",
+      "tags": [
+        "class"
+      ]
+    },
+    {
+      "id": "file:src/domain/entities/AffectVector.ts",
+      "name": "AffectVector.ts",
+      "type": "file",
+      "filePath": "src/domain/entities/AffectVector.ts",
+      "summary": "File AffectVector.ts in Say It First",
+      "description": "Implementation file src/domain/entities/AffectVector.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "function:src/domain/entities/AffectVector.ts:clampComponent",
+      "name": "clampComponent",
+      "type": "function",
+      "filePath": "src/domain/entities/AffectVector.ts",
+      "summary": "Function clampComponent",
+      "description": "Function implementation for clampComponent",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:src/domain/entities/AffectVector.ts:createAffectVector",
+      "name": "createAffectVector",
+      "type": "function",
+      "filePath": "src/domain/entities/AffectVector.ts",
+      "summary": "Function createAffectVector",
+      "description": "Function implementation for createAffectVector",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:src/domain/entities/AffectVector.ts:isValidAffectVector",
+      "name": "isValidAffectVector",
+      "type": "function",
+      "filePath": "src/domain/entities/AffectVector.ts",
+      "summary": "Function isValidAffectVector",
+      "description": "Function implementation for isValidAffectVector",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:src/domain/entities/AffectVector.ts:addAffectVectors",
+      "name": "addAffectVectors",
+      "type": "function",
+      "filePath": "src/domain/entities/AffectVector.ts",
+      "summary": "Function addAffectVectors",
+      "description": "Function implementation for addAffectVectors",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:src/domain/entities/AffectVector.ts:scaleAffectVector",
+      "name": "scaleAffectVector",
+      "type": "function",
+      "filePath": "src/domain/entities/AffectVector.ts",
+      "summary": "Function scaleAffectVector",
+      "description": "Function implementation for scaleAffectVector",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:src/domain/entities/AffectVector.ts:affectDistance",
+      "name": "affectDistance",
+      "type": "function",
+      "filePath": "src/domain/entities/AffectVector.ts",
+      "summary": "Function affectDistance",
+      "description": "Function implementation for affectDistance",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "file:src/domain/entities/ConversationNode.ts",
+      "name": "ConversationNode.ts",
+      "type": "file",
+      "filePath": "src/domain/entities/ConversationNode.ts",
+      "summary": "File ConversationNode.ts in Say It First",
+      "description": "Implementation file src/domain/entities/ConversationNode.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "function:src/domain/entities/ConversationNode.ts:createConversationNode",
+      "name": "createConversationNode",
+      "type": "function",
+      "filePath": "src/domain/entities/ConversationNode.ts",
+      "summary": "Function createConversationNode",
+      "description": "Function implementation for createConversationNode",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "file:src/domain/entities/ConversationTimelineGraph.ts",
+      "name": "ConversationTimelineGraph.ts",
+      "type": "file",
+      "filePath": "src/domain/entities/ConversationTimelineGraph.ts",
+      "summary": "File ConversationTimelineGraph.ts in Say It First",
+      "description": "Implementation file src/domain/entities/ConversationTimelineGraph.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "class:src/domain/entities/ConversationTimelineGraph.ts:ConversationTimelineGraph",
+      "name": "ConversationTimelineGraph",
+      "type": "class",
+      "filePath": "src/domain/entities/ConversationTimelineGraph.ts",
+      "summary": "Class ConversationTimelineGraph",
+      "description": "Class definition for ConversationTimelineGraph",
+      "complexity": "moderate",
+      "tags": [
+        "class"
+      ]
+    },
+    {
+      "id": "file:src/domain/entities/SophiaScenarioPresentation.ts",
+      "name": "SophiaScenarioPresentation.ts",
+      "type": "file",
+      "filePath": "src/domain/entities/SophiaScenarioPresentation.ts",
+      "summary": "File SophiaScenarioPresentation.ts in Say It First",
+      "description": "Implementation file src/domain/entities/SophiaScenarioPresentation.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "function:src/domain/entities/SophiaScenarioPresentation.ts:inferPresentationArchetype",
+      "name": "inferPresentationArchetype",
+      "type": "function",
+      "filePath": "src/domain/entities/SophiaScenarioPresentation.ts",
+      "summary": "Function inferPresentationArchetype",
+      "description": "Function implementation for inferPresentationArchetype",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:src/domain/entities/SophiaScenarioPresentation.ts:getSophiaPresentationForScenario",
+      "name": "getSophiaPresentationForScenario",
+      "type": "function",
+      "filePath": "src/domain/entities/SophiaScenarioPresentation.ts",
+      "summary": "Function getSophiaPresentationForScenario",
+      "description": "Function implementation for getSophiaPresentationForScenario",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "file:src/domain/entities/TwoWayBridge.ts",
+      "name": "TwoWayBridge.ts",
+      "type": "file",
+      "filePath": "src/domain/entities/TwoWayBridge.ts",
+      "summary": "File TwoWayBridge.ts in Say It First",
+      "description": "Implementation file src/domain/entities/TwoWayBridge.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "function:src/domain/entities/TwoWayBridge.ts:isValidTwoWayBridge",
+      "name": "isValidTwoWayBridge",
+      "type": "function",
+      "filePath": "src/domain/entities/TwoWayBridge.ts",
+      "summary": "Function isValidTwoWayBridge",
+      "description": "Function implementation for isValidTwoWayBridge",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:src/domain/entities/TwoWayBridge.ts:createTwoWayBridge",
+      "name": "createTwoWayBridge",
+      "type": "function",
+      "filePath": "src/domain/entities/TwoWayBridge.ts",
+      "summary": "Function createTwoWayBridge",
+      "description": "Function implementation for createTwoWayBridge",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "file:src/domain/scenarios/ScenarioGenerator.ts",
+      "name": "ScenarioGenerator.ts",
+      "type": "file",
+      "filePath": "src/domain/scenarios/ScenarioGenerator.ts",
+      "summary": "File ScenarioGenerator.ts in Say It First",
+      "description": "Implementation file src/domain/scenarios/ScenarioGenerator.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "class:src/domain/scenarios/ScenarioGenerator.ts:ScenarioGenerator",
+      "name": "ScenarioGenerator",
+      "type": "class",
+      "filePath": "src/domain/scenarios/ScenarioGenerator.ts",
+      "summary": "Class ScenarioGenerator",
+      "description": "Class definition for ScenarioGenerator",
+      "complexity": "moderate",
+      "tags": [
+        "class"
+      ]
+    },
+    {
+      "id": "file:src/domain/scenarios/topics.ts",
+      "name": "topics.ts",
+      "type": "file",
+      "filePath": "src/domain/scenarios/topics.ts",
+      "summary": "File topics.ts in Say It First",
+      "description": "Implementation file src/domain/scenarios/topics.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "function:src/domain/scenarios/topics.ts:registerCustomTopic",
+      "name": "registerCustomTopic",
+      "type": "function",
+      "filePath": "src/domain/scenarios/topics.ts",
+      "summary": "Function registerCustomTopic",
+      "description": "Function implementation for registerCustomTopic",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:src/domain/scenarios/topics.ts:getRegisteredCustomTopics",
+      "name": "getRegisteredCustomTopics",
+      "type": "function",
+      "filePath": "src/domain/scenarios/topics.ts",
+      "summary": "Function getRegisteredCustomTopics",
+      "description": "Function implementation for getRegisteredCustomTopics",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:src/domain/scenarios/topics.ts:getTopicById",
+      "name": "getTopicById",
+      "type": "function",
+      "filePath": "src/domain/scenarios/topics.ts",
+      "summary": "Function getTopicById",
+      "description": "Function implementation for getTopicById",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:src/domain/scenarios/topics.ts:getTopicsByCategory",
+      "name": "getTopicsByCategory",
+      "type": "function",
+      "filePath": "src/domain/scenarios/topics.ts",
+      "summary": "Function getTopicsByCategory",
+      "description": "Function implementation for getTopicsByCategory",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "file:src/domain/services/AffectDynamicsService.ts",
+      "name": "AffectDynamicsService.ts",
+      "type": "file",
+      "filePath": "src/domain/services/AffectDynamicsService.ts",
+      "summary": "File AffectDynamicsService.ts in Say It First",
+      "description": "Implementation file src/domain/services/AffectDynamicsService.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "function:src/domain/services/AffectDynamicsService.ts:applyEmotionalDamping",
+      "name": "applyEmotionalDamping",
+      "type": "function",
+      "filePath": "src/domain/services/AffectDynamicsService.ts",
+      "summary": "Function applyEmotionalDamping",
+      "description": "Function implementation for applyEmotionalDamping",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:src/domain/services/AffectDynamicsService.ts:applyPeerDamping",
+      "name": "applyPeerDamping",
+      "type": "function",
+      "filePath": "src/domain/services/AffectDynamicsService.ts",
+      "summary": "Function applyPeerDamping",
+      "description": "Function implementation for applyPeerDamping",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:src/domain/services/AffectDynamicsService.ts:applySupervisorDamping",
+      "name": "applySupervisorDamping",
+      "type": "function",
+      "filePath": "src/domain/services/AffectDynamicsService.ts",
+      "summary": "Function applySupervisorDamping",
+      "description": "Function implementation for applySupervisorDamping",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:src/domain/services/AffectDynamicsService.ts:simulateTrajectory",
+      "name": "simulateTrajectory",
+      "type": "function",
+      "filePath": "src/domain/services/AffectDynamicsService.ts",
+      "summary": "Function simulateTrajectory",
+      "description": "Function implementation for simulateTrajectory",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "file:src/domain/services/AvatarKinematicsService.ts",
+      "name": "AvatarKinematicsService.ts",
+      "type": "file",
+      "filePath": "src/domain/services/AvatarKinematicsService.ts",
+      "summary": "File AvatarKinematicsService.ts in Say It First",
+      "description": "Implementation file src/domain/services/AvatarKinematicsService.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "function:src/domain/services/AvatarKinematicsService.ts:computeAvatarKinematics",
+      "name": "computeAvatarKinematics",
+      "type": "function",
+      "filePath": "src/domain/services/AvatarKinematicsService.ts",
+      "summary": "Function computeAvatarKinematics",
+      "description": "Function implementation for computeAvatarKinematics",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "file:src/domain/services/TensionEvaluatorService.ts",
+      "name": "TensionEvaluatorService.ts",
+      "type": "file",
+      "filePath": "src/domain/services/TensionEvaluatorService.ts",
+      "summary": "File TensionEvaluatorService.ts in Say It First",
+      "description": "Implementation file src/domain/services/TensionEvaluatorService.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "function:src/domain/services/TensionEvaluatorService.ts:calculateTensionIndex",
+      "name": "calculateTensionIndex",
+      "type": "function",
+      "filePath": "src/domain/services/TensionEvaluatorService.ts",
+      "summary": "Function calculateTensionIndex",
+      "description": "Function implementation for calculateTensionIndex",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:src/domain/services/TensionEvaluatorService.ts:evaluateSafetyGate",
+      "name": "evaluateSafetyGate",
+      "type": "function",
+      "filePath": "src/domain/services/TensionEvaluatorService.ts",
+      "summary": "Function evaluateSafetyGate",
+      "description": "Function implementation for evaluateSafetyGate",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "file:src/domain/value-objects/ProsodyMetrics.ts",
+      "name": "ProsodyMetrics.ts",
+      "type": "file",
+      "filePath": "src/domain/value-objects/ProsodyMetrics.ts",
+      "summary": "File ProsodyMetrics.ts in Say It First",
+      "description": "Implementation file src/domain/value-objects/ProsodyMetrics.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "function:src/domain/value-objects/ProsodyMetrics.ts:isValidProsodyMetrics",
+      "name": "isValidProsodyMetrics",
+      "type": "function",
+      "filePath": "src/domain/value-objects/ProsodyMetrics.ts",
+      "summary": "Function isValidProsodyMetrics",
+      "description": "Function implementation for isValidProsodyMetrics",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:src/domain/value-objects/ProsodyMetrics.ts:createProsodyMetrics",
+      "name": "createProsodyMetrics",
+      "type": "function",
+      "filePath": "src/domain/value-objects/ProsodyMetrics.ts",
+      "summary": "Function createProsodyMetrics",
+      "description": "Function implementation for createProsodyMetrics",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "file:src/domain/value-objects/ScaffoldingLevel.ts",
+      "name": "ScaffoldingLevel.ts",
+      "type": "file",
+      "filePath": "src/domain/value-objects/ScaffoldingLevel.ts",
+      "summary": "File ScaffoldingLevel.ts in Say It First",
+      "description": "Implementation file src/domain/value-objects/ScaffoldingLevel.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "function:src/domain/value-objects/ScaffoldingLevel.ts:isValidScaffoldingLevel",
+      "name": "isValidScaffoldingLevel",
+      "type": "function",
+      "filePath": "src/domain/value-objects/ScaffoldingLevel.ts",
+      "summary": "Function isValidScaffoldingLevel",
+      "description": "Function implementation for isValidScaffoldingLevel",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:src/domain/value-objects/ScaffoldingLevel.ts:shouldShowSubtext",
+      "name": "shouldShowSubtext",
+      "type": "function",
+      "filePath": "src/domain/value-objects/ScaffoldingLevel.ts",
+      "summary": "Function shouldShowSubtext",
+      "description": "Function implementation for shouldShowSubtext",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:src/domain/value-objects/ScaffoldingLevel.ts:shouldShowNonverbalBadges",
+      "name": "shouldShowNonverbalBadges",
+      "type": "function",
+      "filePath": "src/domain/value-objects/ScaffoldingLevel.ts",
+      "summary": "Function shouldShowNonverbalBadges",
+      "description": "Function implementation for shouldShowNonverbalBadges",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:src/domain/value-objects/ScaffoldingLevel.ts:getScaffoldingLabel",
+      "name": "getScaffoldingLabel",
+      "type": "function",
+      "filePath": "src/domain/value-objects/ScaffoldingLevel.ts",
+      "summary": "Function getScaffoldingLabel",
+      "description": "Function implementation for getScaffoldingLabel",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "file:src/infrastructure/adapters/llm/GeminiStructuredAdapter.ts",
+      "name": "GeminiStructuredAdapter.ts",
+      "type": "file",
+      "filePath": "src/infrastructure/adapters/llm/GeminiStructuredAdapter.ts",
+      "summary": "File GeminiStructuredAdapter.ts in Say It First",
+      "description": "Implementation file src/infrastructure/adapters/llm/GeminiStructuredAdapter.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "class:src/infrastructure/adapters/llm/GeminiStructuredAdapter.ts:GeminiStructuredAdapter",
+      "name": "GeminiStructuredAdapter",
+      "type": "class",
+      "filePath": "src/infrastructure/adapters/llm/GeminiStructuredAdapter.ts",
+      "summary": "Class GeminiStructuredAdapter",
+      "description": "Class definition for GeminiStructuredAdapter",
+      "complexity": "moderate",
+      "tags": [
+        "class"
+      ]
+    },
+    {
+      "id": "file:src/infrastructure/adapters/llm/PromptTemplates.ts",
+      "name": "PromptTemplates.ts",
+      "type": "file",
+      "filePath": "src/infrastructure/adapters/llm/PromptTemplates.ts",
+      "summary": "File PromptTemplates.ts in Say It First",
+      "description": "Implementation file src/infrastructure/adapters/llm/PromptTemplates.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "function:src/infrastructure/adapters/llm/PromptTemplates.ts:buildSystemPrompt",
+      "name": "buildSystemPrompt",
+      "type": "function",
+      "filePath": "src/infrastructure/adapters/llm/PromptTemplates.ts",
+      "summary": "Function buildSystemPrompt",
+      "description": "Function implementation for buildSystemPrompt",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "file:src/infrastructure/adapters/storage/InMemorySessionRepo.ts",
+      "name": "InMemorySessionRepo.ts",
+      "type": "file",
+      "filePath": "src/infrastructure/adapters/storage/InMemorySessionRepo.ts",
+      "summary": "File InMemorySessionRepo.ts in Say It First",
+      "description": "Implementation file src/infrastructure/adapters/storage/InMemorySessionRepo.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "class:src/infrastructure/adapters/storage/InMemorySessionRepo.ts:InMemorySessionRepo",
+      "name": "InMemorySessionRepo",
+      "type": "class",
+      "filePath": "src/infrastructure/adapters/storage/InMemorySessionRepo.ts",
+      "summary": "Class InMemorySessionRepo",
+      "description": "Class definition for InMemorySessionRepo",
+      "complexity": "moderate",
+      "tags": [
+        "class"
+      ]
+    },
+    {
+      "id": "file:src/infrastructure/web-audio/AudioProcessor.ts",
+      "name": "AudioProcessor.ts",
+      "type": "file",
+      "filePath": "src/infrastructure/web-audio/AudioProcessor.ts",
+      "summary": "File AudioProcessor.ts in Say It First",
+      "description": "Implementation file src/infrastructure/web-audio/AudioProcessor.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "class:src/infrastructure/web-audio/AudioProcessor.ts:AudioProcessor",
+      "name": "AudioProcessor",
+      "type": "class",
+      "filePath": "src/infrastructure/web-audio/AudioProcessor.ts",
+      "summary": "Class AudioProcessor",
+      "description": "Class definition for AudioProcessor",
+      "complexity": "moderate",
+      "tags": [
+        "class"
+      ]
+    },
+    {
+      "id": "file:src/infrastructure/web-audio/ProsodyExtractor.ts",
+      "name": "ProsodyExtractor.ts",
+      "type": "file",
+      "filePath": "src/infrastructure/web-audio/ProsodyExtractor.ts",
+      "summary": "File ProsodyExtractor.ts in Say It First",
+      "description": "Implementation file src/infrastructure/web-audio/ProsodyExtractor.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "class:src/infrastructure/web-audio/ProsodyExtractor.ts:AudioProsodyAnalyzer",
+      "name": "AudioProsodyAnalyzer",
+      "type": "class",
+      "filePath": "src/infrastructure/web-audio/ProsodyExtractor.ts",
+      "summary": "Class AudioProsodyAnalyzer",
+      "description": "Class definition for AudioProsodyAnalyzer",
+      "complexity": "moderate",
+      "tags": [
+        "class"
+      ]
+    },
+    {
+      "id": "file:src/presentation/api/routes/conversation.ts",
+      "name": "conversation.ts",
+      "type": "file",
+      "filePath": "src/presentation/api/routes/conversation.ts",
+      "summary": "File conversation.ts in Say It First",
+      "description": "Implementation file src/presentation/api/routes/conversation.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "function:src/presentation/api/routes/conversation.ts:createProcessTurnUseCase",
+      "name": "createProcessTurnUseCase",
+      "type": "function",
+      "filePath": "src/presentation/api/routes/conversation.ts",
+      "summary": "Function createProcessTurnUseCase",
+      "description": "Function implementation for createProcessTurnUseCase",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:src/presentation/api/routes/conversation.ts:handleTurnRequest",
+      "name": "handleTurnRequest",
+      "type": "function",
+      "filePath": "src/presentation/api/routes/conversation.ts",
+      "summary": "Function handleTurnRequest",
+      "description": "Function implementation for handleTurnRequest",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "file:src/presentation/components/AffectRadarCanvas.tsx",
+      "name": "AffectRadarCanvas.tsx",
+      "type": "file",
+      "filePath": "src/presentation/components/AffectRadarCanvas.tsx",
+      "summary": "File AffectRadarCanvas.tsx in Say It First",
+      "description": "Implementation file src/presentation/components/AffectRadarCanvas.tsx",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "function:src/presentation/components/AffectRadarCanvas.tsx:AffectRadarCanvas",
+      "name": "AffectRadarCanvas",
+      "type": "function",
+      "filePath": "src/presentation/components/AffectRadarCanvas.tsx",
+      "summary": "Function AffectRadarCanvas",
+      "description": "Function implementation for AffectRadarCanvas",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "file:src/presentation/components/CoRegulationModal.tsx",
+      "name": "CoRegulationModal.tsx",
+      "type": "file",
+      "filePath": "src/presentation/components/CoRegulationModal.tsx",
+      "summary": "File CoRegulationModal.tsx in Say It First",
+      "description": "Implementation file src/presentation/components/CoRegulationModal.tsx",
+      "complexity": "moderate",
+      "tags": [
+        "code",
+        "tested"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "function:src/presentation/components/CoRegulationModal.tsx:CoRegulationModal",
+      "name": "CoRegulationModal",
+      "type": "function",
+      "filePath": "src/presentation/components/CoRegulationModal.tsx",
+      "summary": "Function CoRegulationModal",
+      "description": "Function implementation for CoRegulationModal",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "file:src/presentation/components/InputDock.tsx",
+      "name": "InputDock.tsx",
+      "type": "file",
+      "filePath": "src/presentation/components/InputDock.tsx",
+      "summary": "File InputDock.tsx in Say It First",
+      "description": "Implementation file src/presentation/components/InputDock.tsx",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "function:src/presentation/components/InputDock.tsx:InputDock",
+      "name": "InputDock",
+      "type": "function",
+      "filePath": "src/presentation/components/InputDock.tsx",
+      "summary": "Function InputDock",
+      "description": "Function implementation for InputDock",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "file:src/presentation/components/MyProgress.tsx",
+      "name": "MyProgress.tsx",
+      "type": "file",
+      "filePath": "src/presentation/components/MyProgress.tsx",
+      "summary": "File MyProgress.tsx in Say It First",
+      "description": "Implementation file src/presentation/components/MyProgress.tsx",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "function:src/presentation/components/MyProgress.tsx:MyProgress",
+      "name": "MyProgress",
+      "type": "function",
+      "filePath": "src/presentation/components/MyProgress.tsx",
+      "summary": "Function MyProgress",
+      "description": "Function implementation for MyProgress",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "file:src/presentation/components/MyScenarios.tsx",
+      "name": "MyScenarios.tsx",
+      "type": "file",
+      "filePath": "src/presentation/components/MyScenarios.tsx",
+      "summary": "File MyScenarios.tsx in Say It First",
+      "description": "Implementation file src/presentation/components/MyScenarios.tsx",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "function:src/presentation/components/MyScenarios.tsx:MyScenarios",
+      "name": "MyScenarios",
+      "type": "function",
+      "filePath": "src/presentation/components/MyScenarios.tsx",
+      "summary": "Function MyScenarios",
+      "description": "Function implementation for MyScenarios",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "file:src/presentation/components/PostSessionDebrief.tsx",
+      "name": "PostSessionDebrief.tsx",
+      "type": "file",
+      "filePath": "src/presentation/components/PostSessionDebrief.tsx",
+      "summary": "File PostSessionDebrief.tsx in Say It First",
+      "description": "Implementation file src/presentation/components/PostSessionDebrief.tsx",
+      "complexity": "moderate",
+      "tags": [
+        "code",
+        "tested"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "function:src/presentation/components/PostSessionDebrief.tsx:PostSessionDebrief",
+      "name": "PostSessionDebrief",
+      "type": "function",
+      "filePath": "src/presentation/components/PostSessionDebrief.tsx",
+      "summary": "Function PostSessionDebrief",
+      "description": "Function implementation for PostSessionDebrief",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "file:src/presentation/components/PracticeStage.tsx",
+      "name": "PracticeStage.tsx",
+      "type": "file",
+      "filePath": "src/presentation/components/PracticeStage.tsx",
+      "summary": "File PracticeStage.tsx in Say It First",
+      "description": "Implementation file src/presentation/components/PracticeStage.tsx",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "function:src/presentation/components/PracticeStage.tsx:PracticeStage",
+      "name": "PracticeStage",
+      "type": "function",
+      "filePath": "src/presentation/components/PracticeStage.tsx",
+      "summary": "Function PracticeStage",
+      "description": "Function implementation for PracticeStage",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "file:src/presentation/components/PreferencesModal.tsx",
+      "name": "PreferencesModal.tsx",
+      "type": "file",
+      "filePath": "src/presentation/components/PreferencesModal.tsx",
+      "summary": "File PreferencesModal.tsx in Say It First",
+      "description": "Implementation file src/presentation/components/PreferencesModal.tsx",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "function:src/presentation/components/PreferencesModal.tsx:PreferencesModal",
+      "name": "PreferencesModal",
+      "type": "function",
+      "filePath": "src/presentation/components/PreferencesModal.tsx",
+      "summary": "Function PreferencesModal",
+      "description": "Function implementation for PreferencesModal",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "file:src/presentation/components/ScenarioCreator.tsx",
+      "name": "ScenarioCreator.tsx",
+      "type": "file",
+      "filePath": "src/presentation/components/ScenarioCreator.tsx",
+      "summary": "File ScenarioCreator.tsx in Say It First",
+      "description": "Implementation file src/presentation/components/ScenarioCreator.tsx",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "function:src/presentation/components/ScenarioCreator.tsx:ScenarioCreator",
+      "name": "ScenarioCreator",
+      "type": "function",
+      "filePath": "src/presentation/components/ScenarioCreator.tsx",
+      "summary": "Function ScenarioCreator",
+      "description": "Function implementation for ScenarioCreator",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "file:src/presentation/components/SophiaLiveAvatar.tsx",
+      "name": "SophiaLiveAvatar.tsx",
+      "type": "file",
+      "filePath": "src/presentation/components/SophiaLiveAvatar.tsx",
+      "summary": "File SophiaLiveAvatar.tsx in Say It First",
+      "description": "Implementation file src/presentation/components/SophiaLiveAvatar.tsx",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "function:src/presentation/components/SophiaLiveAvatar.tsx:SophiaLiveAvatar",
+      "name": "SophiaLiveAvatar",
+      "type": "function",
+      "filePath": "src/presentation/components/SophiaLiveAvatar.tsx",
+      "summary": "Function SophiaLiveAvatar",
+      "description": "Function implementation for SophiaLiveAvatar",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "file:src/presentation/components/SubtextHud.tsx",
+      "name": "SubtextHud.tsx",
+      "type": "file",
+      "filePath": "src/presentation/components/SubtextHud.tsx",
+      "summary": "File SubtextHud.tsx in Say It First",
+      "description": "Implementation file src/presentation/components/SubtextHud.tsx",
+      "complexity": "moderate",
+      "tags": [
+        "code",
+        "tested"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "function:src/presentation/components/SubtextHud.tsx:SubtextHud",
+      "name": "SubtextHud",
+      "type": "function",
+      "filePath": "src/presentation/components/SubtextHud.tsx",
+      "summary": "Function SubtextHud",
+      "description": "Function implementation for SubtextHud",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "file:src/presentation/components/TopicDashboard.tsx",
+      "name": "TopicDashboard.tsx",
+      "type": "file",
+      "filePath": "src/presentation/components/TopicDashboard.tsx",
+      "summary": "File TopicDashboard.tsx in Say It First",
+      "description": "Implementation file src/presentation/components/TopicDashboard.tsx",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "function:src/presentation/components/TopicDashboard.tsx:TopicDashboard",
+      "name": "TopicDashboard",
+      "type": "function",
+      "filePath": "src/presentation/components/TopicDashboard.tsx",
+      "summary": "Function TopicDashboard",
+      "description": "Function implementation for TopicDashboard",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:src/presentation/components/TopicDashboard.tsx:TopicCard",
+      "name": "TopicCard",
+      "type": "function",
+      "filePath": "src/presentation/components/TopicDashboard.tsx",
+      "summary": "Function TopicCard",
+      "description": "Function implementation for TopicCard",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "file:src/presentation/components/TopicDetailModal.tsx",
+      "name": "TopicDetailModal.tsx",
+      "type": "file",
+      "filePath": "src/presentation/components/TopicDetailModal.tsx",
+      "summary": "File TopicDetailModal.tsx in Say It First",
+      "description": "Implementation file src/presentation/components/TopicDetailModal.tsx",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "function:src/presentation/components/TopicDetailModal.tsx:TopicDetailModal",
+      "name": "TopicDetailModal",
+      "type": "function",
+      "filePath": "src/presentation/components/TopicDetailModal.tsx",
+      "summary": "Function TopicDetailModal",
+      "description": "Function implementation for TopicDetailModal",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "file:src/presentation/components/WelcomeOnboarding.tsx",
+      "name": "WelcomeOnboarding.tsx",
+      "type": "file",
+      "filePath": "src/presentation/components/WelcomeOnboarding.tsx",
+      "summary": "File WelcomeOnboarding.tsx in Say It First",
+      "description": "Implementation file src/presentation/components/WelcomeOnboarding.tsx",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "function:src/presentation/components/WelcomeOnboarding.tsx:WelcomeOnboarding",
+      "name": "WelcomeOnboarding",
+      "type": "function",
+      "filePath": "src/presentation/components/WelcomeOnboarding.tsx",
+      "summary": "Function WelcomeOnboarding",
+      "description": "Function implementation for WelcomeOnboarding",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "file:src/presentation/hooks/useLiveAvatarSession.ts",
+      "name": "useLiveAvatarSession.ts",
+      "type": "file",
+      "filePath": "src/presentation/hooks/useLiveAvatarSession.ts",
+      "summary": "File useLiveAvatarSession.ts in Say It First",
+      "description": "Implementation file src/presentation/hooks/useLiveAvatarSession.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "function:src/presentation/hooks/useLiveAvatarSession.ts:useLiveAvatarSession",
+      "name": "useLiveAvatarSession",
+      "type": "function",
+      "filePath": "src/presentation/hooks/useLiveAvatarSession.ts",
+      "summary": "Function useLiveAvatarSession",
+      "description": "Function implementation for useLiveAvatarSession",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "file:src/presentation/hooks/useTimelineBranching.ts",
+      "name": "useTimelineBranching.ts",
+      "type": "file",
+      "filePath": "src/presentation/hooks/useTimelineBranching.ts",
+      "summary": "File useTimelineBranching.ts in Say It First",
+      "description": "Implementation file src/presentation/hooks/useTimelineBranching.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "function:src/presentation/hooks/useTimelineBranching.ts:useTimelineBranching",
+      "name": "useTimelineBranching",
+      "type": "function",
+      "filePath": "src/presentation/hooks/useTimelineBranching.ts",
+      "summary": "Function useTimelineBranching",
+      "description": "Function implementation for useTimelineBranching",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "file:src/presentation/hooks/useWebAudioProsody.ts",
+      "name": "useWebAudioProsody.ts",
+      "type": "file",
+      "filePath": "src/presentation/hooks/useWebAudioProsody.ts",
+      "summary": "File useWebAudioProsody.ts in Say It First",
+      "description": "Implementation file src/presentation/hooks/useWebAudioProsody.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "function:src/presentation/hooks/useWebAudioProsody.ts:useWebAudioProsody",
+      "name": "useWebAudioProsody",
+      "type": "function",
+      "filePath": "src/presentation/hooks/useWebAudioProsody.ts",
+      "summary": "Function useWebAudioProsody",
+      "description": "Function implementation for useWebAudioProsody",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "file:src/presentation/theme/tokens.ts",
+      "name": "tokens.ts",
+      "type": "file",
+      "filePath": "src/presentation/theme/tokens.ts",
+      "summary": "File tokens.ts in Say It First",
+      "description": "Implementation file src/presentation/theme/tokens.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "file:src/presentation/utils/cozyAudio.ts",
+      "name": "cozyAudio.ts",
+      "type": "file",
+      "filePath": "src/presentation/utils/cozyAudio.ts",
+      "summary": "File cozyAudio.ts in Say It First",
+      "description": "Implementation file src/presentation/utils/cozyAudio.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "function:src/presentation/utils/cozyAudio.ts:getAudioContext",
+      "name": "getAudioContext",
+      "type": "function",
+      "filePath": "src/presentation/utils/cozyAudio.ts",
+      "summary": "Function getAudioContext",
+      "description": "Function implementation for getAudioContext",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:src/presentation/utils/cozyAudio.ts:isUiSoundEnabled",
+      "name": "isUiSoundEnabled",
+      "type": "function",
+      "filePath": "src/presentation/utils/cozyAudio.ts",
+      "summary": "Function isUiSoundEnabled",
+      "description": "Function implementation for isUiSoundEnabled",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:src/presentation/utils/cozyAudio.ts:setUiSoundEnabled",
+      "name": "setUiSoundEnabled",
+      "type": "function",
+      "filePath": "src/presentation/utils/cozyAudio.ts",
+      "summary": "Function setUiSoundEnabled",
+      "description": "Function implementation for setUiSoundEnabled",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:src/presentation/utils/cozyAudio.ts:playCozySound",
+      "name": "playCozySound",
+      "type": "function",
+      "filePath": "src/presentation/utils/cozyAudio.ts",
+      "summary": "Function playCozySound",
+      "description": "Function implementation for playCozySound",
+      "complexity": "moderate",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "file:tailwind.config.js",
+      "name": "tailwind.config.js",
+      "type": "file",
+      "filePath": "tailwind.config.js",
+      "summary": "File tailwind.config.js in Say It First",
+      "description": "Implementation file tailwind.config.js",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "javascript"
+    },
+    {
+      "id": "file:tests/application/use-cases/BranchConversationUseCase.test.ts",
+      "name": "BranchConversationUseCase.test.ts",
+      "type": "file",
+      "filePath": "tests/application/use-cases/BranchConversationUseCase.test.ts",
+      "summary": "File BranchConversationUseCase.test.ts in Say It First",
+      "description": "Implementation file tests/application/use-cases/BranchConversationUseCase.test.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "class:tests/application/use-cases/BranchConversationUseCase.test.ts:MockSessionRepo",
+      "name": "MockSessionRepo",
+      "type": "class",
+      "filePath": "tests/application/use-cases/BranchConversationUseCase.test.ts",
+      "summary": "Class MockSessionRepo",
+      "description": "Class definition for MockSessionRepo",
+      "complexity": "moderate",
+      "tags": [
+        "class"
+      ]
+    },
+    {
+      "id": "file:tests/application/use-cases/ConversationalContinuityAndSemantics.test.ts",
+      "name": "ConversationalContinuityAndSemantics.test.ts",
+      "type": "file",
+      "filePath": "tests/application/use-cases/ConversationalContinuityAndSemantics.test.ts",
+      "summary": "File ConversationalContinuityAndSemantics.test.ts in Say It First",
+      "description": "Implementation file tests/application/use-cases/ConversationalContinuityAndSemantics.test.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "class:tests/application/use-cases/ConversationalContinuityAndSemantics.test.ts:MemorySessionRepo",
+      "name": "MemorySessionRepo",
+      "type": "class",
+      "filePath": "tests/application/use-cases/ConversationalContinuityAndSemantics.test.ts",
+      "summary": "Class MemorySessionRepo",
+      "description": "Class definition for MemorySessionRepo",
+      "complexity": "moderate",
+      "tags": [
+        "class"
+      ]
+    },
+    {
+      "id": "file:tests/application/use-cases/GeneratePocketScriptUseCase.test.ts",
+      "name": "GeneratePocketScriptUseCase.test.ts",
+      "type": "file",
+      "filePath": "tests/application/use-cases/GeneratePocketScriptUseCase.test.ts",
+      "summary": "File GeneratePocketScriptUseCase.test.ts in Say It First",
+      "description": "Implementation file tests/application/use-cases/GeneratePocketScriptUseCase.test.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "class:tests/application/use-cases/GeneratePocketScriptUseCase.test.ts:MockSessionRepo",
+      "name": "MockSessionRepo",
+      "type": "class",
+      "filePath": "tests/application/use-cases/GeneratePocketScriptUseCase.test.ts",
+      "summary": "Class MockSessionRepo",
+      "description": "Class definition for MockSessionRepo",
+      "complexity": "moderate",
+      "tags": [
+        "class"
+      ]
+    },
+    {
+      "id": "file:tests/application/use-cases/ProcessTurnUseCase.test.ts",
+      "name": "ProcessTurnUseCase.test.ts",
+      "type": "file",
+      "filePath": "tests/application/use-cases/ProcessTurnUseCase.test.ts",
+      "summary": "File ProcessTurnUseCase.test.ts in Say It First",
+      "description": "Implementation file tests/application/use-cases/ProcessTurnUseCase.test.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "class:tests/application/use-cases/ProcessTurnUseCase.test.ts:MockSessionRepo",
+      "name": "MockSessionRepo",
+      "type": "class",
+      "filePath": "tests/application/use-cases/ProcessTurnUseCase.test.ts",
+      "summary": "Class MockSessionRepo",
+      "description": "Class definition for MockSessionRepo",
+      "complexity": "moderate",
+      "tags": [
+        "class"
+      ]
+    },
+    {
+      "id": "file:tests/domain/AffectDynamicsService.test.ts",
+      "name": "AffectDynamicsService.test.ts",
+      "type": "file",
+      "filePath": "tests/domain/AffectDynamicsService.test.ts",
+      "summary": "File AffectDynamicsService.test.ts in Say It First",
+      "description": "Implementation file tests/domain/AffectDynamicsService.test.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "file:tests/domain/AffectVector.test.ts",
+      "name": "AffectVector.test.ts",
+      "type": "file",
+      "filePath": "tests/domain/AffectVector.test.ts",
+      "summary": "File AffectVector.test.ts in Say It First",
+      "description": "Implementation file tests/domain/AffectVector.test.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "file:tests/domain/ConversationNode.test.ts",
+      "name": "ConversationNode.test.ts",
+      "type": "file",
+      "filePath": "tests/domain/ConversationNode.test.ts",
+      "summary": "File ConversationNode.test.ts in Say It First",
+      "description": "Implementation file tests/domain/ConversationNode.test.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "file:tests/domain/ConversationTimelineGraph.test.ts",
+      "name": "ConversationTimelineGraph.test.ts",
+      "type": "file",
+      "filePath": "tests/domain/ConversationTimelineGraph.test.ts",
+      "summary": "File ConversationTimelineGraph.test.ts in Say It First",
+      "description": "Implementation file tests/domain/ConversationTimelineGraph.test.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "file:tests/domain/ProsodyMetrics.test.ts",
+      "name": "ProsodyMetrics.test.ts",
+      "type": "file",
+      "filePath": "tests/domain/ProsodyMetrics.test.ts",
+      "summary": "File ProsodyMetrics.test.ts in Say It First",
+      "description": "Implementation file tests/domain/ProsodyMetrics.test.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "file:tests/domain/ScaffoldingLevel.test.ts",
+      "name": "ScaffoldingLevel.test.ts",
+      "type": "file",
+      "filePath": "tests/domain/ScaffoldingLevel.test.ts",
+      "summary": "File ScaffoldingLevel.test.ts in Say It First",
+      "description": "Implementation file tests/domain/ScaffoldingLevel.test.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "file:tests/domain/ScenarioGenerator.test.ts",
+      "name": "ScenarioGenerator.test.ts",
+      "type": "file",
+      "filePath": "tests/domain/ScenarioGenerator.test.ts",
+      "summary": "File ScenarioGenerator.test.ts in Say It First",
+      "description": "Implementation file tests/domain/ScenarioGenerator.test.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "file:tests/domain/SophiaScenarioPresentation.test.ts",
+      "name": "SophiaScenarioPresentation.test.ts",
+      "type": "file",
+      "filePath": "tests/domain/SophiaScenarioPresentation.test.ts",
+      "summary": "File SophiaScenarioPresentation.test.ts in Say It First",
+      "description": "Implementation file tests/domain/SophiaScenarioPresentation.test.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "file:tests/domain/TensionEvaluatorService.test.ts",
+      "name": "TensionEvaluatorService.test.ts",
+      "type": "file",
+      "filePath": "tests/domain/TensionEvaluatorService.test.ts",
+      "summary": "File TensionEvaluatorService.test.ts in Say It First",
+      "description": "Implementation file tests/domain/TensionEvaluatorService.test.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "file:tests/domain/TwoWayBridge.test.ts",
+      "name": "TwoWayBridge.test.ts",
+      "type": "file",
+      "filePath": "tests/domain/TwoWayBridge.test.ts",
+      "summary": "File TwoWayBridge.test.ts in Say It First",
+      "description": "Implementation file tests/domain/TwoWayBridge.test.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "file:tests/infrastructure/AudioProsodyAnalyzer.test.ts",
+      "name": "AudioProsodyAnalyzer.test.ts",
+      "type": "file",
+      "filePath": "tests/infrastructure/AudioProsodyAnalyzer.test.ts",
+      "summary": "File AudioProsodyAnalyzer.test.ts in Say It First",
+      "description": "Implementation file tests/infrastructure/AudioProsodyAnalyzer.test.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "class:tests/infrastructure/AudioProsodyAnalyzer.test.ts:MockAnalyserNode",
+      "name": "MockAnalyserNode",
+      "type": "class",
+      "filePath": "tests/infrastructure/AudioProsodyAnalyzer.test.ts",
+      "summary": "Class MockAnalyserNode",
+      "description": "Class definition for MockAnalyserNode",
+      "complexity": "moderate",
+      "tags": [
+        "class"
+      ]
+    },
+    {
+      "id": "file:tests/infrastructure/GeminiStructuredAdapter.test.ts",
+      "name": "GeminiStructuredAdapter.test.ts",
+      "type": "file",
+      "filePath": "tests/infrastructure/GeminiStructuredAdapter.test.ts",
+      "summary": "File GeminiStructuredAdapter.test.ts in Say It First",
+      "description": "Implementation file tests/infrastructure/GeminiStructuredAdapter.test.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "file:tests/infrastructure/InMemorySessionRepo.test.ts",
+      "name": "InMemorySessionRepo.test.ts",
+      "type": "file",
+      "filePath": "tests/infrastructure/InMemorySessionRepo.test.ts",
+      "summary": "File InMemorySessionRepo.test.ts in Say It First",
+      "description": "Implementation file tests/infrastructure/InMemorySessionRepo.test.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "file:tests/infrastructure/PromptTemplates.test.ts",
+      "name": "PromptTemplates.test.ts",
+      "type": "file",
+      "filePath": "tests/infrastructure/PromptTemplates.test.ts",
+      "summary": "File PromptTemplates.test.ts in Say It First",
+      "description": "Implementation file tests/infrastructure/PromptTemplates.test.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "file:tests/presentation/LatencyReduction.test.ts",
+      "name": "LatencyReduction.test.ts",
+      "type": "file",
+      "filePath": "tests/presentation/LatencyReduction.test.ts",
+      "summary": "File LatencyReduction.test.ts in Say It First",
+      "description": "Implementation file tests/presentation/LatencyReduction.test.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "class:tests/presentation/LatencyReduction.test.ts:MockAudio",
+      "name": "MockAudio",
+      "type": "class",
+      "filePath": "tests/presentation/LatencyReduction.test.ts",
+      "summary": "Class MockAudio",
+      "description": "Class definition for MockAudio",
+      "complexity": "moderate",
+      "tags": [
+        "class"
+      ]
+    },
+    {
+      "id": "file:tests/presentation/SophiaLiveAvatar.test.ts",
+      "name": "SophiaLiveAvatar.test.ts",
+      "type": "file",
+      "filePath": "tests/presentation/SophiaLiveAvatar.test.ts",
+      "summary": "File SophiaLiveAvatar.test.ts in Say It First",
+      "description": "Implementation file tests/presentation/SophiaLiveAvatar.test.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "file:tests/presentation/VoiceContractPreservation.test.ts",
+      "name": "VoiceContractPreservation.test.ts",
+      "type": "file",
+      "filePath": "tests/presentation/VoiceContractPreservation.test.ts",
+      "summary": "File VoiceContractPreservation.test.ts in Say It First",
+      "description": "Implementation file tests/presentation/VoiceContractPreservation.test.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "file:tests/presentation/components/CoRegulationModal.test.ts",
+      "name": "CoRegulationModal.test.ts",
+      "type": "file",
+      "filePath": "tests/presentation/components/CoRegulationModal.test.ts",
+      "summary": "File CoRegulationModal.test.ts in Say It First",
+      "description": "Implementation file tests/presentation/components/CoRegulationModal.test.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "file:tests/presentation/components/PostSessionDebrief.test.ts",
+      "name": "PostSessionDebrief.test.ts",
+      "type": "file",
+      "filePath": "tests/presentation/components/PostSessionDebrief.test.ts",
+      "summary": "File PostSessionDebrief.test.ts in Say It First",
+      "description": "Implementation file tests/presentation/components/PostSessionDebrief.test.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "file:tests/presentation/components/SubtextHud.test.ts",
+      "name": "SubtextHud.test.ts",
+      "type": "file",
+      "filePath": "tests/presentation/components/SubtextHud.test.ts",
+      "summary": "File SubtextHud.test.ts in Say It First",
+      "description": "Implementation file tests/presentation/components/SubtextHud.test.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "file:tests/presentation/conversationRoute.test.ts",
+      "name": "conversationRoute.test.ts",
+      "type": "file",
+      "filePath": "tests/presentation/conversationRoute.test.ts",
+      "summary": "File conversationRoute.test.ts in Say It First",
+      "description": "Implementation file tests/presentation/conversationRoute.test.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "file:tests/presentation/useTimelineBranching.test.ts",
+      "name": "useTimelineBranching.test.ts",
+      "type": "file",
+      "filePath": "tests/presentation/useTimelineBranching.test.ts",
+      "summary": "File useTimelineBranching.test.ts in Say It First",
+      "description": "Implementation file tests/presentation/useTimelineBranching.test.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "file:tests/presentation/useWebAudioProsody.test.ts",
+      "name": "useWebAudioProsody.test.ts",
+      "type": "file",
+      "filePath": "tests/presentation/useWebAudioProsody.test.ts",
+      "summary": "File useWebAudioProsody.test.ts in Say It First",
+      "description": "Implementation file tests/presentation/useWebAudioProsody.test.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "file:vitest.config.ts",
+      "name": "vitest.config.ts",
+      "type": "file",
+      "filePath": "vitest.config.ts",
+      "summary": "File vitest.config.ts in Say It First",
+      "description": "Implementation file vitest.config.ts",
+      "complexity": "moderate",
+      "tags": [
+        "code"
+      ],
+      "language": "typescript"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:src/app/api/v1/avatar/session/route.ts",
+      "target": "function:src/app/api/v1/avatar/session/route.ts:isKeyConfigured",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/app/api/v1/avatar/session/route.ts",
+      "target": "function:src/app/api/v1/avatar/session/route.ts:POST",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/app/api/v1/avatar/session/route.ts",
+      "target": "function:src/app/api/v1/avatar/session/route.ts:DELETE",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/app/api/v1/conversation/turn/route.ts",
+      "target": "function:src/app/api/v1/conversation/turn/route.ts:POST",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/app/api/v1/voice/synthesize/route.ts",
+      "target": "function:src/app/api/v1/voice/synthesize/route.ts:POST",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/app/layout.tsx",
+      "target": "function:src/app/layout.tsx:RootLayout",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/app/page.tsx",
+      "target": "function:src/app/page.tsx:SayItFirstRoot",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/application/use-cases/BranchConversationUseCase.ts",
+      "target": "class:src/application/use-cases/BranchConversationUseCase.ts:BranchConversationUseCase",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/application/use-cases/GeneratePocketScriptUseCase.ts",
+      "target": "class:src/application/use-cases/GeneratePocketScriptUseCase.ts:GeneratePocketScriptUseCase",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/application/use-cases/ProcessTurnUseCase.ts",
+      "target": "class:src/application/use-cases/ProcessTurnUseCase.ts:ProcessTurnUseCase",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/domain/entities/AffectVector.ts",
+      "target": "function:src/domain/entities/AffectVector.ts:clampComponent",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/domain/entities/AffectVector.ts",
+      "target": "function:src/domain/entities/AffectVector.ts:createAffectVector",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/domain/entities/AffectVector.ts",
+      "target": "function:src/domain/entities/AffectVector.ts:isValidAffectVector",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/domain/entities/AffectVector.ts",
+      "target": "function:src/domain/entities/AffectVector.ts:addAffectVectors",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/domain/entities/AffectVector.ts",
+      "target": "function:src/domain/entities/AffectVector.ts:scaleAffectVector",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/domain/entities/AffectVector.ts",
+      "target": "function:src/domain/entities/AffectVector.ts:affectDistance",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/domain/entities/ConversationNode.ts",
+      "target": "function:src/domain/entities/ConversationNode.ts:createConversationNode",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/domain/entities/ConversationTimelineGraph.ts",
+      "target": "class:src/domain/entities/ConversationTimelineGraph.ts:ConversationTimelineGraph",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/domain/entities/SophiaScenarioPresentation.ts",
+      "target": "function:src/domain/entities/SophiaScenarioPresentation.ts:inferPresentationArchetype",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/domain/entities/SophiaScenarioPresentation.ts",
+      "target": "function:src/domain/entities/SophiaScenarioPresentation.ts:getSophiaPresentationForScenario",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/domain/entities/TwoWayBridge.ts",
+      "target": "function:src/domain/entities/TwoWayBridge.ts:isValidTwoWayBridge",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/domain/entities/TwoWayBridge.ts",
+      "target": "function:src/domain/entities/TwoWayBridge.ts:createTwoWayBridge",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/domain/scenarios/ScenarioGenerator.ts",
+      "target": "class:src/domain/scenarios/ScenarioGenerator.ts:ScenarioGenerator",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/domain/scenarios/topics.ts",
+      "target": "function:src/domain/scenarios/topics.ts:registerCustomTopic",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/domain/scenarios/topics.ts",
+      "target": "function:src/domain/scenarios/topics.ts:getRegisteredCustomTopics",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/domain/scenarios/topics.ts",
+      "target": "function:src/domain/scenarios/topics.ts:getTopicById",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/domain/scenarios/topics.ts",
+      "target": "function:src/domain/scenarios/topics.ts:getTopicsByCategory",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/domain/services/AffectDynamicsService.ts",
+      "target": "function:src/domain/services/AffectDynamicsService.ts:applyEmotionalDamping",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/domain/services/AffectDynamicsService.ts",
+      "target": "function:src/domain/services/AffectDynamicsService.ts:applyPeerDamping",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/domain/services/AffectDynamicsService.ts",
+      "target": "function:src/domain/services/AffectDynamicsService.ts:applySupervisorDamping",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/domain/services/AffectDynamicsService.ts",
+      "target": "function:src/domain/services/AffectDynamicsService.ts:simulateTrajectory",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/domain/services/AvatarKinematicsService.ts",
+      "target": "function:src/domain/services/AvatarKinematicsService.ts:computeAvatarKinematics",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/domain/services/TensionEvaluatorService.ts",
+      "target": "function:src/domain/services/TensionEvaluatorService.ts:calculateTensionIndex",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/domain/services/TensionEvaluatorService.ts",
+      "target": "function:src/domain/services/TensionEvaluatorService.ts:evaluateSafetyGate",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/domain/value-objects/ProsodyMetrics.ts",
+      "target": "function:src/domain/value-objects/ProsodyMetrics.ts:isValidProsodyMetrics",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/domain/value-objects/ProsodyMetrics.ts",
+      "target": "function:src/domain/value-objects/ProsodyMetrics.ts:createProsodyMetrics",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/domain/value-objects/ScaffoldingLevel.ts",
+      "target": "function:src/domain/value-objects/ScaffoldingLevel.ts:isValidScaffoldingLevel",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/domain/value-objects/ScaffoldingLevel.ts",
+      "target": "function:src/domain/value-objects/ScaffoldingLevel.ts:shouldShowSubtext",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/domain/value-objects/ScaffoldingLevel.ts",
+      "target": "function:src/domain/value-objects/ScaffoldingLevel.ts:shouldShowNonverbalBadges",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/domain/value-objects/ScaffoldingLevel.ts",
+      "target": "function:src/domain/value-objects/ScaffoldingLevel.ts:getScaffoldingLabel",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/infrastructure/adapters/llm/GeminiStructuredAdapter.ts",
+      "target": "class:src/infrastructure/adapters/llm/GeminiStructuredAdapter.ts:GeminiStructuredAdapter",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/infrastructure/adapters/llm/PromptTemplates.ts",
+      "target": "function:src/infrastructure/adapters/llm/PromptTemplates.ts:buildSystemPrompt",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/infrastructure/adapters/storage/InMemorySessionRepo.ts",
+      "target": "class:src/infrastructure/adapters/storage/InMemorySessionRepo.ts:InMemorySessionRepo",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/infrastructure/web-audio/AudioProcessor.ts",
+      "target": "class:src/infrastructure/web-audio/AudioProcessor.ts:AudioProcessor",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/infrastructure/web-audio/ProsodyExtractor.ts",
+      "target": "class:src/infrastructure/web-audio/ProsodyExtractor.ts:AudioProsodyAnalyzer",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/presentation/api/routes/conversation.ts",
+      "target": "function:src/presentation/api/routes/conversation.ts:createProcessTurnUseCase",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/presentation/api/routes/conversation.ts",
+      "target": "function:src/presentation/api/routes/conversation.ts:handleTurnRequest",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/presentation/components/AffectRadarCanvas.tsx",
+      "target": "function:src/presentation/components/AffectRadarCanvas.tsx:AffectRadarCanvas",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/presentation/components/CoRegulationModal.tsx",
+      "target": "function:src/presentation/components/CoRegulationModal.tsx:CoRegulationModal",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/presentation/components/InputDock.tsx",
+      "target": "function:src/presentation/components/InputDock.tsx:InputDock",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/presentation/components/MyProgress.tsx",
+      "target": "function:src/presentation/components/MyProgress.tsx:MyProgress",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/presentation/components/MyScenarios.tsx",
+      "target": "function:src/presentation/components/MyScenarios.tsx:MyScenarios",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/presentation/components/PostSessionDebrief.tsx",
+      "target": "function:src/presentation/components/PostSessionDebrief.tsx:PostSessionDebrief",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/presentation/components/PracticeStage.tsx",
+      "target": "function:src/presentation/components/PracticeStage.tsx:PracticeStage",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/presentation/components/PreferencesModal.tsx",
+      "target": "function:src/presentation/components/PreferencesModal.tsx:PreferencesModal",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/presentation/components/ScenarioCreator.tsx",
+      "target": "function:src/presentation/components/ScenarioCreator.tsx:ScenarioCreator",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/presentation/components/SophiaLiveAvatar.tsx",
+      "target": "function:src/presentation/components/SophiaLiveAvatar.tsx:SophiaLiveAvatar",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/presentation/components/SubtextHud.tsx",
+      "target": "function:src/presentation/components/SubtextHud.tsx:SubtextHud",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/presentation/components/TopicDashboard.tsx",
+      "target": "function:src/presentation/components/TopicDashboard.tsx:TopicDashboard",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/presentation/components/TopicDashboard.tsx",
+      "target": "function:src/presentation/components/TopicDashboard.tsx:TopicCard",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/presentation/components/TopicDetailModal.tsx",
+      "target": "function:src/presentation/components/TopicDetailModal.tsx:TopicDetailModal",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/presentation/components/WelcomeOnboarding.tsx",
+      "target": "function:src/presentation/components/WelcomeOnboarding.tsx:WelcomeOnboarding",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/presentation/hooks/useLiveAvatarSession.ts",
+      "target": "function:src/presentation/hooks/useLiveAvatarSession.ts:useLiveAvatarSession",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/presentation/hooks/useTimelineBranching.ts",
+      "target": "function:src/presentation/hooks/useTimelineBranching.ts:useTimelineBranching",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/presentation/hooks/useWebAudioProsody.ts",
+      "target": "function:src/presentation/hooks/useWebAudioProsody.ts:useWebAudioProsody",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/presentation/utils/cozyAudio.ts",
+      "target": "function:src/presentation/utils/cozyAudio.ts:getAudioContext",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/presentation/utils/cozyAudio.ts",
+      "target": "function:src/presentation/utils/cozyAudio.ts:isUiSoundEnabled",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/presentation/utils/cozyAudio.ts",
+      "target": "function:src/presentation/utils/cozyAudio.ts:setUiSoundEnabled",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/presentation/utils/cozyAudio.ts",
+      "target": "function:src/presentation/utils/cozyAudio.ts:playCozySound",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:tests/application/use-cases/BranchConversationUseCase.test.ts",
+      "target": "class:tests/application/use-cases/BranchConversationUseCase.test.ts:MockSessionRepo",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:tests/application/use-cases/ConversationalContinuityAndSemantics.test.ts",
+      "target": "class:tests/application/use-cases/ConversationalContinuityAndSemantics.test.ts:MemorySessionRepo",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:tests/application/use-cases/GeneratePocketScriptUseCase.test.ts",
+      "target": "class:tests/application/use-cases/GeneratePocketScriptUseCase.test.ts:MockSessionRepo",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:tests/application/use-cases/ProcessTurnUseCase.test.ts",
+      "target": "class:tests/application/use-cases/ProcessTurnUseCase.test.ts:MockSessionRepo",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:tests/infrastructure/AudioProsodyAnalyzer.test.ts",
+      "target": "class:tests/infrastructure/AudioProsodyAnalyzer.test.ts:MockAnalyserNode",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:tests/presentation/LatencyReduction.test.ts",
+      "target": "class:tests/presentation/LatencyReduction.test.ts:MockAudio",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:src/application/use-cases/BranchConversationUseCase.ts",
+      "target": "file:tests/application/use-cases/BranchConversationUseCase.test.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5,
+      "description": "Path-based pairing (deterministic)"
+    },
+    {
+      "source": "file:src/application/use-cases/GeneratePocketScriptUseCase.ts",
+      "target": "file:tests/application/use-cases/GeneratePocketScriptUseCase.test.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5,
+      "description": "Path-based pairing (deterministic)"
+    },
+    {
+      "source": "file:src/application/use-cases/ProcessTurnUseCase.ts",
+      "target": "file:tests/application/use-cases/ProcessTurnUseCase.test.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5,
+      "description": "Path-based pairing (deterministic)"
+    },
+    {
+      "source": "file:src/presentation/components/CoRegulationModal.tsx",
+      "target": "file:tests/presentation/components/CoRegulationModal.test.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5,
+      "description": "Path-based pairing (deterministic)"
+    },
+    {
+      "source": "file:src/presentation/components/PostSessionDebrief.tsx",
+      "target": "file:tests/presentation/components/PostSessionDebrief.test.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5,
+      "description": "Path-based pairing (deterministic)"
+    },
+    {
+      "source": "file:src/presentation/components/SubtextHud.tsx",
+      "target": "file:tests/presentation/components/SubtextHud.test.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5,
+      "description": "Path-based pairing (deterministic)"
+    }
+  ],
+  "layers": [
+    {
+      "id": "layer:core-app",
+      "name": "Application & API Routes",
+      "description": "Next.js App router pages, layouts, and API session/turn handlers.",
+      "nodeIds": [
+        "file:src/app/api/v1/avatar/session/route.ts",
+        "file:src/app/api/v1/conversation/turn/route.ts",
+        "file:src/app/api/v1/voice/synthesize/route.ts",
+        "file:src/app/layout.tsx",
+        "file:src/app/page.tsx",
+        "file:src/application/ports/in/ProcessTurnCommand.ts",
+        "file:src/application/use-cases/BranchConversationUseCase.ts",
+        "file:src/application/use-cases/GeneratePocketScriptUseCase.ts",
+        "file:src/application/use-cases/ProcessTurnUseCase.ts"
+      ]
+    },
+    {
+      "id": "layer:presentation",
+      "name": "Presentation & UI Components",
+      "description": "React user interface components, practice stage, modals, and avatar stage.",
+      "nodeIds": [
+        "file:src/presentation/api/routes/conversation.ts",
+        "file:src/presentation/components/AffectRadarCanvas.tsx",
+        "file:src/presentation/components/CoRegulationModal.tsx",
+        "file:src/presentation/components/InputDock.tsx",
+        "file:src/presentation/components/MyProgress.tsx",
+        "file:src/presentation/components/MyScenarios.tsx",
+        "file:src/presentation/components/PostSessionDebrief.tsx",
+        "file:src/presentation/components/PracticeStage.tsx",
+        "file:src/presentation/components/PreferencesModal.tsx",
+        "file:src/presentation/components/ScenarioCreator.tsx",
+        "file:src/presentation/components/SophiaLiveAvatar.tsx",
+        "file:src/presentation/components/SubtextHud.tsx",
+        "file:src/presentation/components/TopicDashboard.tsx",
+        "file:src/presentation/components/TopicDetailModal.tsx",
+        "file:src/presentation/components/WelcomeOnboarding.tsx",
+        "file:src/presentation/hooks/useLiveAvatarSession.ts",
+        "file:src/presentation/hooks/useTimelineBranching.ts",
+        "file:src/presentation/hooks/useWebAudioProsody.ts",
+        "file:src/presentation/theme/tokens.ts",
+        "file:src/presentation/utils/cozyAudio.ts"
+      ]
+    },
+    {
+      "id": "layer:domain",
+      "name": "Domain Entities & Scenarios",
+      "description": "Core business logic, scenario definitions, conversation models, and presentations.",
+      "nodeIds": [
+        "file:src/application/ports/in/ProcessTurnCommand.ts",
+        "file:src/application/use-cases/BranchConversationUseCase.ts",
+        "file:src/application/use-cases/GeneratePocketScriptUseCase.ts",
+        "file:src/application/use-cases/ProcessTurnUseCase.ts",
+        "file:src/domain/entities/AffectVector.ts",
+        "file:src/domain/entities/ConversationNode.ts",
+        "file:src/domain/entities/ConversationTimelineGraph.ts",
+        "file:src/domain/entities/SophiaScenarioPresentation.ts",
+        "file:src/domain/entities/TwoWayBridge.ts",
+        "file:src/domain/scenarios/ScenarioGenerator.ts",
+        "file:src/domain/scenarios/topics.ts",
+        "file:src/domain/services/AffectDynamicsService.ts",
+        "file:src/domain/services/AvatarKinematicsService.ts",
+        "file:src/domain/services/TensionEvaluatorService.ts",
+        "file:src/domain/value-objects/ProsodyMetrics.ts",
+        "file:src/domain/value-objects/ScaffoldingLevel.ts"
+      ]
+    },
+    {
+      "id": "layer:infrastructure",
+      "name": "Infrastructure & Adapters",
+      "description": "External adapters for LLMs (Gemini), audio synthesis, and ports.",
+      "nodeIds": [
+        "file:src/infrastructure/adapters/llm/GeminiStructuredAdapter.ts",
+        "file:src/infrastructure/adapters/llm/PromptTemplates.ts",
+        "file:src/infrastructure/adapters/storage/InMemorySessionRepo.ts",
+        "file:src/infrastructure/web-audio/AudioProcessor.ts",
+        "file:src/infrastructure/web-audio/ProsodyExtractor.ts"
+      ]
+    },
+    {
+      "id": "layer:config-infra",
+      "name": "Configuration & Project Specs",
+      "description": "Configs, package manifests, tests, and CI/CD pipelines.",
+      "nodeIds": [
+        "file:.github/workflows/ci.yml",
+        "file:.env.example",
+        "file:CODE_OF_CONDUCT.md",
+        "file:CONTRIBUTING.md",
+        "file:README.md",
+        "file:SECURITY.md",
+        "file:package.json",
+        "file:tsconfig.json",
+        "file:.github/ISSUE_TEMPLATE/bug_report.yml",
+        "file:.github/ISSUE_TEMPLATE/config.yml",
+        "file:.github/ISSUE_TEMPLATE/feature_request.yml",
+        "file:.github/PULL_REQUEST_TEMPLATE.md",
+        "file:postcss.config.js",
+        "file:tailwind.config.js",
+        "file:tests/application/use-cases/BranchConversationUseCase.test.ts",
+        "file:tests/application/use-cases/ConversationalContinuityAndSemantics.test.ts",
+        "file:tests/application/use-cases/GeneratePocketScriptUseCase.test.ts",
+        "file:tests/application/use-cases/ProcessTurnUseCase.test.ts",
+        "file:tests/domain/AffectDynamicsService.test.ts",
+        "file:tests/domain/AffectVector.test.ts",
+        "file:tests/domain/ConversationNode.test.ts",
+        "file:tests/domain/ConversationTimelineGraph.test.ts",
+        "file:tests/domain/ProsodyMetrics.test.ts",
+        "file:tests/domain/ScaffoldingLevel.test.ts",
+        "file:tests/domain/ScenarioGenerator.test.ts",
+        "file:tests/domain/SophiaScenarioPresentation.test.ts",
+        "file:tests/domain/TensionEvaluatorService.test.ts",
+        "file:tests/domain/TwoWayBridge.test.ts",
+        "file:tests/infrastructure/AudioProsodyAnalyzer.test.ts",
+        "file:tests/infrastructure/GeminiStructuredAdapter.test.ts",
+        "file:tests/infrastructure/InMemorySessionRepo.test.ts",
+        "file:tests/infrastructure/PromptTemplates.test.ts",
+        "file:tests/presentation/LatencyReduction.test.ts",
+        "file:tests/presentation/SophiaLiveAvatar.test.ts",
+        "file:tests/presentation/VoiceContractPreservation.test.ts",
+        "file:tests/presentation/components/CoRegulationModal.test.ts",
+        "file:tests/presentation/components/PostSessionDebrief.test.ts",
+        "file:tests/presentation/components/SubtextHud.test.ts",
+        "file:tests/presentation/conversationRoute.test.ts",
+        "file:tests/presentation/useTimelineBranching.test.ts",
+        "file:tests/presentation/useWebAudioProsody.test.ts",
+        "file:vitest.config.ts"
+      ]
+    }
+  ],
+  "tour": [
+    {
+      "order": 1,
+      "title": "Project Overview",
+      "description": "Say It First is a supportive, low-stakes conversational practice stage for practicing difficult conversations safely with AI.",
+      "nodeIds": [
+        "file:README.md",
+        "file:src/app/page.tsx"
+      ]
+    },
+    {
+      "order": 2,
+      "title": "Scenario & Domain Library",
+      "description": "Rich scenario definitions and partner archetypes configured in domain entities.",
+      "nodeIds": [
+        "file:src/domain/scenarios/topics.ts",
+        "file:src/domain/entities/SophiaScenarioPresentation.ts"
+      ]
+    },
+    {
+      "order": 3,
+      "title": "Avatar & Practice Stage",
+      "description": "Interactive practice stage rendering Sophia using Tavus conversational video interface (CVI) or HeyGen LiveAvatar fallback.",
+      "nodeIds": [
+        "file:src/presentation/components/PracticeStage.tsx",
+        "file:src/presentation/components/SophiaLiveAvatar.tsx"
+      ]
+    },
+    {
+      "order": 4,
+      "title": "Backend Avatar Session Negotiation",
+      "description": "Server route handler connecting Next.js with Tavus CVI and ElevenLabs.",
+      "nodeIds": [
+        "file:src/app/api/v1/avatar/session/route.ts"
+      ]
+    }
+  ]
+}
