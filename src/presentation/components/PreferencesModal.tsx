@@ -78,7 +78,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({
                   }
                   className={`w-full p-3 rounded-xl border text-left flex items-center justify-between transition ${
                     preferences.guidanceLevel === lvl.id
-                      ? 'bg-teal-subtle border-teal-brand font-medium'
+                      ? 'bg-sif-primarySubtle border-sif-primary font-medium'
                       : 'bg-canvas-surface border-canvas-border text-ink-secondary hover:bg-canvas-subtle'
                   }`}
                 >
@@ -88,7 +88,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({
                   </div>
                   <span
                     className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                      preferences.guidanceLevel === lvl.id ? 'border-teal-brand bg-teal-brand' : 'border-canvas-border'
+                      preferences.guidanceLevel === lvl.id ? 'border-sif-primary bg-sif-primary' : 'border-canvas-border'
                     }`}
                   >
                     {preferences.guidanceLevel === lvl.id && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
@@ -118,7 +118,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({
                   })
                 }
                 className={`w-11 h-6 rounded-full transition-colors relative focus:outline-none ${
-                  !preferences.hideAvatar ? 'bg-teal-brand' : 'bg-canvas-border'
+                  !preferences.hideAvatar ? 'bg-sif-primary' : 'bg-canvas-border'
                 }`}
               >
                 <span
@@ -143,7 +143,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({
                   })
                 }
                 className={`w-11 h-6 rounded-full transition-colors relative focus:outline-none ${
-                  preferences.reducedMotion ? 'bg-teal-brand' : 'bg-canvas-border'
+                  preferences.reducedMotion ? 'bg-sif-primary' : 'bg-canvas-border'
                 }`}
               >
                 <span
@@ -168,7 +168,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({
                   })
                 }
                 className={`w-11 h-6 rounded-full transition-colors relative focus:outline-none ${
-                  preferences.spokenPartnerAudio ? 'bg-teal-brand' : 'bg-canvas-border'
+                  preferences.spokenPartnerAudio ? 'bg-sif-primary' : 'bg-canvas-border'
                 }`}
               >
                 <span
@@ -193,7 +193,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({
                   if (next) playCozySound('toggle');
                 }}
                 className={`w-11 h-6 rounded-full transition-colors relative focus:outline-none ${
-                  uiSoundsEnabled ? 'bg-teal-brand' : 'bg-canvas-border'
+                  uiSoundsEnabled ? 'bg-sif-primary' : 'bg-canvas-border'
                 }`}
               >
                 <span
@@ -231,7 +231,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({
         <div className="p-4 border-t border-canvas-borderSubtle bg-canvas-light flex justify-end">
           <button
             onClick={onClose}
-            className="px-5 py-2 rounded-xl bg-teal-brand text-canvas-surface font-medium hover:bg-teal-hover transition text-sm focus:outline-none focus:ring-2 focus:ring-teal-brand"
+            className="px-5 py-2 rounded-xl bg-sif-primary text-canvas-surface font-medium hover:bg-sif-primaryHover transition text-sm focus:outline-none focus:ring-2 focus:ring-sif-primary"
           >
             Done
           </button>

@@ -172,13 +172,13 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
 
       {/* Main Persistent Sidebar */}
       <aside
-        className={`fixed top-0 bottom-0 left-0 z-40 w-64 md:w-72 bg-canvas-surface border-r border-canvas-border flex flex-col justify-between transition-transform duration-300 ease-out select-none shadow-xs md:translate-x-0 ${
+        className={`fixed top-0 bottom-0 left-0 z-40 w-64 md:w-72 bg-canvas-surface/85 backdrop-blur-md border-r border-canvas-border flex flex-col justify-between transition-transform duration-300 ease-out select-none shadow-glass-card md:translate-x-0 ${
           isMobileOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
         data-testid="app-sidebar"
       >
         {/* Brand Header */}
-        <div className="p-5 sm:p-6 border-b border-canvas-borderSubtle">
+        <div className="p-5 sm:p-6 border-b border-canvas-borderSubtle bg-gradient-to-b from-white/40 to-transparent">
           <div className="flex items-center justify-between">
             <button
               onClick={() => {
@@ -187,13 +187,12 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
               }}
               className="flex items-center gap-3 text-left group"
             >
-              <div className="w-10 h-10 rounded-2xl overflow-hidden bg-teal-subtle p-1 border border-teal-border/50 shadow-2xs group-hover:scale-105 transition-transform flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-2xl overflow-hidden bg-white/90 p-1 border border-sif-border shadow-glass-card group-hover:scale-105 group-hover:shadow-glass-glow transition-all flex items-center justify-center shrink-0">
                 <img
                   src="/logo.png"
                   alt="Say It First"
                   className="w-full h-full object-contain"
                   onError={(e) => {
-                    // Fallback to text icon if logo image not yet loaded
                     (e.target as HTMLElement).style.display = 'none';
                   }}
                 />
@@ -201,7 +200,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
 
               <div>
                 <div className="flex items-center gap-1.5">
-                  <span className="font-display font-bold text-lg text-ink-primary tracking-tight leading-none group-hover:text-teal-brand transition-colors">
+                  <span className="font-display font-bold text-lg text-ink-primary tracking-tight leading-none group-hover:text-sif-primary transition-colors">
                     Say It First
                   </span>
                 </div>
@@ -243,15 +242,17 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                 }}
                 className={`w-full px-3.5 py-3 rounded-2xl flex items-center justify-between text-left transition-all duration-200 group ${
                   isActive
-                    ? 'bg-teal-subtle text-teal-brand font-semibold shadow-2xs'
-                    : 'text-ink-secondary hover:bg-canvas-subtle hover:text-ink-primary'
+                    ? 'bg-gradient-to-r from-sif-primary/15 to-sif-secondary/20 text-sif-primaryDeep font-semibold border border-sif-primary/30 shadow-glass-card'
+                    : 'text-ink-secondary hover:bg-white/60 hover:text-ink-primary hover:border hover:border-canvas-borderSubtle'
                 }`}
                 data-testid={`sidebar-tab-${item.id}`}
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <div
-                    className={`w-8 h-8 rounded-xl flex items-center justify-center transition-colors ${
-                      isActive ? 'bg-canvas-surface shadow-2xs' : 'bg-transparent group-hover:bg-canvas-light'
+                    className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all ${
+                      isActive
+                        ? 'bg-white shadow-2xs text-sif-primary'
+                        : 'bg-transparent text-ink-muted group-hover:bg-white/70 group-hover:text-ink-primary'
                     }`}
                   >
                     {item.icon(isActive)}
@@ -261,7 +262,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                     <span className="text-sm block leading-tight truncate">{item.label}</span>
                     <span
                       className={`text-[11px] block truncate transition-colors ${
-                        isActive ? 'text-teal-brand/80 font-normal' : 'text-ink-muted'
+                        isActive ? 'text-sif-primary font-normal' : 'text-ink-muted'
                       }`}
                     >
                       {item.description}
@@ -273,8 +274,8 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                   <span
                     className={`text-[11px] px-2 py-0.5 rounded-full font-semibold shrink-0 ml-2 ${
                       isActive
-                        ? 'bg-teal-brand text-canvas-surface'
-                        : 'bg-canvas-subtle text-ink-secondary border border-canvas-borderSubtle'
+                        ? 'bg-sif-primary text-white shadow-2xs'
+                        : 'bg-white/80 text-ink-secondary border border-canvas-border'
                     }`}
                   >
                     {item.badge}
@@ -286,26 +287,26 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
         </nav>
 
         {/* Footer: Tutorial & Comfort Callout */}
-        <div className="p-4 border-t border-canvas-borderSubtle bg-canvas-subtle/50 space-y-2.5">
+        <div className="p-4 border-t border-canvas-borderSubtle bg-white/40 space-y-2.5">
           <button
             onClick={() => {
               playCozySound('pop');
               onOpenTutorial();
             }}
-            className="w-full px-3.5 py-2.5 rounded-xl bg-canvas-surface border border-canvas-border text-ink-primary text-xs font-medium hover:border-teal-border hover:bg-canvas-light transition flex items-center justify-between shadow-2xs"
+            className="w-full px-3.5 py-2.5 rounded-2xl bg-white/90 border border-sif-border text-ink-primary text-xs font-medium hover:border-sif-primary hover:bg-white transition-all flex items-center justify-between shadow-glass-card group"
             data-testid="tutorial-trigger-btn"
           >
             <span className="flex items-center gap-2">
-              <span className="text-teal-brand text-sm">💡</span>
-              <span>How SiF works</span>
+              <span className="text-sif-primary text-sm group-hover:scale-110 transition-transform">💡</span>
+              <span className="font-semibold text-ink-primary">How SiF works</span>
             </span>
-            <span className="text-[11px] text-teal-brand font-semibold">Guide →</span>
+            <span className="text-[11px] text-sif-primary font-semibold">Guide →</span>
           </button>
 
           <div className="px-2 pt-1 flex items-center justify-between text-[11px] text-ink-muted">
             <span className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              <span>Private & Safe</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-sif-secondary" />
+              <span>Safe & Private</span>
             </span>
             <span>v1.2</span>
           </div>

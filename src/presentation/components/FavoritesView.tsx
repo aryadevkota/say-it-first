@@ -39,7 +39,7 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-teal-subtle text-teal-brand border border-teal-border">
+            <span className="px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-sif-primarySubtle text-sif-primary border border-sif-border shadow-2xs">
               Personal Library
             </span>
           </div>
@@ -56,7 +56,7 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
             playCozySound('tap');
             onBrowseMore();
           }}
-          className="px-4 py-2 rounded-xl bg-canvas-surface border border-canvas-border hover:bg-canvas-subtle text-ink-primary text-xs font-medium transition"
+          className="px-4 py-2 rounded-xl bg-white/80 border border-canvas-border hover:bg-white text-ink-primary text-xs font-medium transition shadow-2xs"
         >
           Browse All Scenarios →
         </button>
@@ -64,8 +64,8 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
 
       {/* Grid of Saved Scenario Cards */}
       {savedScenarios.length === 0 ? (
-        <div className="p-10 sm:p-14 rounded-3xl bg-canvas-surface border border-canvas-border text-center space-y-4">
-          <div className="w-14 h-14 rounded-2xl bg-teal-subtle text-teal-brand flex items-center justify-center mx-auto text-2xl shadow-xs">
+        <div className="p-10 sm:p-14 rounded-3xl bg-white/80 backdrop-blur-md border border-canvas-border shadow-glass-card text-center space-y-4">
+          <div className="w-14 h-14 rounded-2xl bg-sif-primarySubtle text-sif-primary border border-sif-border flex items-center justify-center mx-auto text-2xl shadow-glass-card">
             ★
           </div>
           <div>
@@ -79,7 +79,7 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
               playCozySound('tap');
               onBrowseMore();
             }}
-            className="px-5 py-2.5 rounded-xl bg-teal-brand text-canvas-surface text-xs font-semibold hover:bg-teal-hover transition shadow-2xs"
+            className="px-5 py-2.5 rounded-xl bg-sif-primary text-white text-xs font-semibold hover:bg-sif-primaryHover transition shadow-glass-card"
           >
             Explore Scenarios
           </button>

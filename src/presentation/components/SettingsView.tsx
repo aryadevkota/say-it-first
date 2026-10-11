@@ -83,8 +83,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 }}
                 className={`p-4 rounded-2xl border text-left flex flex-col justify-between transition ${
                   preferences.guidanceLevel === lvl.id
-                    ? 'bg-teal-subtle border-teal-brand font-medium shadow-2xs'
-                    : 'bg-canvas-surface border-canvas-border hover:bg-canvas-subtle'
+                    ? 'bg-sif-primarySubtle border-sif-primary text-sif-primaryDeep font-medium shadow-glass-card'
+                    : 'bg-white/80 border-canvas-border hover:bg-white'
                 }`}
               >
                 <div>
@@ -94,7 +94,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 <div className="pt-3 flex justify-end">
                   <span
                     className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                      preferences.guidanceLevel === lvl.id ? 'border-teal-brand bg-teal-brand' : 'border-canvas-border'
+                      preferences.guidanceLevel === lvl.id ? 'border-sif-primary bg-sif-primary' : 'border-canvas-border'
                     }`}
                   >
                     {preferences.guidanceLevel === lvl.id && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
@@ -106,7 +106,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         </div>
 
         {/* Section 2: Avatar & Audio Experience */}
-        <div className="p-6 rounded-3xl bg-canvas-surface border border-canvas-border shadow-xs space-y-4">
+        <div className="p-6 rounded-3xl bg-white/80 backdrop-blur-md border border-canvas-border shadow-glass-card space-y-4">
           <div>
             <h2 className="text-base font-semibold text-ink-primary">Avatar & Voice Presentation</h2>
             <p className="text-xs text-ink-muted mt-0.5">Control visual avatar presence and audio playback options.</p>
@@ -126,7 +126,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   onUpdatePreferences({ ...preferences, hideAvatar: !preferences.hideAvatar });
                 }}
                 className={`w-12 h-6 rounded-full transition-colors relative flex items-center p-0.5 ${
-                  !preferences.hideAvatar ? 'bg-teal-brand' : 'bg-canvas-border'
+                  !preferences.hideAvatar ? 'bg-sif-primary' : 'bg-canvas-border'
                 }`}
                 aria-pressed={!preferences.hideAvatar}
               >
@@ -148,7 +148,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 type="button"
                 onClick={() => handleToggleSound(!uiSoundsEnabled)}
                 className={`w-12 h-6 rounded-full transition-colors relative flex items-center p-0.5 ${
-                  uiSoundsEnabled ? 'bg-teal-brand' : 'bg-canvas-border'
+                  uiSoundsEnabled ? 'bg-sif-primary' : 'bg-canvas-border'
                 }`}
                 aria-pressed={uiSoundsEnabled}
               >

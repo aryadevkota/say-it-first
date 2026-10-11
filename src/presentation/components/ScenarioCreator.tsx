@@ -207,7 +207,7 @@ export const ScenarioCreator: React.FC<ScenarioCreatorProps> = ({
         <div className="space-y-8">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider text-teal-brand">
+              <span className="text-xs font-semibold uppercase tracking-wider text-sif-primary">
                 Custom Scenario
               </span>
               <span className="text-canvas-border">•</span>
@@ -242,7 +242,7 @@ export const ScenarioCreator: React.FC<ScenarioCreatorProps> = ({
                 onClick={() => setInputMode('text')}
                 className={`px-4 py-2 rounded-lg text-xs font-medium transition ${
                   inputMode === 'text'
-                    ? 'bg-teal-subtle text-teal-brand font-semibold'
+                    ? 'bg-sif-primarySubtle text-sif-primary font-semibold'
                     : 'text-ink-muted hover:text-ink-primary'
                 }`}
               >
@@ -253,7 +253,7 @@ export const ScenarioCreator: React.FC<ScenarioCreatorProps> = ({
                 onClick={() => setInputMode('file')}
                 className={`px-4 py-2 rounded-lg text-xs font-medium transition ${
                   inputMode === 'file'
-                    ? 'bg-teal-subtle text-teal-brand font-semibold'
+                    ? 'bg-sif-primarySubtle text-sif-primary font-semibold'
                     : 'text-ink-muted hover:text-ink-primary'
                 }`}
               >
@@ -273,7 +273,7 @@ export const ScenarioCreator: React.FC<ScenarioCreatorProps> = ({
                   onChange={(e) => setSituationText(e.target.value)}
                   placeholder="Example: My roommate plays loud music late while I'm trying to sleep. I want to ask them to use headphones after 10 PM without getting defensive or making them feel attacked."
                   rows={5}
-                  className="w-full rounded-2xl bg-canvas-surface border border-canvas-border p-4 text-sm text-ink-primary placeholder-ink-muted focus:outline-none focus:ring-2 focus:ring-teal-brand transition leading-relaxed"
+                  className="w-full rounded-2xl bg-canvas-surface border border-canvas-border p-4 text-sm text-ink-primary placeholder-ink-muted focus:outline-none focus:ring-2 focus:ring-sif-primary transition leading-relaxed"
                 />
                 <span className="text-[11px] text-ink-muted block">
                   Include as much or as little context as you like.
@@ -287,9 +287,9 @@ export const ScenarioCreator: React.FC<ScenarioCreatorProps> = ({
                 </label>
                 <div
                   onClick={() => fileInputRef.current?.click()}
-                  className="border-2 border-dashed border-canvas-border hover:border-teal-border rounded-2xl p-6 sm:p-8 text-center bg-canvas-surface cursor-pointer transition flex flex-col items-center justify-center gap-2"
+                  className="border-2 border-dashed border-canvas-border hover:border-sif-border rounded-2xl p-6 sm:p-8 text-center bg-canvas-surface cursor-pointer transition flex flex-col items-center justify-center gap-2"
                 >
-                  <div className="w-12 h-12 rounded-full bg-teal-subtle text-teal-brand flex items-center justify-center text-xl">
+                  <div className="w-12 h-12 rounded-full bg-sif-primarySubtle text-sif-primary flex items-center justify-center text-xl">
                     📄
                   </div>
                   <div>
@@ -335,7 +335,7 @@ export const ScenarioCreator: React.FC<ScenarioCreatorProps> = ({
                     value={partnerRole}
                     onChange={(e) => setPartnerRole(e.target.value)}
                     placeholder="e.g. Roommate, Manager, Landlord"
-                    className="w-full rounded-xl bg-canvas-light border border-canvas-border px-3.5 py-2.5 text-xs text-ink-primary focus:outline-none focus:ring-2 focus:ring-teal-brand"
+                    className="w-full rounded-xl bg-canvas-light border border-canvas-border px-3.5 py-2.5 text-xs text-ink-primary focus:outline-none focus:ring-2 focus:ring-sif-primary"
                   />
                 </div>
 
@@ -349,7 +349,7 @@ export const ScenarioCreator: React.FC<ScenarioCreatorProps> = ({
                     value={userGoal}
                     onChange={(e) => setUserGoal(e.target.value)}
                     placeholder="e.g. Ask for quiet hours after 10 PM"
-                    className="w-full rounded-xl bg-canvas-light border border-canvas-border px-3.5 py-2.5 text-xs text-ink-primary focus:outline-none focus:ring-2 focus:ring-teal-brand"
+                    className="w-full rounded-xl bg-canvas-light border border-canvas-border px-3.5 py-2.5 text-xs text-ink-primary focus:outline-none focus:ring-2 focus:ring-sif-primary"
                   />
                 </div>
               </div>
@@ -364,7 +364,7 @@ export const ScenarioCreator: React.FC<ScenarioCreatorProps> = ({
                   value={relationshipContext}
                   onChange={(e) => setRelationshipContext(e.target.value)}
                   placeholder="e.g. We get along well, but this is our first time bringing up noise"
-                  className="w-full rounded-xl bg-canvas-light border border-canvas-border px-3.5 py-2.5 text-xs text-ink-primary focus:outline-none focus:ring-2 focus:ring-teal-brand"
+                  className="w-full rounded-xl bg-canvas-light border border-canvas-border px-3.5 py-2.5 text-xs text-ink-primary focus:outline-none focus:ring-2 focus:ring-sif-primary"
                 />
               </div>
 
@@ -378,7 +378,7 @@ export const ScenarioCreator: React.FC<ScenarioCreatorProps> = ({
                   value={avoidConstraints}
                   onChange={(e) => setAvoidConstraints(e.target.value)}
                   placeholder="e.g. Don't make them overly combative, keep it collaborative"
-                  className="w-full rounded-xl bg-canvas-light border border-canvas-border px-3.5 py-2.5 text-xs text-ink-primary focus:outline-none focus:ring-2 focus:ring-teal-brand"
+                  className="w-full rounded-xl bg-canvas-light border border-canvas-border px-3.5 py-2.5 text-xs text-ink-primary focus:outline-none focus:ring-2 focus:ring-sif-primary"
                 />
               </div>
             </div>
@@ -399,7 +399,7 @@ export const ScenarioCreator: React.FC<ScenarioCreatorProps> = ({
                 className={`px-6 py-3 rounded-xl text-xs font-medium transition shadow-xs ${
                   isProcessing || !situationText.trim()
                     ? 'bg-canvas-subtle text-ink-muted cursor-not-allowed border border-canvas-borderSubtle'
-                    : 'bg-teal-brand hover:bg-teal-hover text-canvas-surface'
+                    : 'bg-sif-primary hover:bg-sif-primaryHover text-canvas-surface'
                 }`}
               >
                 {isProcessing ? 'Preparing scenario…' : 'Generate practice scenario →'}
@@ -413,7 +413,7 @@ export const ScenarioCreator: React.FC<ScenarioCreatorProps> = ({
       {step === 'review' && generationResult && (
         <div className="space-y-8 animate-fadeIn">
           <div>
-            <span className="text-xs font-semibold uppercase tracking-wider text-teal-brand block mb-1">
+            <span className="text-xs font-semibold uppercase tracking-wider text-sif-primary block mb-1">
               Review & Customize
             </span>
             <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-ink-primary">
@@ -426,7 +426,7 @@ export const ScenarioCreator: React.FC<ScenarioCreatorProps> = ({
 
           {/* Section A: What You Provided (Facts) */}
           <div className="p-5 rounded-2xl bg-canvas-surface border border-canvas-border space-y-4">
-            <span className="text-xs font-semibold uppercase text-teal-brand block">
+            <span className="text-xs font-semibold uppercase text-sif-primary block">
               1. What You Provided (Your Stated Context)
             </span>
 
@@ -439,7 +439,7 @@ export const ScenarioCreator: React.FC<ScenarioCreatorProps> = ({
                 type="text"
                 value={editTitle}
                 onChange={(e) => setEditTitle(e.target.value)}
-                className="w-full rounded-xl bg-canvas-light border border-canvas-border px-3.5 py-2 text-sm font-semibold text-ink-primary focus:outline-none focus:ring-2 focus:ring-teal-brand"
+                className="w-full rounded-xl bg-canvas-light border border-canvas-border px-3.5 py-2 text-sm font-semibold text-ink-primary focus:outline-none focus:ring-2 focus:ring-sif-primary"
               />
             </div>
 
@@ -452,7 +452,7 @@ export const ScenarioCreator: React.FC<ScenarioCreatorProps> = ({
                 type="text"
                 value={editGoal}
                 onChange={(e) => setEditGoal(e.target.value)}
-                className="w-full rounded-xl bg-canvas-light border border-canvas-border px-3.5 py-2 text-xs text-ink-primary focus:outline-none focus:ring-2 focus:ring-teal-brand"
+                className="w-full rounded-xl bg-canvas-light border border-canvas-border px-3.5 py-2 text-xs text-ink-primary focus:outline-none focus:ring-2 focus:ring-sif-primary"
               />
             </div>
 
@@ -480,7 +480,7 @@ export const ScenarioCreator: React.FC<ScenarioCreatorProps> = ({
                   type="text"
                   value={editPartnerName}
                   onChange={(e) => setEditPartnerName(e.target.value)}
-                  className="w-full rounded-xl bg-canvas-light border border-canvas-border px-3.5 py-2 text-xs font-medium text-ink-primary focus:outline-none focus:ring-2 focus:ring-teal-brand"
+                  className="w-full rounded-xl bg-canvas-light border border-canvas-border px-3.5 py-2 text-xs font-medium text-ink-primary focus:outline-none focus:ring-2 focus:ring-sif-primary"
                 />
               </div>
 
@@ -493,7 +493,7 @@ export const ScenarioCreator: React.FC<ScenarioCreatorProps> = ({
                   type="text"
                   value={editPartnerRole}
                   onChange={(e) => setEditPartnerRole(e.target.value)}
-                  className="w-full rounded-xl bg-canvas-light border border-canvas-border px-3.5 py-2 text-xs font-medium text-ink-primary focus:outline-none focus:ring-2 focus:ring-teal-brand"
+                  className="w-full rounded-xl bg-canvas-light border border-canvas-border px-3.5 py-2 text-xs font-medium text-ink-primary focus:outline-none focus:ring-2 focus:ring-sif-primary"
                 />
               </div>
             </div>
@@ -513,7 +513,7 @@ export const ScenarioCreator: React.FC<ScenarioCreatorProps> = ({
                 value={editPartnerOpening}
                 onChange={(e) => setEditPartnerOpening(e.target.value)}
                 rows={2}
-                className="w-full rounded-xl bg-canvas-light border border-canvas-border p-3 text-xs italic text-ink-primary focus:outline-none focus:ring-2 focus:ring-teal-brand"
+                className="w-full rounded-xl bg-canvas-light border border-canvas-border p-3 text-xs italic text-ink-primary focus:outline-none focus:ring-2 focus:ring-sif-primary"
               />
             </div>
           </div>
@@ -534,7 +534,7 @@ export const ScenarioCreator: React.FC<ScenarioCreatorProps> = ({
                 onClick={handleSave}
                 className={`px-4 py-2.5 rounded-xl text-xs font-medium transition ${
                   isSaved
-                    ? 'bg-teal-subtle text-teal-brand font-semibold'
+                    ? 'bg-sif-primarySubtle text-sif-primary font-semibold'
                     : 'bg-canvas-surface border border-canvas-border text-ink-secondary hover:bg-canvas-subtle'
                 }`}
               >
@@ -544,7 +544,7 @@ export const ScenarioCreator: React.FC<ScenarioCreatorProps> = ({
               <button
                 type="button"
                 onClick={handleStart}
-                className="flex-1 sm:flex-initial px-6 py-2.5 rounded-xl bg-teal-brand hover:bg-teal-hover text-canvas-surface text-xs font-medium transition shadow-xs"
+                className="flex-1 sm:flex-initial px-6 py-2.5 rounded-xl bg-sif-primary hover:bg-sif-primaryHover text-canvas-surface text-xs font-medium transition shadow-xs"
               >
                 Jump into practice →
               </button>

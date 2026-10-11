@@ -92,10 +92,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
       data-testid="home-learning-view"
     >
       {/* ── TOP HERO BANNER ──────────────────────────────────────────────── */}
-      <div className="relative rounded-3xl bg-gradient-to-br from-canvas-surface via-canvas-subtle/50 to-canvas-light border border-canvas-border p-6 sm:p-10 shadow-xs overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-        <div className="space-y-3 max-w-2xl">
+      <div className="relative rounded-3xl bg-gradient-to-br from-white/90 via-canvas-subtle/80 to-canvas-surfaceStrong/40 border border-sif-border p-6 sm:p-10 shadow-glass-card overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6 backdrop-blur-md">
+        {/* Luminous atmospheric background glow */}
+        <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-sif-accent/25 blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-20 -left-20 w-80 h-80 rounded-full bg-sif-primary/15 blur-3xl pointer-events-none" />
+
+        <div className="space-y-3 max-w-2xl relative z-10">
           <div className="flex items-center gap-2">
-            <span className="px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-teal-subtle text-teal-brand border border-teal-border">
+            <span className="px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-white/90 text-sif-primaryDeep border border-sif-border shadow-2xs">
               Conversational Practice Studio
             </span>
           </div>
@@ -115,7 +119,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 const starter = TOPICS.find((t) => t.id === 'everyday-smalltalk') || TOPICS[0];
                 onSelectScenario(starter);
               }}
-              className="px-5 py-2.5 rounded-xl bg-teal-brand text-canvas-surface text-xs font-semibold hover:bg-teal-hover transition shadow-2xs flex items-center gap-2"
+              className="px-5 py-2.5 rounded-xl bg-sif-primary text-white text-xs font-semibold hover:bg-sif-primaryHover transition shadow-glass-card hover:shadow-glass-elevated flex items-center gap-2"
             >
               <span>Quick Starter Scenario</span>
               <span>→</span>
@@ -126,7 +130,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 playCozySound('tap');
                 onCreateCustomScenario();
               }}
-              className="px-4 py-2.5 rounded-xl bg-canvas-surface border border-canvas-border hover:bg-canvas-subtle text-ink-primary text-xs font-medium transition"
+              className="px-4 py-2.5 rounded-xl bg-white/80 border border-canvas-border hover:bg-white text-ink-primary text-xs font-medium transition shadow-2xs hover:border-sif-primary/40"
             >
               + Create Custom Scenario
             </button>
@@ -134,10 +138,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </div>
 
         {/* Right Feature Card */}
-        <div className="w-full md:w-72 p-5 rounded-2xl bg-canvas-surface border border-canvas-border shadow-xs text-xs space-y-3 shrink-0">
+        <div className="w-full md:w-72 p-5 rounded-2xl bg-white/80 backdrop-blur-md border border-sif-border shadow-glass-card text-xs space-y-3 shrink-0 relative z-10">
           <div className="flex items-center justify-between">
             <span className="font-semibold text-ink-primary">Current Coaching Focus</span>
-            <span className="text-teal-brand font-bold text-sm">✦</span>
+            <span className="text-sif-primary font-bold text-sm">✦</span>
           </div>
           <p className="text-ink-secondary leading-relaxed">
             "Acknowledge the other person’s tone or context before asserting your preference."
@@ -149,7 +153,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 playCozySound('pop');
                 onOpenTutorial();
               }}
-              className="text-teal-brand font-medium hover:underline"
+              className="text-sif-primary font-semibold hover:underline"
             >
               Learn why →
             </button>
@@ -246,9 +250,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
       )}
 
       {/* ── CUSTOM SCENARIO INVITATION BANNER ─────────────────────────────── */}
-      <div className="p-8 rounded-3xl bg-teal-subtle/40 border border-teal-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-        <div className="space-y-1 max-w-xl">
-          <span className="text-xs font-semibold uppercase tracking-wider text-teal-brand">
+      <div className="p-8 rounded-3xl bg-gradient-to-r from-white/90 via-canvas-surfaceStrong/30 to-white/80 border border-sif-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 shadow-glass-card backdrop-blur-md relative overflow-hidden">
+        <div className="absolute right-0 top-0 w-64 h-64 rounded-full bg-sif-accent/15 blur-2xl pointer-events-none" />
+        <div className="space-y-1 max-w-xl relative z-10">
+          <span className="text-xs font-semibold uppercase tracking-wider text-sif-primary">
             Tailor-Made Simulations
           </span>
           <h2 className="text-lg sm:text-xl font-semibold text-ink-primary">
@@ -264,7 +269,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             playCozySound('tap');
             onCreateCustomScenario();
           }}
-          className="px-5 py-3 rounded-xl bg-teal-brand text-canvas-surface text-xs font-semibold hover:bg-teal-hover transition shadow-2xs shrink-0 flex items-center gap-2"
+          className="px-5 py-3 rounded-xl bg-sif-primary text-white text-xs font-semibold hover:bg-sif-primaryHover transition shadow-glass-card hover:shadow-glass-elevated shrink-0 flex items-center gap-2 relative z-10"
         >
           <span>+ Create a Scenario</span>
         </button>

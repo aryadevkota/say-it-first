@@ -158,7 +158,7 @@ export const AppShell: React.FC<AppShellProps> = ({
 
           <button
             onClick={() => setIsTutorialOpen(true)}
-            className="p-1.5 rounded-xl text-teal-brand bg-teal-subtle text-xs font-semibold"
+            className="p-1.5 rounded-xl text-sif-primary bg-sif-primarySubtle text-xs font-semibold"
             aria-label="Open tutorial"
           >
             💡

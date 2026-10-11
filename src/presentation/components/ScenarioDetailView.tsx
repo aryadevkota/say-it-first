@@ -75,8 +75,8 @@ export const ScenarioDetailView: React.FC<ScenarioDetailViewProps> = ({
               }}
               className={`px-3.5 py-1.5 rounded-xl text-xs font-medium border transition flex items-center gap-1.5 ${
                 isSaved
-                  ? 'bg-teal-subtle text-teal-brand border-teal-border font-semibold'
-                  : 'bg-canvas-surface border-canvas-border text-ink-secondary hover:bg-canvas-subtle'
+                  ? 'bg-sif-primarySubtle text-sif-primary border-sif-border font-semibold shadow-2xs'
+                  : 'bg-white/80 border-canvas-border text-ink-secondary hover:bg-white'
               }`}
             >
               <span>{isSaved ? '★ Saved to Favorites' : '☆ Save Scenario'}</span>
@@ -84,12 +84,12 @@ export const ScenarioDetailView: React.FC<ScenarioDetailViewProps> = ({
           )}
 
           {/* Stepper indicator between Layer 1 & 2 */}
-          <div className="flex items-center gap-1 bg-canvas-subtle p-1 rounded-xl border border-canvas-borderSubtle text-xs">
+          <div className="flex items-center gap-1 bg-white/70 p-1 rounded-xl border border-canvas-border text-xs shadow-2xs">
             <button
               onClick={() => setCurrentLayer('overview')}
               className={`px-2.5 py-1 rounded-lg transition font-medium ${
                 currentLayer === 'overview'
-                  ? 'bg-canvas-surface text-ink-primary shadow-2xs font-semibold'
+                  ? 'bg-sif-primary text-white shadow-2xs font-semibold'
                   : 'text-ink-muted hover:text-ink-primary'
               }`}
             >
@@ -99,7 +99,7 @@ export const ScenarioDetailView: React.FC<ScenarioDetailViewProps> = ({
               onClick={() => setCurrentLayer('preparation')}
               className={`px-2.5 py-1 rounded-lg transition font-medium ${
                 currentLayer === 'preparation'
-                  ? 'bg-canvas-surface text-ink-primary shadow-2xs font-semibold'
+                  ? 'bg-sif-primary text-white shadow-2xs font-semibold'
                   : 'text-ink-muted hover:text-ink-primary'
               }`}
             >
@@ -113,9 +113,9 @@ export const ScenarioDetailView: React.FC<ScenarioDetailViewProps> = ({
       {currentLayer === 'overview' && (
         <div className="space-y-8 animate-fadeIn">
           {/* Main Title & Hero Banner */}
-          <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-canvas-surface via-canvas-subtle/40 to-canvas-light border border-canvas-border shadow-xs space-y-4">
+          <div className="p-6 sm:p-8 rounded-3xl bg-white/85 backdrop-blur-md border border-sif-border shadow-glass-card space-y-4">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-teal-subtle text-teal-brand border border-teal-border">
+              <span className="px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-sif-primarySubtle text-sif-primary border border-sif-border">
                 {scenario.categoryLabel}
               </span>
               <span className="text-canvas-border">•</span>
@@ -133,8 +133,8 @@ export const ScenarioDetailView: React.FC<ScenarioDetailViewProps> = ({
             </p>
 
             {/* Goal pill */}
-            <div className="p-4 rounded-2xl bg-canvas-surface border border-canvas-border flex items-start gap-3 text-xs sm:text-sm">
-              <span className="text-teal-brand font-bold text-base shrink-0">🎯</span>
+            <div className="p-4 rounded-2xl bg-white/90 border border-sif-border flex items-start gap-3 text-xs sm:text-sm shadow-2xs">
+              <span className="text-sif-primary font-bold text-base shrink-0">🎯</span>
               <div>
                 <span className="font-semibold text-ink-primary block mb-0.5">Your Scenario Goal:</span>
                 <p className="text-ink-secondary leading-relaxed">{scenario.userGoal}</p>
@@ -145,8 +145,8 @@ export const ScenarioDetailView: React.FC<ScenarioDetailViewProps> = ({
           {/* Core Idea & Double Empathy Perspectives */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {/* Core Insight */}
-            <div className="p-6 rounded-3xl bg-canvas-surface border border-canvas-border space-y-3">
-              <span className="text-xs font-semibold uppercase tracking-wider text-teal-brand block">
+            <div className="p-6 rounded-3xl bg-white/80 backdrop-blur-md border border-canvas-border space-y-3 shadow-glass-card">
+              <span className="text-xs font-semibold uppercase tracking-wider text-sif-primary block">
                 The Core Social Dynamic
               </span>
               <p className="text-xs sm:text-sm text-ink-secondary leading-relaxed">
@@ -155,17 +155,17 @@ export const ScenarioDetailView: React.FC<ScenarioDetailViewProps> = ({
             </div>
 
             {/* Two-Way Perspectives */}
-            <div className="p-6 rounded-3xl bg-canvas-surface border border-canvas-border space-y-3">
+            <div className="p-6 rounded-3xl bg-white/80 backdrop-blur-md border border-canvas-border space-y-3 shadow-glass-card">
               <span className="text-xs font-semibold uppercase tracking-wider text-ink-muted block">
                 Double Empathy Perspectives
               </span>
               <div className="space-y-2 text-xs">
-                <div className="p-3 rounded-xl bg-canvas-subtle">
-                  <span className="font-semibold text-teal-brand block mb-0.5">Your Need:</span>
+                <div className="p-3 rounded-xl bg-canvas-subtle border border-canvas-borderSubtle">
+                  <span className="font-semibold text-sif-primary block mb-0.5">Your Need:</span>
                   <p className="text-ink-secondary">{scenario.learning.doubleEmpathyPerspective.yourNeed}</p>
                 </div>
-                <div className="p-3 rounded-xl bg-canvas-subtle">
-                  <span className="font-semibold text-topic-apricot block mb-0.5">Their Perspective:</span>
+                <div className="p-3 rounded-xl bg-canvas-subtle border border-canvas-borderSubtle">
+                  <span className="font-semibold text-sif-accent block mb-0.5">Their Perspective:</span>
                   <p className="text-ink-secondary">{scenario.learning.doubleEmpathyPerspective.theirPerspective}</p>
                 </div>
               </div>
@@ -173,9 +173,9 @@ export const ScenarioDetailView: React.FC<ScenarioDetailViewProps> = ({
           </div>
 
           {/* Action to proceed to Layer 2 */}
-          <div className="p-6 rounded-3xl bg-teal-subtle/40 border border-teal-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="p-6 rounded-3xl bg-gradient-to-r from-white/90 via-sif-secondarySubtle/50 to-white/90 border border-sif-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-glass-card">
             <div>
-              <span className="text-xs font-semibold uppercase text-teal-brand block mb-0.5">Ready for advice?</span>
+              <span className="text-xs font-semibold uppercase text-sif-primary block mb-0.5">Ready for advice?</span>
               <h2 className="text-base font-semibold text-ink-primary">
                 Review preparation coaching before stepping into the call
               </h2>
@@ -184,7 +184,7 @@ export const ScenarioDetailView: React.FC<ScenarioDetailViewProps> = ({
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setCurrentLayer('preparation')}
-                className="px-5 py-2.5 rounded-xl bg-teal-brand text-canvas-surface text-xs font-semibold hover:bg-teal-hover transition shadow-2xs"
+                className="px-5 py-2.5 rounded-xl bg-sif-primary text-white text-xs font-semibold hover:bg-sif-primaryHover transition shadow-glass-card"
               >
                 Continue to Preparation Advice →
               </button>
@@ -197,7 +197,7 @@ export const ScenarioDetailView: React.FC<ScenarioDetailViewProps> = ({
       {currentLayer === 'preparation' && (
         <div className="space-y-8 animate-fadeIn">
           <div>
-            <span className="text-xs font-semibold uppercase tracking-wider text-teal-brand block mb-1">
+            <span className="text-xs font-semibold uppercase tracking-wider text-sif-primary block mb-1">
               Layer 2 • Preparation Guidance
             </span>
             <h1 className="text-2xl sm:text-3xl font-display font-semibold text-ink-primary">
@@ -210,7 +210,7 @@ export const ScenarioDetailView: React.FC<ScenarioDetailViewProps> = ({
 
           {/* 4 Advice Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-            <div className="p-5 rounded-2xl bg-canvas-surface border border-canvas-border space-y-2">
+            <div className="p-5 rounded-2xl bg-white/80 backdrop-blur-md border border-canvas-border space-y-2 shadow-glass-card">
               <span className="text-base">👂</span>
               <h3 className="font-semibold text-ink-primary text-sm">What to Listen For</h3>
               <p className="text-ink-secondary leading-relaxed">
@@ -218,7 +218,7 @@ export const ScenarioDetailView: React.FC<ScenarioDetailViewProps> = ({
               </p>
             </div>
 
-            <div className="p-5 rounded-2xl bg-canvas-surface border border-canvas-border space-y-2">
+            <div className="p-5 rounded-2xl bg-white/80 backdrop-blur-md border border-canvas-border space-y-2 shadow-glass-card">
               <span className="text-base">💬</span>
               <h3 className="font-semibold text-ink-primary text-sm">What a Strong Response Might Include</h3>
               <p className="text-ink-secondary leading-relaxed">
@@ -226,7 +226,7 @@ export const ScenarioDetailView: React.FC<ScenarioDetailViewProps> = ({
               </p>
             </div>
 
-            <div className="p-5 rounded-2xl bg-canvas-surface border border-canvas-border space-y-2">
+            <div className="p-5 rounded-2xl bg-white/80 backdrop-blur-md border border-canvas-border space-y-2 shadow-glass-card">
               <span className="text-base">🌿</span>
               <h3 className="font-semibold text-ink-primary text-sm">What to Avoid Overthinking</h3>
               <p className="text-ink-secondary leading-relaxed">
@@ -234,7 +234,7 @@ export const ScenarioDetailView: React.FC<ScenarioDetailViewProps> = ({
               </p>
             </div>
 
-            <div className="p-5 rounded-2xl bg-canvas-surface border border-canvas-border space-y-2">
+            <div className="p-5 rounded-2xl bg-white/80 backdrop-blur-md border border-canvas-border space-y-2 shadow-glass-card">
               <span className="text-base">🔄</span>
               <h3 className="font-semibold text-ink-primary text-sm">Non-Destructive Retries</h3>
               <p className="text-ink-secondary leading-relaxed">
@@ -244,26 +244,26 @@ export const ScenarioDetailView: React.FC<ScenarioDetailViewProps> = ({
           </div>
 
           {/* Example Phrasings */}
-          <div className="p-6 rounded-3xl bg-canvas-surface border border-canvas-border space-y-3">
+          <div className="p-6 rounded-3xl bg-white/85 backdrop-blur-md border border-sif-border space-y-3 shadow-glass-card">
             <span className="text-xs font-semibold uppercase text-ink-muted block">
               Helpful Phrasing Approaches
             </span>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-              <div className="p-3.5 rounded-xl bg-canvas-subtle">
-                <span className="font-semibold text-teal-brand block mb-1">A Gentle Option:</span>
+              <div className="p-3.5 rounded-xl bg-canvas-subtle border border-canvas-borderSubtle">
+                <span className="font-semibold text-sif-primary block mb-1">A Gentle Option:</span>
                 <p className="text-ink-primary italic">"{scenario.learning.examplePhrases.gentle}"</p>
               </div>
-              <div className="p-3.5 rounded-xl bg-canvas-subtle">
-                <span className="font-semibold text-topic-apricot block mb-1">A More Direct Option:</span>
+              <div className="p-3.5 rounded-xl bg-canvas-subtle border border-canvas-borderSubtle">
+                <span className="font-semibold text-sif-accent block mb-1">A More Direct Option:</span>
                 <p className="text-ink-primary italic">"{scenario.learning.examplePhrases.direct}"</p>
               </div>
             </div>
           </div>
 
           {/* Launch Practice CTA (Layer 3 Transition) */}
-          <div className="p-6 rounded-3xl bg-gradient-to-r from-teal-brand to-[#15565A] text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+          <div className="p-6 rounded-3xl bg-gradient-to-r from-sif-primary to-sif-primaryDeep text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-glass-card">
             <div>
-              <span className="text-xs font-semibold uppercase text-teal-subtle block mb-0.5">
+              <span className="text-xs font-semibold uppercase text-sif-secondary block mb-0.5">
                 Layer 3 • Live Simulation
               </span>
               <h2 className="text-lg sm:text-xl font-semibold text-white">
@@ -276,7 +276,7 @@ export const ScenarioDetailView: React.FC<ScenarioDetailViewProps> = ({
 
             <button
               onClick={handleStartPractice}
-              className="px-6 py-3 rounded-2xl bg-canvas-surface text-teal-brand text-xs font-bold hover:bg-canvas-light transition shadow-md shrink-0 flex items-center gap-2"
+              className="px-6 py-3 rounded-2xl bg-white text-sif-primaryDeep text-xs font-bold hover:bg-canvas-subtle transition shadow-glass-card shrink-0 flex items-center gap-2"
               data-testid="launch-practice-btn"
             >
               <span>Start Live Practice Call</span>

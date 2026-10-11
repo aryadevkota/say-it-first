@@ -78,15 +78,15 @@ export const ReportGenerationView: React.FC<ReportGenerationViewProps> = ({
       className="min-h-screen bg-canvas-light text-ink-primary flex flex-col items-center justify-center p-6 relative select-none animate-fadeIn"
       data-testid="report-generation-screen"
     >
-      <div className="max-w-md w-full bg-canvas-surface border border-canvas-border rounded-3xl p-8 sm:p-10 shadow-lg text-center space-y-8">
+      <div className="max-w-md w-full bg-white/90 backdrop-blur-md border border-sif-border rounded-3xl p-8 sm:p-10 shadow-glass-elevated text-center space-y-8">
         {/* Calming icon & header */}
         <div className="space-y-3">
-          <div className="w-16 h-16 rounded-2xl bg-teal-subtle text-teal-brand mx-auto flex items-center justify-center text-2xl shadow-2xs relative">
+          <div className="w-16 h-16 rounded-2xl bg-sif-primarySubtle text-sif-primary mx-auto flex items-center justify-center text-2xl shadow-2xs relative">
             <span className="animate-pulse">✨</span>
-            <div className="absolute -inset-1 rounded-2xl border border-teal-border/40 animate-ping opacity-25" />
+            <div className="absolute -inset-1 rounded-2xl border border-sif-border/40 animate-ping opacity-25" />
           </div>
 
-          <span className="text-xs font-semibold text-teal-brand uppercase tracking-wider block">
+          <span className="text-xs font-semibold text-sif-primary uppercase tracking-wider block">
             Synthesizing Your Session
           </span>
 
@@ -102,10 +102,10 @@ export const ReportGenerationView: React.FC<ReportGenerationViewProps> = ({
         <div className="space-y-2 text-left">
           <div className="flex items-center justify-between text-xs font-medium text-ink-secondary">
             <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-teal-brand animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-sif-primary animate-pulse" />
               {currentStage.label}
             </span>
-            <span className="font-semibold text-teal-brand tabular-nums">{displayedPercent}%</span>
+            <span className="font-semibold text-sif-primary tabular-nums">{displayedPercent}%</span>
           </div>
 
           <div
@@ -117,7 +117,7 @@ export const ReportGenerationView: React.FC<ReportGenerationViewProps> = ({
             aria-label="Report synthesis progress"
           >
             <div
-              className="h-full bg-gradient-to-r from-teal-brand to-[#228489] rounded-full transition-all duration-700 ease-out shadow-xs"
+              className="h-full bg-gradient-to-r from-sif-primary to-sif-secondary rounded-full transition-all duration-700 ease-out shadow-xs"
               style={{ width: `${displayedPercent}%` }}
             />
           </div>
@@ -142,9 +142,9 @@ export const ReportGenerationView: React.FC<ReportGenerationViewProps> = ({
                 <div
                   className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
                     isCompleted
-                      ? 'bg-teal-brand scale-100'
+                      ? 'bg-sif-primary scale-100'
                       : isCurrent
-                      ? 'bg-teal-brand/70 animate-ping ring-2 ring-teal-brand'
+                      ? 'bg-sif-primary/70 animate-ping ring-2 ring-sif-primary'
                       : 'bg-canvas-border'
                   }`}
                 />

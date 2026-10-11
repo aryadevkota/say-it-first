@@ -585,7 +585,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
             </button>
             <span className="text-canvas-border hidden sm:inline">|</span>
             <div>
-              <span className="text-xs font-semibold text-teal-brand uppercase tracking-wider block">
+              <span className="text-xs font-semibold text-sif-primary uppercase tracking-wider block">
                 {topic.categoryLabel}
               </span>
               <h1 className="text-sm sm:text-base font-semibold text-ink-primary leading-tight">
@@ -631,7 +631,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
             {/* Finish Practice */}
             <button
               onClick={handleFinishPractice}
-              className="px-3.5 py-1.5 rounded-xl text-xs font-medium bg-teal-brand hover:bg-teal-hover text-canvas-surface transition shadow-2xs"
+              className="px-3.5 py-1.5 rounded-xl text-xs font-medium bg-sif-primary hover:bg-sif-primaryHover text-canvas-surface transition shadow-2xs"
             >
               Finish
             </button>
@@ -643,7 +643,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
       <div className="bg-canvas-subtle border-b border-canvas-borderSubtle px-4 py-2">
         <div className="max-w-5xl mx-auto flex items-center justify-between text-xs text-ink-secondary">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-teal-brand">Your goal:</span>
+            <span className="font-semibold text-sif-primary">Your goal:</span>
             <span>{topic.userGoal}</span>
           </div>
 
@@ -668,7 +668,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
                 className={`p-3 rounded-xl text-xs ${
                   turn.role === 'partner'
                     ? 'bg-canvas-subtle text-ink-primary'
-                    : 'bg-teal-subtle text-ink-primary ml-6'
+                    : 'bg-sif-primarySubtle text-ink-primary ml-6'
                 }`}
               >
                 <span className="font-semibold block mb-0.5">
@@ -709,7 +709,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
               onClick={() => {
                 setHideAvatar(false);
               }}
-              className="text-teal-brand font-medium hover:underline"
+              className="text-sif-primary font-medium hover:underline"
             >
               Show Avatar
             </button>
@@ -731,7 +731,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
                   className={`text-xs px-2 py-0.5 rounded-lg border transition ${
                     isMuted
                       ? 'bg-canvas-subtle text-ink-muted border-canvas-border'
-                      : 'bg-teal-subtle text-teal-brand border-teal-border font-medium'
+                      : 'bg-sif-primarySubtle text-sif-primary border-sif-border font-medium'
                   }`}
                   title={isMuted ? 'Unmute partner voice' : 'Mute partner voice'}
                 >
@@ -813,7 +813,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
               {guidanceLevel === 'subtext' && latestPartnerTurn.twoWayBridge && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-3 border-b border-canvas-borderSubtle">
                   <div className="p-3 rounded-xl bg-canvas-subtle">
-                    <span className="text-[11px] font-semibold text-teal-brand uppercase block mb-1">
+                    <span className="text-[11px] font-semibold text-sif-primary uppercase block mb-1">
                       In this simulation: What you meant
                     </span>
                     <p className="text-xs text-ink-secondary leading-relaxed">
@@ -835,16 +835,16 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
               {/* Unspoken Subtext insight */}
               {latestPartnerTurn.subtext && (
                 <div className="text-xs text-ink-secondary flex items-start gap-2">
-                  <span className="text-teal-brand font-semibold shrink-0">Subtext hint:</span>
+                  <span className="text-sif-primary font-semibold shrink-0">Subtext hint:</span>
                   <span className="italic">“{latestPartnerTurn.subtext}”</span>
                 </div>
               )}
 
               {/* Optional Suggestion Phrasing (Purely optional, never auto-submits) */}
               {latestPartnerTurn.suggestedWording && (
-                <div className="p-3 rounded-xl bg-teal-subtle/50 border border-teal-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                <div className="p-3 rounded-xl bg-sif-primarySubtle/50 border border-sif-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                   <div>
-                    <span className="text-[11px] font-semibold text-teal-brand uppercase block mb-0.5">
+                    <span className="text-[11px] font-semibold text-sif-primary uppercase block mb-0.5">
                       Another approach to consider
                     </span>
                     <p className="text-xs text-ink-primary italic">
@@ -853,7 +853,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
                   </div>
                   <button
                     onClick={() => handleUseSuggestedWording(latestPartnerTurn.suggestedWording!)}
-                    className="px-2.5 py-1 rounded-lg text-xs font-medium bg-canvas-surface border border-teal-border text-teal-brand hover:bg-teal-subtle transition shrink-0"
+                    className="px-2.5 py-1 rounded-lg text-xs font-medium bg-canvas-surface border border-sif-border text-sif-primary hover:bg-sif-primarySubtle transition shrink-0"
                   >
                     Edit this in response
                   </button>
@@ -872,7 +872,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
             <span>Respond in your own words (Text or Speech)</span>
             <button
               onClick={handleTryAnotherVersion}
-              className="text-teal-brand hover:underline font-medium"
+              className="text-sif-primary hover:underline font-medium"
             >
               + Try another version
             </button>
@@ -894,7 +894,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
                 placeholder="What would you like to say? (Press Enter to send)"
                 rows={2}
                 disabled={isLoading}
-                className="w-full resize-none rounded-2xl bg-canvas-light border border-canvas-border px-4 py-3 text-sm text-ink-primary placeholder-ink-muted focus:outline-none focus:ring-2 focus:ring-teal-brand focus:border-transparent transition"
+                className="w-full resize-none rounded-2xl bg-canvas-light border border-canvas-border px-4 py-3 text-sm text-ink-primary placeholder-ink-muted focus:outline-none focus:ring-2 focus:ring-sif-primary focus:border-transparent transition"
               />
             </div>
 
@@ -902,7 +902,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
             <button
               type="button"
               onClick={toggleVoiceRecording}
-              className={`p-3 rounded-2xl border transition focus:outline-none focus:ring-2 focus:ring-teal-brand ${
+              className={`p-3 rounded-2xl border transition focus:outline-none focus:ring-2 focus:ring-sif-primary ${
                 isRecording
                   ? 'bg-topic-apricot text-white border-topic-apricot animate-pulse'
                   : 'bg-canvas-light border-canvas-border text-ink-muted hover:text-ink-primary hover:bg-canvas-subtle'
@@ -917,10 +917,10 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
             <button
               type="submit"
               disabled={isLoading || !userDraft.trim()}
-              className={`px-5 py-3 rounded-2xl font-medium text-sm transition focus:outline-none focus:ring-2 focus:ring-teal-brand shadow-xs ${
+              className={`px-5 py-3 rounded-2xl font-medium text-sm transition focus:outline-none focus:ring-2 focus:ring-sif-primary shadow-xs ${
                 isLoading || !userDraft.trim()
                   ? 'bg-canvas-subtle text-ink-muted cursor-not-allowed border border-canvas-borderSubtle'
-                  : 'bg-teal-brand hover:bg-teal-hover active:bg-teal-active text-canvas-surface'
+                  : 'bg-sif-primary hover:bg-sif-primaryHover active:bg-sif-primaryDeep text-canvas-surface'
               }`}
             >
               {isLoading ? 'Thinking…' : 'Send'}
@@ -937,7 +937,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
           aria-modal="true"
         >
           <div className="bg-canvas-surface border border-canvas-border rounded-3xl p-6 shadow-xl max-w-md w-full text-center space-y-5 animate-fadeIn">
-            <div className="w-16 h-16 rounded-full bg-teal-subtle text-teal-brand flex items-center justify-center mx-auto text-2xl font-light">
+            <div className="w-16 h-16 rounded-full bg-sif-primarySubtle text-sif-primary flex items-center justify-center mx-auto text-2xl font-light">
               ☕
             </div>
 
@@ -951,15 +951,15 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
             {/* Gentle Optional Breathing Cue */}
             <div className="p-4 rounded-2xl bg-canvas-subtle border border-canvas-borderSubtle flex flex-col items-center">
               <span className="text-xs text-ink-muted mb-2 font-medium">Take a calm breath</span>
-              <div className="w-12 h-12 rounded-full border-2 border-teal-brand flex items-center justify-center animate-calm-pulse">
-                <span className="text-[10px] text-teal-brand font-medium">Breathe</span>
+              <div className="w-12 h-12 rounded-full border-2 border-sif-primary flex items-center justify-center animate-calm-pulse">
+                <span className="text-[10px] text-sif-primary font-medium">Breathe</span>
               </div>
             </div>
 
             <div className="flex flex-col gap-2 pt-2">
               <button
                 onClick={() => setIsPaused(false)}
-                className="w-full py-2.5 rounded-xl bg-teal-brand text-canvas-surface text-sm font-medium hover:bg-teal-hover transition shadow-xs"
+                className="w-full py-2.5 rounded-xl bg-sif-primary text-canvas-surface text-sm font-medium hover:bg-sif-primaryHover transition shadow-xs"
               >
                 Resume conversation
               </button>
@@ -994,7 +994,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
         >
           <div className="bg-canvas-surface border border-canvas-border rounded-3xl p-6 sm:p-8 shadow-xl max-w-lg w-full text-left space-y-6 animate-fadeIn">
             <div>
-              <span className="text-xs font-semibold text-teal-brand uppercase tracking-wider block mb-1">
+              <span className="text-xs font-semibold text-sif-primary uppercase tracking-wider block mb-1">
                 Reflect & Keep
               </span>
               <h2 className="text-2xl font-semibold text-ink-primary">Words to take with you</h2>
@@ -1016,7 +1016,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
                   setTakeawaySaved(false);
                 }}
                 rows={4}
-                className="w-full rounded-2xl bg-canvas-light border border-canvas-border p-4 text-sm text-ink-primary leading-relaxed focus:outline-none focus:ring-2 focus:ring-teal-brand"
+                className="w-full rounded-2xl bg-canvas-light border border-canvas-border p-4 text-sm text-ink-primary leading-relaxed focus:outline-none focus:ring-2 focus:ring-sif-primary"
               />
             </div>
 
@@ -1038,8 +1038,8 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
                   disabled={takeawaySaved}
                   className={`flex-1 py-2.5 rounded-xl text-xs font-medium transition text-center ${
                     takeawaySaved
-                      ? 'bg-teal-subtle text-teal-brand font-semibold'
-                      : 'bg-canvas-surface border border-teal-border text-teal-brand hover:bg-teal-subtle'
+                      ? 'bg-sif-primarySubtle text-sif-primary font-semibold'
+                      : 'bg-canvas-surface border border-sif-border text-sif-primary hover:bg-sif-primarySubtle'
                   }`}
                 >
                   {takeawaySaved ? '✓ Saved to Progress' : 'Save to My Progress'}
@@ -1048,7 +1048,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
 
               <button
                 onClick={handleExitStage}
-                className="w-full py-3 rounded-xl bg-teal-brand text-canvas-surface text-sm font-medium hover:bg-teal-hover transition shadow-xs text-center"
+                className="w-full py-3 rounded-xl bg-sif-primary text-canvas-surface text-sm font-medium hover:bg-sif-primaryHover transition shadow-xs text-center"
               >
                 Return to dashboard
               </button>

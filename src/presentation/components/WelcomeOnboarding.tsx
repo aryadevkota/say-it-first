@@ -119,7 +119,7 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
         {/* Top minimal header */}
         <header className="max-w-5xl mx-auto w-full flex items-center justify-between pt-2">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-teal-brand text-canvas-surface flex items-center justify-center font-bold text-base shadow-sm">
+            <div className="w-8 h-8 rounded-xl bg-sif-primary text-canvas-surface flex items-center justify-center font-bold text-base shadow-sm">
               S
             </div>
             <span className="font-semibold text-lg tracking-tight text-ink-primary">Say It First</span>
@@ -127,7 +127,7 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
 
           <button
             onClick={onExploreDirectly}
-            className="text-sm font-medium text-ink-muted hover:text-ink-primary px-3 py-1.5 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-teal-brand"
+            className="text-sm font-medium text-ink-muted hover:text-ink-primary px-3 py-1.5 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-sif-primary"
           >
             Explore first
           </button>
@@ -137,8 +137,8 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
         <main className="max-w-5xl mx-auto w-full my-auto py-10 grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center">
           {/* Left: Warm, clear copy */}
           <div className="md:col-span-7 flex flex-col items-start text-left">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-teal-subtle text-teal-brand border border-teal-border mb-4">
-              <span className="w-2 h-2 rounded-full bg-teal-brand" />
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-sif-primarySubtle text-sif-primary border border-sif-border mb-4">
+              <span className="w-2 h-2 rounded-full bg-sif-primary" />
               {isReturningUser ? 'Welcome back • Settings & progress saved' : 'Conversational Sandbox'}
             </span>
 
@@ -158,7 +158,7 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
                       playCozySound('tap');
                       onExploreDirectly();
                     }}
-                    className="px-6 py-3.5 rounded-xl bg-teal-brand text-canvas-surface font-medium hover:bg-teal-hover active:bg-teal-active transition shadow-sm text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-brand"
+                    className="px-6 py-3.5 rounded-xl bg-sif-primary text-white font-medium hover:bg-sif-primaryHover transition shadow-glass-card text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sif-primary"
                   >
                     Continue
                   </button>
@@ -168,7 +168,7 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
                       playCozySound('tap');
                       setStage('step1');
                     }}
-                    className="px-6 py-3.5 rounded-xl bg-canvas-surface border border-canvas-border text-ink-primary font-medium hover:bg-canvas-subtle transition text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-brand"
+                    className="px-6 py-3.5 rounded-xl bg-white/80 border border-canvas-border text-ink-primary font-medium hover:bg-white transition text-center shadow-2xs focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sif-primary"
                   >
                     Adjust preferences
                   </button>
@@ -180,7 +180,7 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
                       playCozySound('tap');
                       setStage('step1');
                     }}
-                    className="px-6 py-3.5 rounded-xl bg-teal-brand text-canvas-surface font-medium hover:bg-teal-hover active:bg-teal-active transition shadow-sm text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-brand"
+                    className="px-6 py-3.5 rounded-xl bg-sif-primary text-white font-medium hover:bg-sif-primaryHover transition shadow-glass-card text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sif-primary"
                   >
                     Make it yours
                   </button>
@@ -190,7 +190,7 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
                       playCozySound('tap');
                       onExploreDirectly();
                     }}
-                    className="px-6 py-3.5 rounded-xl bg-canvas-surface border border-canvas-border text-ink-primary font-medium hover:bg-canvas-subtle transition text-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-brand"
+                    className="px-6 py-3.5 rounded-xl bg-white/80 border border-canvas-border text-ink-primary font-medium hover:bg-white transition text-center shadow-2xs focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sif-primary"
                   >
                     Explore first
                   </button>
@@ -207,31 +207,31 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
 
           {/* Right: Live Practice Partner (Sophia) Feature Card */}
           <div className="md:col-span-5 flex flex-col items-center justify-center">
-            <div className="w-full max-w-sm rounded-3xl bg-canvas-surface border border-canvas-border p-5 shadow-sm relative overflow-hidden flex flex-col gap-4">
+            <div className="w-full max-w-sm rounded-3xl bg-white/80 backdrop-blur-md border border-sif-border p-5 shadow-glass-elevated relative overflow-hidden flex flex-col gap-4">
               <div className="flex items-center justify-between">
-                <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-950/80 text-emerald-300 border border-emerald-500/40 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-sif-primaryDeep/90 text-sif-secondary border border-sif-secondary/30 flex items-center gap-1.5 shadow-2xs">
+                  <span className="w-2 h-2 rounded-full bg-sif-secondary animate-pulse" />
                   Sophia Live Avatar
                 </span>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-900 text-slate-200 border border-slate-700">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-sif-primaryDeep text-sif-secondarySubtle border border-sif-primary/40">
                   LiveAvatar WebRTC • 24kHz
                 </span>
               </div>
 
               {/* Realistic Scene Preview Container */}
-              <div className="w-full aspect-[4/3] rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 border border-white/10 p-4 flex flex-col justify-between text-white shadow-inner relative overflow-hidden">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-teal-500/10 via-transparent to-transparent pointer-events-none" />
+              <div className="w-full aspect-[4/3] rounded-2xl bg-gradient-to-br from-[#121833] via-[#1B234B] to-[#0D1226] border border-white/10 p-4 flex flex-col justify-between text-white shadow-inner relative overflow-hidden">
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-sif-primary/20 via-transparent to-transparent pointer-events-none" />
 
                 <div className="relative z-10 flex items-center justify-between">
-                  <span className="text-[11px] font-mono text-teal-300 bg-black/60 px-2 py-0.5 rounded-md border border-white/10">
+                  <span className="text-[11px] font-mono text-sif-secondary bg-black/60 px-2 py-0.5 rounded-md border border-white/10">
                     Live Video Stage
                   </span>
-                  <span className="text-[11px] text-white/70">Sophia Voice</span>
+                  <span className="text-[11px] text-white/80">Sophia Voice</span>
                 </div>
 
                 <div className="relative z-10 space-y-1.5 bg-black/70 backdrop-blur-md p-3 rounded-xl border border-white/15">
                   <div className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-teal-400" />
+                    <span className="w-2 h-2 rounded-full bg-sif-accent" />
                     <span className="text-xs font-semibold text-white">Scenario-Adaptive Presence</span>
                   </div>
                   <p className="text-[11px] text-slate-300 leading-snug">
@@ -239,7 +239,7 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
                   </p>
                 </div>
 
-                <div className="relative z-10 flex items-center justify-between text-[10px] text-slate-400 pt-1">
+                <div className="relative z-10 flex items-center justify-between text-[10px] text-sif-secondarySubtle pt-1">
                   <span>Lip-synced Speech-to-Video</span>
                   <span>Sensory text mode toggle</span>
                 </div>
@@ -273,18 +273,18 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
             <span
               className={`h-1.5 w-8 rounded-full ${
                 stage === 'step1' || stage === 'step2' || stage === 'step3'
-                  ? 'bg-teal-brand'
+                  ? 'bg-sif-primary'
                   : 'bg-canvas-border'
               }`}
             />
             <span
               className={`h-1.5 w-8 rounded-full ${
-                stage === 'step2' || stage === 'step3' ? 'bg-teal-brand' : 'bg-canvas-border'
+                stage === 'step2' || stage === 'step3' ? 'bg-sif-primary' : 'bg-canvas-border'
               }`}
             />
             <span
               className={`h-1.5 w-8 rounded-full ${
-                stage === 'step3' ? 'bg-teal-brand' : 'bg-canvas-border'
+                stage === 'step3' ? 'bg-sif-primary' : 'bg-canvas-border'
               }`}
             />
           </div>
@@ -295,7 +295,7 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
 
         <button
           onClick={handleFinishOnboarding}
-          className="text-xs font-medium text-ink-muted hover:text-ink-primary px-3 py-1.5 rounded-lg transition-colors focus:outline-none focus:ring-1 focus:ring-teal-brand"
+          className="text-xs font-medium text-ink-muted hover:text-ink-primary px-3 py-1.5 rounded-lg transition-colors focus:outline-none focus:ring-1 focus:ring-sif-primary"
         >
           Skip to dashboard
         </button>
@@ -306,7 +306,7 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
         {/* STEP 1: INTERESTS */}
         {stage === 'step1' && (
           <div className="animate-fadeIn">
-            <span className="text-xs font-semibold tracking-wider uppercase text-teal-brand mb-2 block">
+            <span className="text-xs font-semibold tracking-wider uppercase text-sif-primary mb-2 block">
               Step 1 • Interests
             </span>
             <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-ink-primary mb-3">
@@ -325,7 +325,7 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
                     onClick={() => toggleInterest(opt.label)}
                     className={`p-4 rounded-xl border text-left transition flex items-center justify-between ${
                       isSelected
-                        ? 'bg-teal-subtle border-teal-brand text-ink-primary font-medium'
+                        ? 'bg-sif-primarySubtle border-sif-primary text-ink-primary font-medium'
                         : 'bg-canvas-surface border-canvas-border text-ink-secondary hover:bg-canvas-subtle'
                     }`}
                   >
@@ -333,7 +333,7 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
                     <span
                       className={`w-5 h-5 rounded-full flex items-center justify-center text-xs ${
                         isSelected
-                          ? 'bg-teal-brand text-canvas-surface font-bold'
+                          ? 'bg-sif-primary text-canvas-surface font-bold'
                           : 'border border-canvas-border'
                       }`}
                     >
@@ -348,7 +348,7 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
               <span className="text-xs text-ink-muted">You can change all of this later.</span>
               <button
                 onClick={() => setStage('step2')}
-                className="px-6 py-2.5 rounded-xl bg-teal-brand text-canvas-surface font-medium hover:bg-teal-hover transition text-sm focus:outline-none focus:ring-2 focus:ring-teal-brand"
+                className="px-6 py-2.5 rounded-xl bg-sif-primary text-canvas-surface font-medium hover:bg-sif-primaryHover transition text-sm focus:outline-none focus:ring-2 focus:ring-sif-primary"
               >
                 Continue to Goals
               </button>
@@ -359,7 +359,7 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
         {/* STEP 2: GOALS */}
         {stage === 'step2' && (
           <div className="animate-fadeIn">
-            <span className="text-xs font-semibold tracking-wider uppercase text-teal-brand mb-2 block">
+            <span className="text-xs font-semibold tracking-wider uppercase text-sif-primary mb-2 block">
               Step 2 • Goals
             </span>
             <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-ink-primary mb-3">
@@ -378,7 +378,7 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
                     onClick={() => toggleGoal(goal)}
                     className={`w-full p-3.5 rounded-xl border text-left transition flex items-center justify-between ${
                       isSelected
-                        ? 'bg-teal-subtle border-teal-brand text-ink-primary font-medium'
+                        ? 'bg-sif-primarySubtle border-sif-primary text-ink-primary font-medium'
                         : 'bg-canvas-surface border-canvas-border text-ink-secondary hover:bg-canvas-subtle'
                     }`}
                   >
@@ -386,7 +386,7 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
                     <span
                       className={`w-5 h-5 rounded-full flex items-center justify-center text-xs ${
                         isSelected
-                          ? 'bg-teal-brand text-canvas-surface font-bold'
+                          ? 'bg-sif-primary text-canvas-surface font-bold'
                           : 'border border-canvas-border'
                       }`}
                     >
@@ -406,7 +406,7 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
               </button>
               <button
                 onClick={() => setStage('step3')}
-                className="px-6 py-2.5 rounded-xl bg-teal-brand text-canvas-surface font-medium hover:bg-teal-hover transition text-sm focus:outline-none focus:ring-2 focus:ring-teal-brand"
+                className="px-6 py-2.5 rounded-xl bg-sif-primary text-canvas-surface font-medium hover:bg-sif-primaryHover transition text-sm focus:outline-none focus:ring-2 focus:ring-sif-primary"
               >
                 Continue to Guidance
               </button>
@@ -417,7 +417,7 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
         {/* STEP 3: GUIDANCE & PREFERENCES */}
         {stage === 'step3' && (
           <div className="animate-fadeIn">
-            <span className="text-xs font-semibold tracking-wider uppercase text-teal-brand mb-2 block">
+            <span className="text-xs font-semibold tracking-wider uppercase text-sif-primary mb-2 block">
               Step 3 • Guidance & Comfort
             </span>
             <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-ink-primary mb-3">
@@ -451,7 +451,7 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
                   onClick={() => setGuidanceLevel(opt.id as 'independent' | 'cues' | 'subtext')}
                   className={`w-full p-4 rounded-xl border text-left transition ${
                     guidanceLevel === opt.id
-                      ? 'bg-teal-subtle border-teal-brand shadow-sm'
+                      ? 'bg-sif-primarySubtle border-sif-primary shadow-sm'
                       : 'bg-canvas-surface border-canvas-border hover:bg-canvas-subtle'
                   }`}
                 >
@@ -459,7 +459,7 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
                     <span className="font-medium text-ink-primary text-base">{opt.title}</span>
                     <span
                       className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                        guidanceLevel === opt.id ? 'border-teal-brand bg-teal-brand' : 'border-canvas-border'
+                        guidanceLevel === opt.id ? 'border-sif-primary bg-sif-primary' : 'border-canvas-border'
                       }`}
                     >
                       {guidanceLevel === opt.id && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
@@ -509,7 +509,7 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
                 <button
                   onClick={() => setSpokenAudio(!spokenAudio)}
                   className={`w-11 h-6 rounded-full transition-colors relative focus:outline-none ${
-                    spokenAudio ? 'bg-teal-brand' : 'bg-canvas-border'
+                    spokenAudio ? 'bg-sif-primary' : 'bg-canvas-border'
                   }`}
                 >
                   <span
@@ -528,7 +528,7 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
                 <button
                   onClick={() => setReducedMotionSetting(!reducedMotionSetting)}
                   className={`w-11 h-6 rounded-full transition-colors relative focus:outline-none ${
-                    reducedMotionSetting ? 'bg-teal-brand' : 'bg-canvas-border'
+                    reducedMotionSetting ? 'bg-sif-primary' : 'bg-canvas-border'
                   }`}
                 >
                   <span
@@ -549,7 +549,7 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
               </button>
               <button
                 onClick={handleFinishOnboarding}
-                className="px-6 py-2.5 rounded-xl bg-teal-brand text-canvas-surface font-medium hover:bg-teal-hover transition text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-brand"
+                className="px-6 py-2.5 rounded-xl bg-sif-primary text-canvas-surface font-medium hover:bg-sif-primaryHover transition text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-sif-primary"
               >
                 Finish & Go to Dashboard
               </button>

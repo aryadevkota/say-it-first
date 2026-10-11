@@ -67,7 +67,7 @@ export const ConversationReportPage: React.FC<ConversationReportPageProps> = ({
         <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-canvas-border pb-6">
           <div>
             <div className="flex items-center gap-2">
-              <span className="px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-teal-subtle text-teal-brand border border-teal-border">
+              <span className="px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-sif-primarySubtle text-sif-primary border border-sif-border">
                 {report.snapshot.categoryLabel} • Guided Coaching Report
               </span>
             </div>
@@ -94,7 +94,7 @@ export const ConversationReportPage: React.FC<ConversationReportPageProps> = ({
                 playCozySound('pop');
                 onRestartPractice();
               }}
-              className="px-4 py-2 rounded-xl text-xs font-semibold bg-teal-brand text-canvas-surface hover:bg-teal-hover transition shadow-2xs"
+              className="px-4 py-2 rounded-xl text-xs font-semibold bg-sif-primary text-canvas-surface hover:bg-sif-primaryHover transition shadow-2xs"
             >
               Practice Again
             </button>
@@ -107,7 +107,7 @@ export const ConversationReportPage: React.FC<ConversationReportPageProps> = ({
           data-testid="section-session-snapshot"
         >
           <div className="flex items-center justify-between flex-wrap gap-2">
-            <span className="text-xs font-semibold uppercase tracking-wider text-teal-brand">
+            <span className="text-xs font-semibold uppercase tracking-wider text-sif-primary">
               1. Session Snapshot
             </span>
             <div className="flex items-center gap-4 text-xs text-ink-muted">
@@ -169,7 +169,7 @@ export const ConversationReportPage: React.FC<ConversationReportPageProps> = ({
           data-testid="section-what-to-keep-doing"
         >
           <div>
-            <span className="text-xs font-semibold uppercase tracking-wider text-teal-brand">
+            <span className="text-xs font-semibold uppercase tracking-wider text-sif-primary">
               3. What to Keep Doing
             </span>
             <h2 className="text-lg font-semibold text-ink-primary mt-1">
@@ -187,7 +187,7 @@ export const ConversationReportPage: React.FC<ConversationReportPageProps> = ({
                 className="p-4 rounded-2xl bg-canvas-subtle border border-canvas-borderSubtle space-y-1.5"
               >
                 <div className="flex items-center gap-2">
-                  <span className="text-teal-brand font-semibold text-sm">✦</span>
+                  <span className="text-sif-primary font-semibold text-sm">✦</span>
                   <h3 className="text-xs sm:text-sm font-semibold text-ink-primary">
                     {habitItem.habit}
                   </h3>
@@ -212,7 +212,7 @@ export const ConversationReportPage: React.FC<ConversationReportPageProps> = ({
         >
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-canvas-borderSubtle pb-4">
             <div>
-              <span className="text-xs font-semibold uppercase tracking-wider text-teal-brand">
+              <span className="text-xs font-semibold uppercase tracking-wider text-sif-primary">
                 4. Exchange-by-Exchange Coaching
               </span>
               <h2 className="text-lg font-semibold text-ink-primary mt-1">
@@ -246,7 +246,7 @@ export const ConversationReportPage: React.FC<ConversationReportPageProps> = ({
                       {exchange.skillTags.map((tag) => (
                         <span
                           key={tag}
-                          className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-canvas-surface border border-canvas-border text-teal-brand shadow-2xs"
+                          className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-canvas-surface border border-canvas-border text-sif-primary shadow-2xs"
                         >
                           #{tag}
                         </span>
@@ -263,8 +263,8 @@ export const ConversationReportPage: React.FC<ConversationReportPageProps> = ({
                       <p className="text-ink-primary">{exchange.partnerMessage}</p>
                     </div>
 
-                    <div className="p-3 rounded-xl bg-teal-subtle/60 border border-teal-border/40 ml-4">
-                      <span className="font-semibold text-teal-brand block mb-0.5">You said:</span>
+                    <div className="p-3 rounded-xl bg-sif-primarySubtle/60 border border-sif-border/40 ml-4">
+                      <span className="font-semibold text-sif-primary block mb-0.5">You said:</span>
                       <p className="text-ink-primary">{exchange.userMessage}</p>
                     </div>
                   </div>
@@ -287,7 +287,7 @@ export const ConversationReportPage: React.FC<ConversationReportPageProps> = ({
                       <p className="text-ink-secondary leading-relaxed">
                         {exchange.socialOrEmotionalCue}
                       </p>
-                      <span className="inline-block text-[10px] text-teal-brand font-medium italic mt-1">
+                      <span className="inline-block text-[10px] text-sif-primary font-medium italic mt-1">
                         Confidence: {exchange.cueConfidence}
                       </span>
                     </div>
@@ -313,7 +313,7 @@ export const ConversationReportPage: React.FC<ConversationReportPageProps> = ({
                     </div>
                   )}
 
-                  <p className="text-xs text-ink-secondary leading-relaxed italic border-l-2 border-teal-brand pl-3">
+                  <p className="text-xs text-ink-secondary leading-relaxed italic border-l-2 border-sif-primary pl-3">
                     <span className="font-semibold not-italic text-ink-primary">Coaching note:</span>{' '}
                     {exchange.coachingNote}
                   </p>
@@ -338,7 +338,7 @@ export const ConversationReportPage: React.FC<ConversationReportPageProps> = ({
                               }}
                               className={`px-2.5 py-1 rounded-lg text-xs font-medium transition ${
                                 activeAltIdx === altIdx
-                                  ? 'bg-teal-brand text-canvas-surface shadow-2xs'
+                                  ? 'bg-sif-primary text-canvas-surface shadow-2xs'
                                   : 'bg-canvas-surface text-ink-secondary hover:bg-canvas-subtle border border-canvas-borderSubtle'
                               }`}
                             >
@@ -353,8 +353,8 @@ export const ConversationReportPage: React.FC<ConversationReportPageProps> = ({
                       </div>
 
                       {/* Active Alternative Card */}
-                      <div className="p-4 rounded-xl bg-canvas-surface border border-teal-border/50 text-xs space-y-2">
-                        <div className="font-semibold text-teal-brand">
+                      <div className="p-4 rounded-xl bg-canvas-surface border border-sif-border/50 text-xs space-y-2">
+                        <div className="font-semibold text-sif-primary">
                           {activeAlternative.label}:
                         </div>
                         <p className="text-ink-primary font-medium italic">
@@ -379,7 +379,7 @@ export const ConversationReportPage: React.FC<ConversationReportPageProps> = ({
           data-testid="section-social-emotional-cues"
         >
           <div>
-            <span className="text-xs font-semibold uppercase tracking-wider text-teal-brand">
+            <span className="text-xs font-semibold uppercase tracking-wider text-sif-primary">
               5. Social and Emotional Cues
             </span>
             <h2 className="text-lg font-semibold text-ink-primary mt-1">
@@ -435,7 +435,7 @@ export const ConversationReportPage: React.FC<ConversationReportPageProps> = ({
           data-testid="section-skill-tags"
         >
           <div>
-            <span className="text-xs font-semibold uppercase tracking-wider text-teal-brand">
+            <span className="text-xs font-semibold uppercase tracking-wider text-sif-primary">
               6. Skill Tags & Learning Patterns
             </span>
             <h2 className="text-lg font-semibold text-ink-primary mt-1">
@@ -453,7 +453,7 @@ export const ConversationReportPage: React.FC<ConversationReportPageProps> = ({
                 key={skill.tag}
                 className="px-3 py-1.5 rounded-xl bg-canvas-subtle border border-canvas-border text-xs flex items-center gap-2"
               >
-                <span className="font-semibold text-teal-brand capitalize">#{skill.tag}</span>
+                <span className="font-semibold text-sif-primary capitalize">#{skill.tag}</span>
                 <span className="text-ink-muted text-[11px]">({skill.count}x)</span>
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
               </div>
@@ -473,7 +473,7 @@ export const ConversationReportPage: React.FC<ConversationReportPageProps> = ({
             </div>
 
             <div className="p-4 rounded-2xl bg-canvas-subtle border border-canvas-borderSubtle">
-              <span className="font-semibold text-teal-brand block mb-1">
+              <span className="font-semibold text-sif-primary block mb-1">
                 Growth Areas to Practice:
               </span>
               <ul className="list-disc pl-4 space-y-1 text-ink-secondary">
@@ -491,7 +491,7 @@ export const ConversationReportPage: React.FC<ConversationReportPageProps> = ({
           data-testid="section-missed-opportunities"
         >
           <div>
-            <span className="text-xs font-semibold uppercase tracking-wider text-teal-brand">
+            <span className="text-xs font-semibold uppercase tracking-wider text-sif-primary">
               7. Missed Opportunities for Connection
             </span>
             <h2 className="text-lg font-semibold text-ink-primary mt-1">
@@ -510,7 +510,7 @@ export const ConversationReportPage: React.FC<ConversationReportPageProps> = ({
               >
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <span className="font-semibold text-ink-primary">{item.moment}</span>
-                  <span className="px-2 py-0.5 rounded-full bg-teal-subtle text-teal-brand text-[10px] font-semibold uppercase">
+                  <span className="px-2 py-0.5 rounded-full bg-sif-primarySubtle text-sif-primary text-[10px] font-semibold uppercase">
                     Principle: {item.demonstratedPrinciple}
                   </span>
                 </div>
@@ -527,12 +527,12 @@ export const ConversationReportPage: React.FC<ConversationReportPageProps> = ({
 
         {/* ── SECTION 8: PRACTICE GOALS FOR NEXT TIME ───────────────────────── */}
         <section
-          className="bg-canvas-surface border-2 border-teal-border/70 rounded-3xl p-6 sm:p-8 shadow-sm space-y-5"
+          className="bg-canvas-surface border-2 border-sif-border/70 rounded-3xl p-6 sm:p-8 shadow-sm space-y-5"
           data-testid="section-practice-goals"
         >
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
-              <span className="text-xs font-semibold uppercase tracking-wider text-teal-brand">
+              <span className="text-xs font-semibold uppercase tracking-wider text-sif-primary">
                 8. Practice Goals for Next Time
               </span>
               <h2 className="text-lg sm:text-xl font-semibold text-ink-primary mt-1">
@@ -550,7 +550,7 @@ export const ConversationReportPage: React.FC<ConversationReportPageProps> = ({
               >
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full bg-teal-brand text-canvas-surface font-bold flex items-center justify-center text-[10px]">
+                    <span className="w-5 h-5 rounded-full bg-sif-primary text-canvas-surface font-bold flex items-center justify-center text-[10px]">
                       {idx + 1}
                     </span>
                     <h3 className="font-semibold text-ink-primary text-sm">{goal.goal}</h3>
@@ -561,7 +561,7 @@ export const ConversationReportPage: React.FC<ConversationReportPageProps> = ({
                   </p>
 
                   <div className="p-3 rounded-xl bg-canvas-surface border border-canvas-borderSubtle text-[11px] text-ink-primary">
-                    <span className="font-semibold block mb-0.5 text-teal-brand">Response template:</span>
+                    <span className="font-semibold block mb-0.5 text-sif-primary">Response template:</span>
                     "{goal.exampleTemplate}"
                   </div>
 
@@ -618,7 +618,7 @@ export const ConversationReportPage: React.FC<ConversationReportPageProps> = ({
                   className={`p-3 rounded-xl text-xs ${
                     turn.role === 'partner'
                       ? 'bg-canvas-subtle text-ink-primary'
-                      : 'bg-teal-subtle text-ink-primary ml-4'
+                      : 'bg-sif-primarySubtle text-ink-primary ml-4'
                   }`}
                 >
                   <span className="font-semibold block mb-0.5 text-ink-secondary">
@@ -648,7 +648,7 @@ export const ConversationReportPage: React.FC<ConversationReportPageProps> = ({
               playCozySound('pop');
               onRestartPractice();
             }}
-            className="px-6 py-2.5 rounded-xl bg-teal-brand text-canvas-surface text-xs font-semibold hover:bg-teal-hover transition shadow-2xs"
+            className="px-6 py-2.5 rounded-xl bg-sif-primary text-canvas-surface text-xs font-semibold hover:bg-sif-primaryHover transition shadow-2xs"
           >
             Practice Another Scenario
           </button>

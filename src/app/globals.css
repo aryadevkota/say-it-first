@@ -70,33 +70,54 @@
 }
 
 :root {
-  --canvas-bg: #FAF7F2;
-  --canvas-subtle: #F4EFEB;
-  --canvas-surface: #FFFFFF;
-  --canvas-border: #E7E1D8;
-  --ink-primary: #13282B;
-  --ink-secondary: #364B4E;
-  --ink-muted: #627678;
-  --teal-brand: #1C6E72;
-  --teal-hover: #15565A;
-  --teal-subtle: #E7F2F2;
+  --canvas-bg: #EAF0FF;
+  --canvas-subtle: #F4F7FF;
+  --canvas-surface: rgba(255, 255, 255, 0.78);
+  --canvas-surface-solid: #FFFFFF;
+  --canvas-surface-strong: #DCE6FF;
+  --canvas-border: rgba(86, 104, 191, 0.16);
+  --canvas-border-subtle: rgba(86, 104, 191, 0.08);
+  --canvas-border-hover: rgba(94, 106, 217, 0.40);
+  --ink-primary: #1D275C;
+  --ink-secondary: #3E4A82;
+  --ink-muted: #6C76A8;
+  --primary: #5E6AD9;
+  --primary-deep: #27348B;
+  --secondary: #B8B7F7;
+  --accent: #D9B6F2;
+  --teal-brand: #5E6AD9;
+  --teal-hover: #4D58C7;
+  --teal-subtle: #E8ECFF;
 }
 
 .dark {
-  --canvas-bg: #14181E;
-  --canvas-subtle: #1A2129;
-  --canvas-surface: #212933;
-  --canvas-border: #2E3A47;
-  --ink-primary: #FAF9F6;
-  --ink-secondary: #D1D8DB;
-  --ink-muted: #9BA8A9;
-  --teal-brand: #288C90;
-  --teal-hover: #3AA3A7;
-  --teal-subtle: #192C2E;
+  --canvas-bg: #0F1426;
+  --canvas-subtle: #171E38;
+  --canvas-surface: rgba(31, 41, 77, 0.85);
+  --canvas-surface-solid: #1F294D;
+  --canvas-surface-strong: #273468;
+  --canvas-border: rgba(184, 183, 247, 0.18);
+  --canvas-border-subtle: rgba(184, 183, 247, 0.09);
+  --canvas-border-hover: rgba(184, 183, 247, 0.35);
+  --ink-primary: #F4F7FF;
+  --ink-secondary: #D2D9FA;
+  --ink-muted: #9AA6D8;
+  --primary: #7580E5;
+  --primary-deep: #5E6AD9;
+  --secondary: #B8B7F7;
+  --accent: #E2C7F7;
+  --teal-brand: #7580E5;
+  --teal-hover: #8D97ED;
+  --teal-subtle: #242D55;
 }
 
 body {
   background-color: var(--canvas-bg);
+  background-image: 
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(184, 183, 247, 0.22), transparent 70%),
+    radial-gradient(ellipse 60% 40% at 95% 20%, rgba(217, 182, 242, 0.12), transparent 60%),
+    radial-gradient(ellipse 50% 50% at 5% 75%, rgba(94, 106, 217, 0.10), transparent 65%);
+  background-attachment: fixed;
   color: var(--ink-primary);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   line-height: 1.65;

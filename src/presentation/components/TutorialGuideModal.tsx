@@ -39,15 +39,15 @@ export const TutorialGuideModal: React.FC<TutorialGuideModalProps> = ({ isOpen, 
       aria-labelledby="tutorial-title"
       data-testid="tutorial-guide-modal"
     >
-      <div className="bg-canvas-surface border border-canvas-border rounded-3xl shadow-xl max-w-xl w-full p-6 sm:p-8 space-y-6 text-ink-primary max-h-[90vh] overflow-y-auto">
+      <div className="bg-white/90 backdrop-blur-md border border-sif-border rounded-3xl shadow-glass-elevated max-w-xl w-full p-6 sm:p-8 space-y-6 text-ink-primary max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-teal-subtle text-teal-brand flex items-center justify-center text-xl shadow-2xs">
+            <div className="w-10 h-10 rounded-2xl bg-sif-primarySubtle text-sif-primary border border-sif-border flex items-center justify-center text-xl shadow-glass-card">
               ✨
             </div>
             <div>
-              <span className="text-xs font-semibold uppercase tracking-wider text-teal-brand block">
+              <span className="text-xs font-semibold uppercase tracking-wider text-sif-primary block">
                 Quick Guide
               </span>
               <h2 id="tutorial-title" className="text-xl sm:text-2xl font-semibold text-ink-primary">
@@ -69,8 +69,8 @@ export const TutorialGuideModal: React.FC<TutorialGuideModalProps> = ({ isOpen, 
         </div>
 
         {/* Core Distinction Callout */}
-        <div className="p-4 rounded-2xl bg-teal-subtle/40 border border-teal-border/70 text-xs sm:text-sm text-ink-secondary leading-relaxed">
-          <span className="font-semibold text-teal-brand block mb-1">
+        <div className="p-4 rounded-2xl bg-gradient-to-r from-sif-primarySubtle/80 to-sif-secondarySubtle/60 border border-sif-border text-xs sm:text-sm text-ink-secondary leading-relaxed shadow-2xs">
+          <span className="font-semibold text-sif-primaryDeep block mb-1">
             Not a generic chatbot. A guided conversational gym.
           </span>
           Say It First uses scenario-adaptive partners and structured social feedback to help you build repeatable communication habits, explore two-way perspectives, and practice at your own pace without scoring or judgment.
@@ -78,8 +78,8 @@ export const TutorialGuideModal: React.FC<TutorialGuideModalProps> = ({ isOpen, 
 
         {/* Feature Cards Grid */}
         <div className="space-y-3">
-          <div className="p-3.5 rounded-2xl bg-canvas-subtle border border-canvas-borderSubtle flex items-start gap-3">
-            <div className="w-7 h-7 rounded-xl bg-canvas-surface text-teal-brand flex items-center justify-center text-sm shrink-0 font-bold">
+          <div className="p-3.5 rounded-2xl bg-white/70 border border-canvas-border flex items-start gap-3 shadow-2xs">
+            <div className="w-7 h-7 rounded-xl bg-sif-primarySubtle text-sif-primary border border-sif-border flex items-center justify-center text-sm shrink-0 font-bold">
               1
             </div>
             <div className="text-xs">
@@ -92,8 +92,8 @@ export const TutorialGuideModal: React.FC<TutorialGuideModalProps> = ({ isOpen, 
             </div>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-canvas-subtle border border-canvas-borderSubtle flex items-start gap-3">
-            <div className="w-7 h-7 rounded-xl bg-canvas-surface text-teal-brand flex items-center justify-center text-sm shrink-0 font-bold">
+          <div className="p-3.5 rounded-2xl bg-white/70 border border-canvas-border flex items-start gap-3 shadow-2xs">
+            <div className="w-7 h-7 rounded-xl bg-sif-primarySubtle text-sif-primary border border-sif-border flex items-center justify-center text-sm shrink-0 font-bold">
               2
             </div>
             <div className="text-xs">
@@ -106,8 +106,8 @@ export const TutorialGuideModal: React.FC<TutorialGuideModalProps> = ({ isOpen, 
             </div>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-canvas-subtle border border-canvas-borderSubtle flex items-start gap-3">
-            <div className="w-7 h-7 rounded-xl bg-canvas-surface text-teal-brand flex items-center justify-center text-sm shrink-0 font-bold">
+          <div className="p-3.5 rounded-2xl bg-white/70 border border-canvas-border flex items-start gap-3 shadow-2xs">
+            <div className="w-7 h-7 rounded-xl bg-sif-primarySubtle text-sif-primary border border-sif-border flex items-center justify-center text-sm shrink-0 font-bold">
               3
             </div>
             <div className="text-xs">
@@ -120,8 +120,8 @@ export const TutorialGuideModal: React.FC<TutorialGuideModalProps> = ({ isOpen, 
             </div>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-canvas-subtle border border-canvas-borderSubtle flex items-start gap-3">
-            <div className="w-7 h-7 rounded-xl bg-canvas-surface text-teal-brand flex items-center justify-center text-sm shrink-0 font-bold">
+          <div className="p-3.5 rounded-2xl bg-white/70 border border-canvas-border flex items-start gap-3 shadow-2xs">
+            <div className="w-7 h-7 rounded-xl bg-sif-primarySubtle text-sif-primary border border-sif-border flex items-center justify-center text-sm shrink-0 font-bold">
               4
             </div>
             <div className="text-xs">
@@ -143,7 +143,7 @@ export const TutorialGuideModal: React.FC<TutorialGuideModalProps> = ({ isOpen, 
               playCozySound('tap');
               onClose();
             }}
-            className="px-5 py-2.5 rounded-xl bg-teal-brand text-canvas-surface text-xs font-semibold hover:bg-teal-hover transition shadow-2xs"
+            className="px-5 py-2.5 rounded-xl bg-sif-primary text-white text-xs font-semibold hover:bg-sif-primaryHover transition shadow-glass-card"
           >
             Got it, let's explore
           </button>

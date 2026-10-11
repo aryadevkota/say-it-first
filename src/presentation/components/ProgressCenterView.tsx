@@ -76,7 +76,7 @@ export const ProgressCenterView: React.FC<ProgressCenterViewProps> = ({
       {/* Header */}
       <div>
         <div className="flex items-center gap-2">
-          <span className="px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-teal-subtle text-teal-brand border border-teal-border">
+          <span className="px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-sif-primarySubtle text-sif-primary border border-sif-border shadow-2xs">
             Reflective Learning
           </span>
         </div>
@@ -90,7 +90,7 @@ export const ProgressCenterView: React.FC<ProgressCenterViewProps> = ({
 
       {/* Overview Stat Tiles (No judgment, purely milestones) */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="p-5 rounded-2xl bg-canvas-surface border border-canvas-border shadow-xs">
+        <div className="p-5 rounded-3xl bg-white/80 backdrop-blur-md border border-canvas-border shadow-glass-card">
           <span className="text-xs font-semibold text-ink-muted uppercase tracking-wider block mb-1">
             Topics Explored
           </span>
@@ -98,30 +98,30 @@ export const ProgressCenterView: React.FC<ProgressCenterViewProps> = ({
           <span className="text-xs text-ink-muted block mt-1">of {TOPICS.length} available scenarios</span>
         </div>
 
-        <div className="p-5 rounded-2xl bg-canvas-surface border border-canvas-border shadow-xs">
+        <div className="p-5 rounded-3xl bg-white/80 backdrop-blur-md border border-canvas-border shadow-glass-card">
           <span className="text-xs font-semibold text-ink-muted uppercase tracking-wider block mb-1">
             Conversations Completed
           </span>
-          <span className="text-2xl font-semibold text-teal-brand">{practicedCount}</span>
+          <span className="text-2xl font-semibold text-sif-primary">{practicedCount}</span>
           <span className="text-xs text-ink-muted block mt-1">interactive simulations finished</span>
         </div>
 
-        <div className="p-5 rounded-2xl bg-canvas-surface border border-canvas-border shadow-xs">
+        <div className="p-5 rounded-3xl bg-white/80 backdrop-blur-md border border-canvas-border shadow-glass-card">
           <span className="text-xs font-semibold text-ink-muted uppercase tracking-wider block mb-1">
             Saved Pocket Scripts
           </span>
-          <span className="text-2xl font-semibold text-topic-apricot">{savedTakeaways.length}</span>
+          <span className="text-2xl font-semibold text-sif-accent">{savedTakeaways.length}</span>
           <span className="text-xs text-ink-muted block mt-1">ready to reuse anytime</span>
         </div>
       </div>
 
       {/* Latest Guided Report Banner (if one exists) */}
       {latestReport && (
-        <div className="p-6 rounded-3xl bg-gradient-to-br from-canvas-surface via-teal-subtle/20 to-canvas-surface border border-teal-border/70 shadow-xs space-y-4">
+        <div className="p-6 rounded-3xl bg-gradient-to-br from-white/90 via-canvas-subtle/80 to-sif-secondarySubtle/50 border border-sif-border shadow-glass-card backdrop-blur-md space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-teal-brand animate-pulse" />
-              <span className="text-xs font-semibold uppercase tracking-wider text-teal-brand">
+              <span className="w-2.5 h-2.5 rounded-full bg-sif-primary animate-pulse" />
+              <span className="text-xs font-semibold uppercase tracking-wider text-sif-primary">
                 Latest Learning Report
               </span>
             </div>
@@ -148,7 +148,7 @@ export const ProgressCenterView: React.FC<ProgressCenterViewProps> = ({
                 playCozySound('tap');
                 setShowFullLatestReport(true);
               }}
-              className="px-5 py-2.5 rounded-xl bg-teal-brand text-canvas-surface text-xs font-semibold hover:bg-teal-hover transition shadow-2xs shrink-0"
+              className="px-5 py-2.5 rounded-xl bg-sif-primary text-white text-xs font-semibold hover:bg-sif-primaryHover transition shadow-glass-card shrink-0"
             >
               View Full 9-Part Report →
             </button>

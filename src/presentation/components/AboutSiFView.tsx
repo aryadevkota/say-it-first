@@ -23,7 +23,7 @@ export const AboutSiFView: React.FC<AboutSiFViewProps> = ({ onStartExplore, onOp
     <div className="max-w-4xl mx-auto w-full py-8 px-4 sm:px-6 space-y-10 animate-fadeIn text-ink-primary">
       {/* Hero */}
       <div className="space-y-4">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-teal-subtle text-teal-brand border border-teal-border">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-sif-primarySubtle text-sif-primary border border-sif-border shadow-2xs">
           <span>Philosophy & Design</span>
         </div>
 
@@ -39,7 +39,7 @@ export const AboutSiFView: React.FC<AboutSiFViewProps> = ({ onStartExplore, onOp
       {/* Comparison Grid: Generic LLMs vs Say It First */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {/* Generic LLM Column */}
-        <div className="p-6 rounded-3xl bg-canvas-surface border border-canvas-border space-y-4 shadow-xs">
+        <div className="p-6 rounded-3xl bg-white/60 backdrop-blur-md border border-canvas-border space-y-4 shadow-glass-card">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-slate-400" />
             <h2 className="text-sm font-semibold uppercase tracking-wider text-ink-muted">
@@ -68,29 +68,29 @@ export const AboutSiFView: React.FC<AboutSiFViewProps> = ({ onStartExplore, onOp
         </div>
 
         {/* Say It First Column */}
-        <div className="p-6 rounded-3xl bg-teal-subtle/40 border border-teal-border space-y-4 shadow-xs">
+        <div className="p-6 rounded-3xl bg-gradient-to-br from-white/90 via-canvas-subtle/80 to-sif-secondarySubtle/50 border border-sif-border space-y-4 shadow-glass-card backdrop-blur-md">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-teal-brand" />
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-teal-brand">
+            <span className="w-2 h-2 rounded-full bg-sif-primary" />
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-sif-primary">
               Say It First Learning Model
             </h2>
           </div>
 
           <ul className="space-y-3 text-xs text-ink-primary">
             <li className="flex items-start gap-2.5">
-              <span className="text-teal-brand font-bold">✓</span>
+              <span className="text-sif-primary font-bold">✓</span>
               <span><strong>Scenario-driven deliberate practice:</strong> Centered simulation rooms tailored to workplace, friendship, and personal boundaries.</span>
             </li>
             <li className="flex items-start gap-2.5">
-              <span className="text-teal-brand font-bold">✓</span>
+              <span className="text-sif-primary font-bold">✓</span>
               <span><strong>Two-Way Bridge & Double Empathy:</strong> Explains what the other person may have signaled, translating implicit subtext into explicit insights.</span>
             </li>
             <li className="flex items-start gap-2.5">
-              <span className="text-teal-brand font-bold">✓</span>
+              <span className="text-sif-primary font-bold">✓</span>
               <span><strong>Strengths-first guided reports:</strong> Identifies repeatable communication habits and offers multiple valid paths (empathetic, curious, direct).</span>
             </li>
             <li className="flex items-start gap-2.5">
-              <span className="text-teal-brand font-bold">✓</span>
+              <span className="text-sif-primary font-bold">✓</span>
               <span><strong>Zero grading pressure:</strong> Non-destructive branch retries where you can try multiple versions without penalization.</span>
             </li>
           </ul>

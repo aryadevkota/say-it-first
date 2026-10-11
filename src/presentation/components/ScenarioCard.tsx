@@ -32,19 +32,18 @@ export const ScenarioCard: React.FC<ScenarioCardProps> = ({
   const isPreview = scenario.status === 'preview';
 
   // Topic accent styling
+  // Topic accent styling strictly mapped to cool brand family
   const accentBorderColor =
     scenario.accentColor === 'apricot'
-      ? 'hover:border-topic-apricotBorder'
+      ? 'hover:border-sif-accent hover:shadow-glass-glow'
       : scenario.accentColor === 'lavender'
-      ? 'hover:border-topic-lavenderBorder'
-      : scenario.accentColor === 'sage'
-      ? 'hover:border-topic-sageBorder'
-      : 'hover:border-teal-border';
+      ? 'hover:border-sif-secondary hover:shadow-glass-glow'
+      : 'hover:border-sif-primary hover:shadow-glass-elevated';
 
   return (
     <div
       onClick={() => onSelect(scenario)}
-      className={`group relative shrink-0 w-72 sm:w-80 rounded-3xl bg-canvas-surface border border-canvas-border p-5 flex flex-col justify-between cursor-pointer select-none transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-md hover:bg-canvas-subtle/40 ${accentBorderColor}`}
+      className={`group relative shrink-0 w-72 sm:w-80 rounded-3xl bg-white/75 backdrop-blur-md border border-canvas-border p-5 flex flex-col justify-between cursor-pointer select-none transition-all duration-300 ease-out hover:-translate-y-1.5 shadow-glass-card hover:bg-white/90 ${accentBorderColor}`}
       data-testid={`scenario-card-${scenario.id}`}
       role="button"
       tabIndex={0}
@@ -59,7 +58,7 @@ export const ScenarioCard: React.FC<ScenarioCardProps> = ({
       <div>
         <div className="flex items-center justify-between gap-2 mb-3">
           <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-teal-brand px-2.5 py-0.5 rounded-full bg-teal-subtle/80 border border-teal-border/40">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-sif-primary px-2.5 py-0.5 rounded-full bg-sif-primarySubtle border border-sif-border">
               {scenario.categoryLabel}
             </span>
             <span className="text-[11px] text-ink-muted">~{scenario.estimatedMinutes}m</span>
@@ -75,8 +74,8 @@ export const ScenarioCard: React.FC<ScenarioCardProps> = ({
               }}
               className={`p-1.5 rounded-xl transition-colors ${
                 isSaved
-                  ? 'text-teal-brand bg-teal-subtle'
-                  : 'text-ink-muted hover:text-ink-primary hover:bg-canvas-light'
+                  ? 'text-sif-primary bg-sif-primarySubtle border border-sif-border'
+                  : 'text-ink-muted hover:text-sif-primary hover:bg-white'
               }`}
               title={isSaved ? 'Remove from saved' : 'Save for later'}
               aria-label={isSaved ? 'Remove from saved' : 'Save for later'}
@@ -94,10 +93,10 @@ export const ScenarioCard: React.FC<ScenarioCardProps> = ({
         </div>
 
         {/* Thumbnail Preview Banner */}
-        <div className="w-full h-24 rounded-2xl bg-gradient-to-br from-canvas-subtle via-teal-subtle/20 to-canvas-light border border-canvas-borderSubtle p-3.5 mb-3.5 flex flex-col justify-between relative overflow-hidden group-hover:brightness-105 transition-all">
+        <div className="w-full h-24 rounded-2xl bg-gradient-to-br from-white/90 via-canvas-subtle/80 to-sif-secondarySubtle/60 border border-canvas-borderSubtle p-3.5 mb-3.5 flex flex-col justify-between relative overflow-hidden group-hover:brightness-105 transition-all shadow-inner">
           <div className="flex items-center justify-between text-[11px] text-ink-muted">
-            <span className="font-medium text-ink-secondary">Partner: {scenario.partner.name}</span>
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-canvas-surface border border-canvas-border">
+            <span className="font-semibold text-ink-primary">Partner: {scenario.partner.name}</span>
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/90 border border-canvas-border font-medium text-ink-secondary">
               {scenario.partner.role}
             </span>
           </div>
@@ -108,7 +107,7 @@ export const ScenarioCard: React.FC<ScenarioCardProps> = ({
         </div>
 
         {/* Title & Subtitle */}
-        <h3 className="font-semibold text-ink-primary text-base leading-snug mb-1 group-hover:text-teal-brand transition-colors">
+        <h3 className="font-semibold text-ink-primary text-base leading-snug mb-1 group-hover:text-sif-primary transition-colors">
           {scenario.title}
         </h3>
         <p className="text-xs text-ink-secondary leading-relaxed line-clamp-2">
@@ -120,13 +119,13 @@ export const ScenarioCard: React.FC<ScenarioCardProps> = ({
       <div className="pt-4 mt-3 border-t border-canvas-borderSubtle flex items-center justify-between text-xs">
         <div>
           {progress === 'practiced' || progress === 'revisited' ? (
-            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-sif-primaryDeep bg-sif-secondarySubtle px-2.5 py-0.5 rounded-full border border-sif-secondary/50">
+              <span className="w-1.5 h-1.5 rounded-full bg-sif-primary" />
               Practiced
             </span>
           ) : progress === 'in-progress' ? (
-            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-topic-amber bg-topic-amberBg px-2 py-0.5 rounded-full border border-topic-amberBorder">
-              <span className="w-1.5 h-1.5 rounded-full bg-topic-amber" />
+            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-sif-primary bg-sif-primarySubtle px-2.5 py-0.5 rounded-full border border-sif-border">
+              <span className="w-1.5 h-1.5 rounded-full bg-sif-primary" />
               In Progress
             </span>
           ) : isPreview ? (
@@ -136,7 +135,7 @@ export const ScenarioCard: React.FC<ScenarioCardProps> = ({
           )}
         </div>
 
-        <span className="font-semibold text-teal-brand group-hover:translate-x-0.5 transition-transform flex items-center gap-1 text-xs">
+        <span className="font-semibold text-sif-primary group-hover:translate-x-1 transition-transform flex items-center gap-1 text-xs">
           <span>Overview</span>
           <span>→</span>
         </span>
