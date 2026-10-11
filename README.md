@@ -197,13 +197,11 @@ Configure your environment variables:
 | :--- | :---: | :--- |
 | `GEMINI_API_KEY` | **Yes** | Powers generative dialogue and intent translation ([Google AI Studio](https://aistudio.google.com/app/apikey)). |
 | `ELEVENLABS_API_KEY` | **Yes** | Required for agent provisioning. |
-| `ELEVENLABS_AGENT_ID` | **Yes** | The ElevenLabs conversational agent ID configured for PCM 24000 Hz. |
-| `TAVUS_API_KEY` | **Yes** | Powers real-time conversational video streaming via Tavus CVI API ([Tavus](https://tavus.io)). |
-| `TAVUS_FACE_ID` | Optional | Tavus replica face identifier (defaults to `r3f427f43c9d`). |
+| `ANAM_API_KEY` | **Yes** | Powers real-time conversational video streaming via Anam API ([Anam](https://lab.anam.ai)). |
 
 > **Note on Live Video Avatar Pipeline:**
-> - **With Tavus CVI**: Initiates a real-time conversational video interface directly via Daily.co WebRTC stream coordinated through the backend session coordinator.
-> - **Fail-Fast Diagnostics**: If `TAVUS_API_KEY` is not configured, the session endpoint safely returns a 503 instead of exposing credentials.
+> - **With Anam**: Initiates a real-time lip-synced conversational video stream using Anam audio passthrough, lip-syncing to ElevenLabs natural voice.
+> - **Fail-Fast Diagnostics**: If `ANAM_API_KEY` is not configured, the session endpoint safely returns a 503 instead of exposing credentials.
 
 ### 4. Run Development Server
 ```bash

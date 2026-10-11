@@ -42,7 +42,7 @@ describe('SophiaScenarioPresentation Entity & Mapping Service', () => {
         partner: {
           name: 'Sophia',
           role: 'Hiring Manager',
-          avatarVariant: 'eva',
+          avatarVariant: 'sophia',
           defaultTone: 'Formal, focused',
           initialDialogue: 'Tell me about a time you handled conflict.',
         },
@@ -84,7 +84,7 @@ describe('SophiaScenarioPresentation Entity & Mapping Service', () => {
         partner: {
           name: 'Sophia',
           role: 'Close Friend',
-          avatarVariant: 'eva',
+          avatarVariant: 'sophia',
           defaultTone: 'Warm and friendly',
           initialDialogue: 'It is so great to grab coffee together!',
         },
@@ -266,7 +266,7 @@ describe('SophiaScenarioPresentation Entity & Mapping Service', () => {
         partner: {
           name: 'Sophia',
           role: 'Conversational Partner',
-          avatarVariant: 'eva',
+          avatarVariant: 'sophia',
           defaultTone: 'Calm',
           initialDialogue: 'Hello there, how are you today?',
         },

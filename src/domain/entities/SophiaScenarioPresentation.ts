@@ -78,6 +78,8 @@ export const SOPHIA_CORE_IDENTITY: SophiaIdentityConsistency = Object.freeze({
   realisticLighting: 'Subtle 3-point portrait illumination with soft ambient key light and warm fill',
 });
 
+export const EVA_CORE_IDENTITY = SOPHIA_CORE_IDENTITY;
+
 // Locked voice contract — Sophia (eleven_multilingual_v2)
 export const LOCKED_VOICE_ID = 'kdmDKE6EkgrWrrykO9Qt';
 export const LOCKED_VOICE_NAME = 'Sophia — Conversational and Natural';
@@ -205,6 +207,8 @@ export const SOPHIA_PRESENTATION_CONFIGS: Record<
     },
   },
 });
+
+export const EVA_PRESENTATION_CONFIGS = SOPHIA_PRESENTATION_CONFIGS;
 
 /**
  * Infer presentation archetype from scenario definition.

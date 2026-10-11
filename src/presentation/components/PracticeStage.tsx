@@ -25,8 +25,7 @@ import { SophiaLiveAvatar } from './SophiaLiveAvatar';
 import type { UserPreferences } from './WelcomeOnboarding';
 type AvatarState = 'listening' | 'speaking' | 'thinking' | 'neutral' | 'receptive';
 import type { SavedTakeaway } from './MyProgress';
-import { useLiveAvatarSession } from '../hooks/useLiveAvatarSession';
-import { useAvatarSessionManager } from '../hooks/useAvatarSessionManager';
+import { useAnamAvatarSession } from '../hooks/useAnamAvatarSession';
 import { playCozySound } from '../utils/cozyAudio';
 import { ReportGenerationView } from './ReportGenerationView';
 import { ConversationReportPage } from './ConversationReportPage';
@@ -128,79 +127,59 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
   const abortControllerRef = useRef<AbortController | null>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // Media Refs for LiveKit Video/Audio
+  // Media Ref for Anam Video Element
   const videoRef = useRef<HTMLVideoElement>(null);
-  const audioRef = useRef<HTMLAudioElement>(null);
 
   const activeAttemptIndexRef = useRef<number>(activeAttemptIndex);
   useEffect(() => {
     activeAttemptIndexRef.current = activeAttemptIndex;
   }, [activeAttemptIndex]);
 
-  // ElevenLabs Voice Hook
+  // Anam Live Avatar & ElevenLabs Voice Passthrough Hook
   const {
+    sessionState: avatarSessionState,
     isPlaying: isSpeakingAudio,
-    voiceNotice,
     isMuted,
+    errorMessage: avatarSessionError,
+    connect: connectAvatarSession,
+    disconnect: disconnectAvatarSession,
+    speakText,
+    interrupt,
     toggleMute,
-    sendText,
-    disconnect,
-    connect,
-  } = useLiveAvatarSession({
-    mediaRefs: { video: videoRef, audio: audioRef },
+    retrySession: retryAvatarSession,
+  } = useAnamAvatarSession({
+    videoElementId: 'anam-avatar-video',
     onPlaybackStateChange: (isPlaying) => {
       setPartnerState(isPlaying ? 'speaking' : 'receptive');
     },
-    onTranscription: (role, text) => {
-      setAttempts((prev) => {
-        const copy = [...prev];
-        const currentAttemptIdx = activeAttemptIndexRef.current;
-        if (copy[currentAttemptIdx]) {
-          // If the role is 'user', the user's turn was already appended optimistically in handleSubmitTurn
-          // So we only append 'agent' turns to avoid duplicates for user.
-          if (role === 'agent') {
-             const partnerTurn: TurnMessage = {
-               id: `partner-${Date.now()}`,
-               role: 'partner',
-               text: text,
-             };
-             copy[currentAttemptIdx] = {
-               ...copy[currentAttemptIdx],
-               turns: [...copy[currentAttemptIdx].turns, partnerTurn],
-             };
-          }
-        }
-        return copy;
-      });
-      if (role === 'agent') {
-        setPartnerState('receptive');
-      }
-    }
   });
+
+  const voiceNotice = null;
+
+  // Connect Anam avatar session on mount
+  useEffect(() => {
+    connectAvatarSession().catch((err) => {
+      console.warn('[PracticeStage] Anam session connection error:', err);
+    });
+  }, [connectAvatarSession]);
+
+  // Initial dialogue synthesis when avatar becomes ready
+  const initialSpokenRef = useRef<boolean>(false);
+  useEffect(() => {
+    if (
+      avatarSessionState === 'active' &&
+      !initialSpokenRef.current &&
+      topic.partner.initialDialogue
+    ) {
+      initialSpokenRef.current = true;
+      speakText(topic.partner.initialDialogue).catch(() => {});
+    }
+  }, [avatarSessionState, topic.partner.initialDialogue, speakText]);
 
   const activeBranch = attempts[activeAttemptIndex] || attempts[0];
   const latestPartnerTurn = [...activeBranch.turns]
     .reverse()
     .find((t) => t.role === 'partner');
-
-  const lastSpokenTurnIdRef = useRef<string | null>(null);
-
-  // Dedicated Avatar Session Manager (lifecycle state machine & single-flight guard)
-  const {
-    sessionState: avatarSessionState,
-    sessionData: avatarSessionData,
-    errorMessage: avatarSessionError,
-    retrySession: retryAvatarSession,
-    endSession: endAvatarSession,
-  } = useAvatarSessionManager({
-    scenarioId: topic.id,
-    partnerName: topic.partner.name,
-    partnerRole: topic.partner.role,
-    userGoal: topic.userGoal,
-    initialDialogue: topic.partner.initialDialogue,
-  });
-
-  const conversationUrl = avatarSessionData?.conversationUrl || null;
 
   // Cancel any audio & in-flight requests on unmount
   useEffect(() => {
@@ -209,9 +188,9 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
-      disconnect();
+      disconnectAvatarSession();
     };
-  }, [disconnect]);
+  }, [disconnectAvatarSession]);
 
   // Handle submitting a turn to API
   const handleSubmitTurn = async (e?: React.FormEvent) => {
@@ -259,16 +238,10 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
     setPartnerState('thinking');
 
     try {
-      // Send the user's text directly to the ElevenLabs Agent
-      sendText(trimmedInput);
+      // Barge-in: interrupt any current speech before processing new turn
+      interrupt();
 
-      // We no longer block on Gemini inference. The ElevenLabs Agent will
-      // process the text and respond via the LiveKit data channel (agent_response).
-      setIsLoading(false);
-
-      // We still asynchronously call Gemini to get the educational subtext and twoWayBridge
-      // This is background guidance and should not block the conversation.
-      fetch('/api/v1/conversation/turn', {
+      const res = await fetch('/api/v1/conversation/turn', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         signal: controller.signal,
@@ -304,20 +277,56 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
               }
             : undefined,
         }),
-      }).then(res => res.json()).then(data => {
-        if (requestId !== activeRequestIdRef.current || controller.signal.aborted) return;
-        
-        // Update the guidance metadata for the latest turn (which will be generated by ElevenLabs)
-        // Note: we can store this guidance in state to be displayed alongside the ElevenLabs response
-        if (data.pivot_recommendation?.suggested_wording) {
-          setEditableTakeaway(data.pivot_recommendation.suggested_wording);
-        }
-      }).catch(err => console.warn('Background guidance fetch failed', err));
+      });
+
+      if (!res.ok) {
+        throw new Error(`Partner turn processing failed (${res.status})`);
+      }
+
+      const data = await res.json();
 
       // Discard response if cancelled or user changed attempt/reset
       if (requestId !== activeRequestIdRef.current || controller.signal.aborted) {
         return;
       }
+
+      const partnerTurn: TurnMessage = {
+        id: data.turn_id || `partner-${Date.now()}`,
+        role: 'partner',
+        text: data.spoken_response,
+        subtext: data.unspoken_subtext,
+        twoWayBridge: data.two_way_bridge
+          ? {
+              userIntent: data.two_way_bridge.user_intent,
+              receivedImpact: data.two_way_bridge.received_as,
+            }
+          : undefined,
+        postureCue: data.avatar_kinematics?.posture_cue,
+      };
+
+      setAttempts((prev) => {
+        const copy = [...prev];
+        if (copy[currentAttemptIdx]) {
+          copy[currentAttemptIdx] = {
+            ...copy[currentAttemptIdx],
+            turns: [...copy[currentAttemptIdx].turns, partnerTurn],
+          };
+        }
+        return copy;
+      });
+
+      if (data.pivot_recommendation?.suggested_wording) {
+        setEditableTakeaway(data.pivot_recommendation.suggested_wording);
+      } else if (data.pocket_script_pivot?.recommended_text) {
+        setEditableTakeaway(data.pocket_script_pivot.recommended_text);
+      }
+
+      setIsLoading(false);
+
+      // Stream synthesized ElevenLabs speech into Anam audio passthrough + Web Audio
+      speakText(data.spoken_response).catch((speakErr) => {
+        console.warn('[PracticeStage] Speech synthesis error:', speakErr);
+      });
     } catch (err: unknown) {
       if (controller.signal.aborted || (err as any)?.name === 'AbortError') {
         return;
@@ -342,7 +351,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
     if (targetIndex === activeAttemptIndex) return;
 
     playCozySound('pop');
-    disconnect();
+    interrupt();
 
     activeRequestIdRef.current++;
     if (abortControllerRef.current) {
@@ -368,7 +377,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
   // Branch a non-destructive new version ("Try another version")
   const handleTryAnotherVersion = () => {
     playCozySound('branch');
-    disconnect();
+    interrupt();
 
     activeRequestIdRef.current++;
     if (abortControllerRef.current) {
@@ -461,8 +470,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
   // Finish practice session and transition automatically to report generation
   const handleFinishPractice = () => {
     playCozySound('tap');
-    disconnect();
-    endAvatarSession().catch(() => {});
+    disconnectAvatarSession();
     activeRequestIdRef.current++;
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -517,8 +525,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
   // Clean exit
   const handleExitStage = () => {
     playCozySound('tap');
-    disconnect();
-    endAvatarSession().catch(() => {});
+    disconnectAvatarSession();
     activeRequestIdRef.current++;
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -671,9 +678,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
               isMuted={isMuted}
               onToggleMute={toggleMute}
               onToggleTextMode={() => setHideAvatar(true)}
-              conversationUrl={conversationUrl || undefined}
               videoRef={videoRef}
-              audioRef={audioRef}
               sessionState={avatarSessionState}
               errorMessage={avatarSessionError}
               onRetry={retryAvatarSession}
