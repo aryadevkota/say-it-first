@@ -1,15 +1,16 @@
 /**
  * route.ts — Next.js 14 App Router Route Handler: POST /api/v1/avatar/session
  *
- * Dedicated live avatar session negotiation gateway connecting ElevenLabs
- * real-time audio orchestration with HeyGen / LiveAvatar WebRTC video streaming.
+ * Dedicated live conversational avatar session gateway connecting ElevenLabs
+ * real-time speech synthesis with Simli's Speech-to-Video WebRTC API.
  *
  * Target Architecture:
- * - Avatar concept: realistic adult practice partner named Eva.
- * - Locked Voice: "Alexandra — Conversational and Natural" (Voice ID: kdmDKE6EkgrWrrykO9Qt).
- * - Target audio format: PCM 24000 Hz (pcm_24000).
- * - Security: API credentials remain strictly server-side.
- * - Resilience: Gracefully falls back when unconfigured or in offline/local sandboxes.
+ * - Avatar: Eva, rendered via Simli WebRTC Speech-to-Video
+ * - Simli Face ID: afdb6a3e-3939-40aa-92df-01604c23101c
+ * - Audio Format: 16kHz linear PCM (pcm_16000, 16-bit, single-channel)
+ * - TTS Provider: ElevenLabs
+ * - Locked Voice: "Alexandra — Conversational and Natural" (Voice ID: kdmDKE6EkgrWrrykO9Qt)
+ * - Fail-Fast Validation: Explicit error responses when SIMLI_API_KEY is missing or fails
  */
 
 import { NextResponse } from 'next/server';
@@ -17,30 +18,40 @@ import {
   LOCKED_VOICE_ID,
   LOCKED_VOICE_NAME,
   LOCKED_MODEL_ID,
-  TARGET_AUDIO_FORMAT,
+  SIMLI_TARGET_AUDIO_FORMAT,
+  SIMLI_DEFAULT_FACE_ID,
 } from '@/domain/entities/EvaScenarioPresentation';
 
 export const runtime = 'nodejs';
 
-interface AvatarSessionResponse {
+export interface SimliSessionPayload {
+  apiKey: string;
+  faceId: string;
+  ttsProvider: 'ElevenLabs';
+  language: string;
+}
+
+export interface SimliSessionResponse {
   session_id: string;
-  status: 'ready' | 'active' | 'connecting' | 'fallback';
+  session_token?: string | null;
+  status: 'ready' | 'active';
+  face_id: string;
+  webrtc_url?: string | null;
+  ice_servers?: Array<{ urls: string | string[]; username?: string; credential?: string }>;
+  simli_endpoint?: string;
+  audio_format: 'pcm_16000';
   avatar: {
     name: 'Eva';
     voice_id: string;
+    face_id: string;
     outfit?: string;
     background?: string;
   };
-  livekit_url?: string | null;
-  room_token?: string | null;
-  room_name?: string | null;
-  audio_format: string;
-  mode: 'live' | 'fallback_local';
   voice_contract: {
     voice_id: string;
     voice_name: string;
     model_id: string;
-    sample_rate: number;
+    sample_rate: 16000;
   };
 }
 
@@ -61,126 +72,133 @@ export async function POST(request: Request): Promise<Response> {
       // Body may be empty or absent
     }
 
-    const liveAvatarKey = process.env.LIVEAVATAR_API_KEY;
-    const elevenLabsKey = process.env.ELEVENLABS_API_KEY;
+    const simliKey = process.env.SIMLI_API_KEY;
+    const faceId =
+      process.env.SIMLI_FACE_ID ||
+      body?.faceId ||
+      SIMLI_DEFAULT_FACE_ID;
 
-    const hasLiveAvatarKey = isKeyConfigured(liveAvatarKey);
-    const hasElevenLabsKey = isKeyConfigured(elevenLabsKey);
+    // Fail-fast validation: Enforce SIMLI_API_KEY
+    if (!isKeyConfigured(simliKey)) {
+      return NextResponse.json(
+        {
+          error: {
+            code: 'SIMLI_API_KEY_MISSING',
+            message:
+              'SIMLI_API_KEY is not configured in .env.local. Configure your Simli API key to enable live WebRTC avatar video.',
+            face_id: faceId,
+            tts_provider: 'ElevenLabs',
+          },
+        },
+        { status: 503 },
+      );
+    }
 
-    const fallbackResponse: AvatarSessionResponse = {
-      session_id: 'eva-session-local',
+    const cleanedSimliKey = simliKey!.trim().replace(/^["']|["']$/g, '');
+
+    // Enforce required Simli session initiation payload contract
+    const simliPayload: SimliSessionPayload = {
+      apiKey: cleanedSimliKey,
+      faceId: faceId,
+      ttsProvider: 'ElevenLabs',
+      language: 'en',
+    };
+
+    const simliEndpoint =
+      process.env.SIMLI_API_URL || 'https://api.simli.ai/startAudioToVideoSession';
+
+    const upstreamRes = await fetch(simliEndpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-simli-api-key': cleanedSimliKey,
+      },
+      signal: AbortSignal.timeout(4500),
+      body: JSON.stringify(simliPayload),
+    });
+
+    if (!upstreamRes.ok) {
+      const errText = await upstreamRes.text().catch(() => 'Unknown Simli error');
+      console.warn(`[SimliSession] Upstream returned status ${upstreamRes.status}:`, errText);
+
+      return NextResponse.json(
+        {
+          error: {
+            code: 'SIMLI_SESSION_FAILED',
+            status: upstreamRes.status,
+            message: `Simli session initiation failed with status ${upstreamRes.status}.`,
+            details: errText,
+            face_id: faceId,
+          },
+        },
+        { status: 502 },
+      );
+    }
+
+    const upstreamData = await upstreamRes.json().catch(() => ({}));
+    const sessionId =
+      upstreamData.session_id ||
+      upstreamData.sessionId ||
+      upstreamData.id ||
+      `simli-${Date.now()}`;
+
+    const sessionToken =
+      upstreamData.session_token ||
+      upstreamData.sessionToken ||
+      upstreamData.token ||
+      null;
+
+    const webrtcUrl =
+      upstreamData.webrtc_url ||
+      upstreamData.webrtcUrl ||
+      upstreamData.url ||
+      'wss://api.simli.ai/compose/webrtc/';
+
+    const defaultIceServers = [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun1.l.google.com:19302' },
+    ];
+
+    const iceServers =
+      upstreamData.ice_servers || upstreamData.iceServers || defaultIceServers;
+
+    const responsePayload: SimliSessionResponse = {
+      session_id: sessionId,
+      session_token: sessionToken,
       status: 'ready',
+      face_id: faceId,
+      webrtc_url: webrtcUrl,
+      ice_servers: iceServers,
+      simli_endpoint: simliEndpoint,
+      audio_format: SIMLI_TARGET_AUDIO_FORMAT,
       avatar: {
         name: 'Eva',
         voice_id: LOCKED_VOICE_ID,
+        face_id: faceId,
         outfit: body?.outfit || 'business-attire',
         background: body?.background || 'office',
       },
-      livekit_url: null,
-      room_token: null,
-      room_name: 'eva-local-room',
-      audio_format: TARGET_AUDIO_FORMAT,
-      mode: 'fallback_local',
       voice_contract: {
         voice_id: LOCKED_VOICE_ID,
         voice_name: LOCKED_VOICE_NAME,
         model_id: LOCKED_MODEL_ID,
-        sample_rate: 24000,
+        sample_rate: 16000,
       },
     };
 
-    // LiveAvatar real-time video streaming requires a valid LiveAvatar API key.
-    // If LiveAvatar is not configured (even if ElevenLabs is configured for audio),
-    // immediately return graceful local fallback without making an unauthenticated external call.
-    if (!hasLiveAvatarKey) {
-      return NextResponse.json(fallbackResponse, { status: 200 });
-    }
-
-    // When LiveAvatar API key is available, negotiate real-time session credentials with 3.5s timeout
-    const sessionApiUrl =
-      process.env.LIVEAVATAR_API_URL || 'https://api.liveavatar.com/v1/sessions';
-
-    try {
-      const activeKey = (liveAvatarKey || '').trim().replace(/^["']|["']$/g, '');
-      const upstreamRes = await fetch(sessionApiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Api-Key': activeKey,
-          'xi-api-key': elevenLabsKey ? elevenLabsKey.trim().replace(/^["']|["']$/g, '') : '',
-        },
-        signal: AbortSignal.timeout(3500),
-        body: JSON.stringify({
-          mode: 'LITE',
-          avatar_id: process.env.LIVEAVATAR_AVATAR_ID || 'eva',
-          elevenlabs_agent_config: {
-            agent_id: process.env.ELEVENLABS_AGENT_ID || 'eva-conversational-agent',
-            secret_id: process.env.LIVEAVATAR_SECRET_ID || 'eva-secret',
-          },
-          voice: {
-            voice_id: LOCKED_VOICE_ID,
-            model_id: LOCKED_MODEL_ID,
-          },
-          audio_format: TARGET_AUDIO_FORMAT,
-          scenario: {
-            scenario_id: body?.scenarioId,
-            outfit: body?.outfit,
-            background: body?.background,
-          },
-        }),
-      });
-
-      if (upstreamRes.ok) {
-        const upstreamData = await upstreamRes.json();
-        const liveResponse: AvatarSessionResponse = {
-          session_id: upstreamData.session_id || upstreamData.id || 'eva-live-session',
-          status: (upstreamData.status as any) || 'ready',
-          avatar: {
-            name: 'Eva',
-            voice_id: LOCKED_VOICE_ID,
-            outfit: body?.outfit || upstreamData.avatar?.outfit,
-            background: body?.background || upstreamData.avatar?.background,
-          },
-          livekit_url: upstreamData.livekit_url || upstreamData.url || null,
-          room_token: upstreamData.room_token || upstreamData.token || null,
-          room_name: upstreamData.room_name || upstreamData.roomName || 'eva-live-room',
-          audio_format: TARGET_AUDIO_FORMAT,
-          mode: 'live',
-          voice_contract: {
-            voice_id: LOCKED_VOICE_ID,
-            voice_name: LOCKED_VOICE_NAME,
-            model_id: LOCKED_MODEL_ID,
-            sample_rate: 24000,
-          },
-        };
-
-        return NextResponse.json(liveResponse, { status: 200 });
-      }
-
-      // If upstream responded with an error, log and fallback gracefully
-      console.warn(
-        `[AvatarSession] Upstream returned status ${upstreamRes.status}. Engaging graceful fallback.`,
-      );
-      return NextResponse.json(fallbackResponse, { status: 200 });
-    } catch (fetchErr) {
-      console.warn('[AvatarSession] Fetch error reaching session provider. Engaging graceful fallback:', fetchErr);
-      return NextResponse.json(fallbackResponse, { status: 200 });
-    }
+    return NextResponse.json(responsePayload, { status: 200 });
   } catch (err: unknown) {
-    // Top-level catch guarantee: never throw unhandled exception
-    console.error('[AvatarSession] Unexpected route handler error:', err);
+    const message = err instanceof Error ? err.message : 'Internal session gateway error';
+    console.error('[SimliSession] Unexpected error:', err);
+
     return NextResponse.json(
       {
-        session_id: 'eva-session-local',
-        status: 'ready',
-        avatar: {
-          name: 'Eva',
-          voice_id: LOCKED_VOICE_ID,
+        error: {
+          code: 'SIMLI_GATEWAY_ERROR',
+          message: `Simli session negotiation encountered an error: ${message}`,
         },
-        mode: 'fallback_local',
-        audio_format: TARGET_AUDIO_FORMAT,
       },
-      { status: 200 },
+      { status: 500 },
     );
   }
 }

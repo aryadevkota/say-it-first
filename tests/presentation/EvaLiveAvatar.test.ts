@@ -1,23 +1,30 @@
 /**
- * EvaLiveAvatar.test.ts — Unit & Integration Tests for Eva Live Avatar
+ * EvaLiveAvatar.test.ts — Unit & Integration Tests for Eva Live Avatar (Simli WebRTC)
  *
  * Verifies:
- * 1. Session API (/api/v1/avatar/session) returns expected structure with locked voice and graceful fallback.
- * 2. EvaLiveAvatar component renders scenario-specific outfit and background metadata.
- * 3. Speaking state activates audio lip-sync visualization.
- * 4. Accessible text mode and mute controls function as required for neurodiverse users.
+ * 1. Session API (/api/v1/avatar/session) validates SIMLI_API_KEY with fail-fast error envelopes.
+ * 2. Simli initiation payload contract matches { apiKey, faceId, ttsProvider: 'ElevenLabs', language: 'en' }.
+ * 3. 16kHz linear PCM audio contract (pcm_16000) is returned downstream to client.
+ * 4. EvaLiveAvatar component renders dedicated HTML5 <video> stream with scenario-specific outfit & background.
+ * 5. Fail-fast error boundary UI surfaces connection/handshake diagnostics without silent vector fallbacks.
+ * 6. Speaking state activates real-time lip-sync visualization.
+ * 7. Accessible interactive controls (text mode, mute toggle) function for neurodiverse users.
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { POST } from '../../src/app/api/v1/avatar/session/route';
-import { EvaLiveAvatar, type EvaLiveAvatarProps } from '../../src/presentation/components/EvaLiveAvatar';
+import {
+  EvaLiveAvatar,
+  type EvaLiveAvatarProps,
+} from '../../src/presentation/components/EvaLiveAvatar';
 import {
   LOCKED_VOICE_ID,
   LOCKED_VOICE_NAME,
   LOCKED_MODEL_ID,
-  TARGET_AUDIO_FORMAT,
+  SIMLI_TARGET_AUDIO_FORMAT,
+  SIMLI_DEFAULT_FACE_ID,
   getEvaPresentationForScenario,
   EVA_CORE_IDENTITY,
   EVA_PRESENTATION_CONFIGS,
@@ -25,7 +32,7 @@ import {
 } from '../../src/domain/entities/EvaScenarioPresentation';
 import type { ScenarioDefinition } from '../../src/domain/scenarios/topics';
 
-describe('Eva Live Avatar Integration Suite', () => {
+describe('Eva Live Avatar Integration Suite (Simli WebRTC)', () => {
   const originalEnv = process.env;
 
   beforeEach(() => {
@@ -40,9 +47,8 @@ describe('Eva Live Avatar Integration Suite', () => {
 
   // ── 1. Session API Route Handler Tests ────────────────────────────────────
   describe('Avatar Session API: POST /api/v1/avatar/session', () => {
-    it('returns graceful fallback structure when unconfigured without throwing', async () => {
-      delete process.env.LIVEAVATAR_API_KEY;
-      delete process.env.ELEVENLABS_API_KEY;
+    it('returns fail-fast 503 error when SIMLI_API_KEY is missing', async () => {
+      delete process.env.SIMLI_API_KEY;
 
       const request = new Request('http://localhost:3000/api/v1/avatar/session', {
         method: 'POST',
@@ -55,24 +61,17 @@ describe('Eva Live Avatar Integration Suite', () => {
       });
 
       const response = await POST(request);
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(503);
 
       const data = await response.json();
-      expect(data.session_id).toBe('eva-session-local');
-      expect(data.status).toBe('ready');
-      expect(data.avatar.name).toBe('Eva');
-      expect(data.avatar.voice_id).toBe(LOCKED_VOICE_ID);
-      expect(data.avatar.voice_id).toBe('kdmDKE6EkgrWrrykO9Qt');
-      expect(data.mode).toBe('fallback_local');
-      expect(data.audio_format).toBe('pcm_24000');
-      expect(data.voice_contract.voice_name).toBe('Alexandra — Conversational and Natural');
-      expect(data.voice_contract.model_id).toBe('eleven_multilingual_v2');
-      expect(data.voice_contract.sample_rate).toBe(24000);
+      expect(data.error).toBeDefined();
+      expect(data.error.code).toBe('SIMLI_API_KEY_MISSING');
+      expect(data.error.message).toContain('SIMLI_API_KEY is not configured');
+      expect(data.error.tts_provider).toBe('ElevenLabs');
     });
 
-    it('treats placeholder keys as unconfigured and falls back gracefully', async () => {
-      process.env.LIVEAVATAR_API_KEY = 'your_liveavatar_key_here';
-      process.env.ELEVENLABS_API_KEY = 'test-key';
+    it('treats placeholder keys as unconfigured and fails fast with 503', async () => {
+      process.env.SIMLI_API_KEY = 'your_simli_key_here';
 
       const request = new Request('http://localhost:3000/api/v1/avatar/session', {
         method: 'POST',
@@ -81,19 +80,15 @@ describe('Eva Live Avatar Integration Suite', () => {
       });
 
       const response = await POST(request);
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(503);
 
       const data = await response.json();
-      expect(data.session_id).toBe('eva-session-local');
-      expect(data.status).toBe('ready');
-      expect(data.avatar.name).toBe('Eva');
-      expect(data.avatar.voice_id).toBe(LOCKED_VOICE_ID);
+      expect(data.error.code).toBe('SIMLI_API_KEY_MISSING');
     });
 
-    it('requests real-time session credentials when API keys are configured', async () => {
-      process.env.LIVEAVATAR_API_KEY = 'liveavatar-valid-secret-key-123';
-      process.env.ELEVENLABS_API_KEY = 'elevenlabs-valid-key-456';
-      process.env.ELEVENLABS_AGENT_ID = 'eva-agent-xyz';
+    it('requests real-time Simli session credentials when API key is configured', async () => {
+      process.env.SIMLI_API_KEY = 'simli-test-valid-key-abcdef123456';
+      process.env.SIMLI_FACE_ID = SIMLI_DEFAULT_FACE_ID;
 
       let capturedUrl = '';
       let capturedBody: any;
@@ -106,11 +101,10 @@ describe('Eva Live Avatar Integration Suite', () => {
 
         return new Response(
           JSON.stringify({
-            session_id: 'live-eva-session-987',
-            status: 'ready',
-            room_name: 'eva-live-room-alpha',
-            livekit_url: 'wss://livekit.liveavatar.com',
-            room_token: 'jwt-access-token-livekit',
+            session_id: 'simli-live-session-789',
+            session_token: 'jwt-simli-token-abc',
+            webrtc_url: 'wss://webrtc.simli.ai/room',
+            ice_servers: [{ urls: 'stun:stun.l.google.com:19302' }],
           }),
           { status: 200, headers: { 'Content-Type': 'application/json' } },
         );
@@ -130,30 +124,36 @@ describe('Eva Live Avatar Integration Suite', () => {
       expect(response.status).toBe(200);
 
       const data = await response.json();
-      expect(data.session_id).toBe('live-eva-session-987');
+      expect(data.session_id).toBe('simli-live-session-789');
+      expect(data.session_token).toBe('jwt-simli-token-abc');
       expect(data.status).toBe('ready');
-      expect(data.room_name).toBe('eva-live-room-alpha');
-      expect(data.livekit_url).toBe('wss://livekit.liveavatar.com');
-      expect(data.room_token).toBe('jwt-access-token-livekit');
-      expect(data.mode).toBe('live');
+      expect(data.face_id).toBe(SIMLI_DEFAULT_FACE_ID);
+      expect(data.audio_format).toBe('pcm_16000');
       expect(data.avatar.name).toBe('Eva');
       expect(data.avatar.voice_id).toBe(LOCKED_VOICE_ID);
-      expect(data.audio_format).toBe(TARGET_AUDIO_FORMAT);
+      expect(data.voice_contract.voice_name).toBe(LOCKED_VOICE_NAME);
+      expect(data.voice_contract.model_id).toBe(LOCKED_MODEL_ID);
+      expect(data.voice_contract.sample_rate).toBe(16000);
 
-      // Verify payload passed to upstream LiveAvatar API
-      expect(capturedUrl).toContain('https://api.liveavatar.com/v1/sessions');
-      expect(capturedBody.mode).toBe('LITE');
-      expect(capturedBody.voice.voice_id).toBe(LOCKED_VOICE_ID);
-      expect(capturedBody.voice.model_id).toBe(LOCKED_MODEL_ID);
-      expect(capturedBody.audio_format).toBe(TARGET_AUDIO_FORMAT);
-      expect(capturedHeaders['X-Api-Key']).toBe('liveavatar-valid-secret-key-123');
+      // Verify payload passed to upstream Simli API
+      expect(capturedUrl).toContain('https://api.simli.ai/startAudioToVideoSession');
+      expect(capturedBody).toEqual({
+        apiKey: 'simli-test-valid-key-abcdef123456',
+        faceId: SIMLI_DEFAULT_FACE_ID,
+        ttsProvider: 'ElevenLabs',
+        language: 'en',
+      });
+      expect(capturedHeaders['x-simli-api-key']).toBe('simli-test-valid-key-abcdef123456');
     });
 
-    it('falls back gracefully without throwing when upstream LiveAvatar API fails', async () => {
-      process.env.LIVEAVATAR_API_KEY = 'liveavatar-valid-key';
+    it('returns fail-fast 502 error when upstream Simli API fails', async () => {
+      process.env.SIMLI_API_KEY = 'simli-test-valid-key';
 
       vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-        new Response('Service unavailable', { status: 503 }),
+        new Response(JSON.stringify({ message: 'Upstream rate limit exceeded' }), {
+          status: 429,
+          headers: { 'Content-Type': 'application/json' },
+        }),
       );
 
       const request = new Request('http://localhost:3000/api/v1/avatar/session', {
@@ -163,19 +163,18 @@ describe('Eva Live Avatar Integration Suite', () => {
       });
 
       const response = await POST(request);
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(502);
 
       const data = await response.json();
-      expect(data.session_id).toBe('eva-session-local');
-      expect(data.status).toBe('ready');
-      expect(data.avatar.name).toBe('Eva');
-      expect(data.avatar.voice_id).toBe(LOCKED_VOICE_ID);
+      expect(data.error.code).toBe('SIMLI_SESSION_FAILED');
+      expect(data.error.status).toBe(429);
+      expect(data.error.face_id).toBe(SIMLI_DEFAULT_FACE_ID);
     });
 
-    it('falls back gracefully without throwing when network exception occurs', async () => {
-      process.env.LIVEAVATAR_API_KEY = 'liveavatar-valid-key';
+    it('returns fail-fast 500 error when network exception occurs', async () => {
+      process.env.SIMLI_API_KEY = 'simli-test-valid-key';
 
-      vi.spyOn(globalThis, 'fetch').mockRejectedValue(new Error('Network failure'));
+      vi.spyOn(globalThis, 'fetch').mockRejectedValue(new Error('DNS resolution failed'));
 
       const request = new Request('http://localhost:3000/api/v1/avatar/session', {
         method: 'POST',
@@ -184,12 +183,11 @@ describe('Eva Live Avatar Integration Suite', () => {
       });
 
       const response = await POST(request);
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(500);
 
       const data = await response.json();
-      expect(data.session_id).toBe('eva-session-local');
-      expect(data.status).toBe('ready');
-      expect(data.avatar.name).toBe('Eva');
+      expect(data.error.code).toBe('SIMLI_GATEWAY_ERROR');
+      expect(data.error.message).toContain('DNS resolution failed');
     });
   });
 
@@ -256,16 +254,17 @@ describe('Eva Live Avatar Integration Suite', () => {
           partnerState: 'listening',
           isSpeakingAudio: false,
           isMuted: false,
+          initialStatus: 'connected',
         }),
       );
 
-      // WebRTC Live video container
+      // Dedicated HTML5 Simli WebRTC Live video container
       expect(html).toContain('data-testid="eva-live-video"');
       expect(html).toContain('data-testid="eva-live-avatar"');
 
-      // Live stream status pill and voice contract badge
-      expect(html).toContain('● Eva Live Avatar • Connected');
-      expect(html).toContain('● Stream Active (Alexandra Voice)');
+      // Connected live stream status pill and locked voice contract badge
+      expect(html).toContain('● Simli Live Avatar • Connected');
+      expect(html).toContain('● Alexandra Voice (16kHz PCM)');
 
       // Scenario metadata badges
       expect(html).toContain(presentation.badgeText || presentation.visualSummary);
@@ -273,9 +272,12 @@ describe('Eva Live Avatar Integration Suite', () => {
       expect(html).toContain('Professional Business Attire');
       expect(html).toContain('Office Background');
 
-      // Realistic portrait elements
-      expect(html).toContain('env-office');
-      expect(html).toContain('outfit-business');
+      // Simli 16kHz audio spec indicator
+      expect(html).toContain('Simli WebRTC • 16kHz PCM');
+
+      // Invariant: Legacy 2D SVG canvas or procedural rigs must NOT exist
+      expect(html).not.toContain('<svg class="avatar-svg-rig"');
+      expect(html).not.toContain('avatar-3d-rig');
     });
 
     it('renders scenario-specific outfit and background metadata for coffee shop archetype', () => {
@@ -287,38 +289,78 @@ describe('Eva Live Avatar Integration Suite', () => {
           partnerState: 'listening',
           isSpeakingAudio: false,
           isMuted: false,
+          initialStatus: 'connected',
         }),
       );
 
       expect(html).toContain('Eva • Turtleneck • Coffee Shop');
       expect(html).toContain('Turtleneck');
       expect(html).toContain('Coffee Shop');
-      expect(html).toContain('env-coffee-shop');
-      expect(html).toContain('outfit-turtleneck');
-    });
-
-    it('renders realistic kinematics with natural breathing and locked voice indicators', () => {
-      const presentation = getEvaPresentationForScenario(mockInterviewScenario);
-
-      const html = renderToString(
-        React.createElement(EvaLiveAvatar, {
-          presentation,
-          partnerState: 'listening',
-          isSpeakingAudio: false,
-          isMuted: false,
-        }),
-      );
-
-      // Natural breathing rhythm keyframe animation
-      expect(html).toContain('evaBreathingRhythm');
-
-      // Voice indicator specifies PCM 24000 Hz and WebRTC
-      expect(html).toContain('PCM 24000 Hz');
-      expect(html).toContain('LiveKit WebRTC');
+      expect(html).toContain('● Alexandra Voice (16kHz PCM)');
     });
   });
 
-  // ── 3. Speaking State & Audio Lip-Sync Visualization Tests ─────────────────
+  // ── 3. Fail-Fast Diagnostic Error Boundary Tests ──────────────────────────
+  describe('Fail-Fast Diagnostic Error Boundary', () => {
+    const interviewPresentation = getEvaPresentationForScenario({
+      id: 'test-scenario',
+      category: 'work-school',
+      categoryLabel: 'Work',
+      title: 'Test',
+      subtitle: 'Test',
+      userGoal: 'Test',
+      estimatedMinutes: 5,
+      status: 'ready',
+      accentColor: 'apricot',
+      learning: {
+        coreInsight: 'Insight',
+        doubleEmpathyPerspective: { yourNeed: 'A', theirPerspective: 'B' },
+        practicalApproaches: [],
+        examplePhrases: { gentle: 'G', direct: 'D' },
+      },
+      partner: {
+        name: 'Eva',
+        role: 'Partner',
+        avatarVariant: 'eva',
+        defaultTone: 'Tone',
+        initialDialogue: 'Hi',
+      },
+      defaultTakeawayScript: 'Takeaway',
+    });
+
+    it('renders diagnostic error UI when Simli connection fails without silent vector fallback', () => {
+      const html = renderToString(
+        React.createElement(EvaLiveAvatar, {
+          presentation: interviewPresentation,
+          partnerState: 'listening',
+          isSpeakingAudio: false,
+          isMuted: false,
+          initialStatus: 'error',
+          initialError: {
+            code: 'WEBRTC_CONNECTION_DROPPED',
+            message: 'WebRTC peer connection to Simli video streaming servers was lost.',
+          },
+        }),
+      );
+
+      // Must render diagnostic error boundary with role alert
+      expect(html).toContain('data-testid="simli-error-boundary"');
+      expect(html).toContain('WEBRTC_CONNECTION_DROPPED');
+      expect(html).toContain('Simli Avatar Video Stream Disconnected');
+      expect(html).toContain(
+        'WebRTC peer connection to Simli video streaming servers was lost.',
+      );
+      expect(html).toContain('🔄 Retry Connection');
+
+      // Status pill reflects error
+      expect(html).toContain('Simli Stream Error');
+
+      // Invariant: No fallback to 2D vector graphic
+      expect(html).not.toContain('<svg class="avatar-svg-rig"');
+    });
+  });
+
+  // ── 4. Speaking State & Audio Lip-Sync Visualization Tests ─────────────────
   describe('Speaking State & Audio Lip-Sync Visualization', () => {
     const interviewPresentation = getEvaPresentationForScenario({
       id: 'test-scenario',
@@ -353,6 +395,7 @@ describe('Eva Live Avatar Integration Suite', () => {
           partnerState: 'speaking',
           isSpeakingAudio: true,
           isMuted: false,
+          initialStatus: 'connected',
         }),
       );
 
@@ -363,7 +406,7 @@ describe('Eva Live Avatar Integration Suite', () => {
       expect(html).toContain('opacity-100');
       expect(html).toContain('Audio Lip-Sync Visualization Active');
       expect(html).toContain('data-testid="partner-state-speaking"');
-      expect(html).toContain('vocal-waves');
+      expect(html).toContain('Speaking');
     });
 
     it('keeps audio lip-sync visualization in idle state when isSpeakingAudio is false', () => {
@@ -373,6 +416,7 @@ describe('Eva Live Avatar Integration Suite', () => {
           partnerState: 'listening',
           isSpeakingAudio: false,
           isMuted: false,
+          initialStatus: 'connected',
         }),
       );
 
@@ -381,7 +425,7 @@ describe('Eva Live Avatar Integration Suite', () => {
       expect(html).toContain('opacity-40');
       expect(html).toContain('Audio Lip-Sync Idle');
       expect(html).toContain('data-testid="partner-state-listening"');
-      expect(html).not.toContain('vocal-waves');
+      expect(html).toContain('Listening');
     });
 
     it('displays thinking / reflecting state when partnerState is thinking', () => {
@@ -391,15 +435,16 @@ describe('Eva Live Avatar Integration Suite', () => {
           partnerState: 'thinking',
           isSpeakingAudio: false,
           isMuted: false,
+          initialStatus: 'connected',
         }),
       );
 
       expect(html).toContain('data-testid="partner-state-thinking"');
-      expect(html).toContain('Thinking...');
+      expect(html).toContain('Reflecting…');
     });
   });
 
-  // ── 4. Accessible Controls for Neurodiverse Users ─────────────────────────
+  // ── 5. Accessible Controls for Neurodiverse Users ─────────────────────────
   describe('Accessible Interactive Controls', () => {
     const presentation = getEvaPresentationForScenario({
       id: 'accessibility-test',
@@ -435,6 +480,7 @@ describe('Eva Live Avatar Integration Suite', () => {
         partnerState: 'listening',
         isSpeakingAudio: false,
         isMuted: false,
+        initialStatus: 'connected',
         onToggleTextMode: mockToggleTextMode,
       };
 
@@ -458,6 +504,7 @@ describe('Eva Live Avatar Integration Suite', () => {
           partnerState: 'listening',
           isSpeakingAudio: false,
           isMuted: false,
+          initialStatus: 'connected',
           onToggleMute: mockToggleMute,
         }),
       );
@@ -473,6 +520,7 @@ describe('Eva Live Avatar Integration Suite', () => {
           partnerState: 'listening',
           isSpeakingAudio: false,
           isMuted: true,
+          initialStatus: 'connected',
           onToggleMute: mockToggleMute,
         }),
       );
@@ -493,6 +541,7 @@ describe('Eva Live Avatar Integration Suite', () => {
           partnerState: 'listening',
           isSpeakingAudio: false,
           isMuted: false,
+          initialStatus: 'connected',
         }),
       );
 

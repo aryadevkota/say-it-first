@@ -82,16 +82,21 @@ export async function POST(request: Request) {
     const modelId =
       process.env.ELEVENLABS_MODEL_ID || body?.modelId || DEFAULT_ELEVENLABS_MODEL;
 
+    const requestedFormat = body?.format || 'audio/mpeg';
+    const isPcm16k = requestedFormat === 'pcm_16000' || requestedFormat === 'pcm';
+    const outputFormatQuery = isPcm16k ? '?output_format=pcm_16000' : '';
+    const acceptHeader = isPcm16k ? 'audio/pcm' : 'audio/mpeg';
+
     const elevenEndpoint = `https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(
       voiceId,
-    )}`;
+    )}${outputFormatQuery}`;
 
     const response = await fetch(elevenEndpoint, {
       method: 'POST',
       headers: {
         'xi-api-key': apiKey,
         'Content-Type': 'application/json',
-        Accept: 'audio/mpeg',
+        Accept: acceptHeader,
       },
       body: JSON.stringify({
         text: cleanedText,
@@ -124,7 +129,8 @@ export async function POST(request: Request) {
     return new Response(response.body, {
       status: 200,
       headers: {
-        'Content-Type': 'audio/mpeg',
+        'Content-Type': isPcm16k ? 'audio/pcm; rate=16000' : 'audio/mpeg',
+        'X-Audio-Format': isPcm16k ? 'pcm_16000' : 'audio/mpeg',
         'Cache-Control': 'no-store, no-cache',
       },
     });

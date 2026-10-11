@@ -197,12 +197,12 @@ Configure your environment variables:
 | :--- | :---: | :--- |
 | `GEMINI_API_KEY` | **Yes** | Powers generative dialogue and intent translation ([Google AI Studio](https://aistudio.google.com/app/apikey)). |
 | `ELEVENLABS_API_KEY` | Optional | Powers natural conversational voice synthesis for Eva with the locked **Alexandra** voice (`kdmDKE6EkgrWrrykO9Qt`, `eleven_multilingual_v2`) and sub-second pipelined streaming ([ElevenLabs](https://elevenlabs.io)). |
-| `LIVEAVATAR_API_KEY` | Optional | Powers real-time WebRTC live video streaming for the ElevenLabs Live Avatar architecture ([LiveAvatar / HeyGen](https://liveavatar.com)). |
+| `SIMLI_API_KEY` | Optional | Powers real-time WebRTC live video streaming via Simli's Speech-to-Video API ([Simli](https://simli.com)). |
+| `SIMLI_FACE_ID` | Optional | Simli Face ID identifier (defaults to `afdb6a3e-3939-40aa-92df-01604c23101c`). |
 
-> **Note on Live Avatar Modes:**
-> - **With `LIVEAVATAR_API_KEY` + `ELEVENLABS_API_KEY`**: Full WebRTC video stream rendered via LiveAvatar.
-> - **With `ELEVENLABS_API_KEY` only**: Real-time ElevenLabs Alexandra voice audio + local Eva presentation engine (scenario-adaptive wardrobe & environment, audio lip-sync visualization).
-> - **Without keys**: Fully functional offline/local sandbox with simulated conversation responses and accessible controls.
+> **Note on Live Video Avatar Pipeline:**
+> - **With `SIMLI_API_KEY`**: Initiates a low-latency WebRTC video stream directly from Simli's Speech-to-Video servers, rendering the live animated avatar on an HTML5 `<video>` element with 16kHz linear PCM audio viseme synchronization.
+> - **Fail-Fast Diagnostics**: If `SIMLI_API_KEY` is not configured or connection drops, an explicit diagnostic error banner is surfaced with actionable troubleshooting details.
 
 ### 4. Run Development Server
 ```bash

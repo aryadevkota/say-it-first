@@ -82,7 +82,9 @@ export const EVA_CORE_IDENTITY: EvaIdentityConsistency = Object.freeze({
 export const LOCKED_VOICE_ID = 'kdmDKE6EkgrWrrykO9Qt';
 export const LOCKED_VOICE_NAME = 'Alexandra — Conversational and Natural';
 export const LOCKED_MODEL_ID = 'eleven_multilingual_v2';
-export const TARGET_AUDIO_FORMAT = 'pcm_24000';
+export const TARGET_AUDIO_FORMAT = 'pcm_16000';
+export const SIMLI_TARGET_AUDIO_FORMAT = 'pcm_16000';
+export const SIMLI_DEFAULT_FACE_ID = 'afdb6a3e-3939-40aa-92df-01604c23101c';
 
 export type PresentationArchetype =
   | 'interview-professional'
