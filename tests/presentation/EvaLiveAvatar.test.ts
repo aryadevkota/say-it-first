@@ -188,6 +188,27 @@ describe('Eva Live Avatar Integration Suite (Simli WebRTC)', () => {
       expect(data.error.code).toBe('SIMLI_GATEWAY_ERROR');
       expect(data.error.message).toContain('DNS resolution failed');
     });
+
+    it('returns fail-fast 504 error when upstream Simli API times out', async () => {
+      process.env.SIMLI_API_KEY = 'simli-test-valid-key';
+
+      const timeoutError = new Error('The operation was aborted due to timeout');
+      timeoutError.name = 'TimeoutError';
+      vi.spyOn(globalThis, 'fetch').mockRejectedValue(timeoutError);
+
+      const request = new Request('http://localhost:3000/api/v1/avatar/session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      });
+
+      const response = await POST(request);
+      expect(response.status).toBe(504);
+
+      const data = await response.json();
+      expect(data.error.code).toBe('SIMLI_SESSION_TIMEOUT');
+      expect(data.error.message).toContain('timed out');
+    });
   });
 
   // ── 2. Component Scenario-Specific Rendering Tests ────────────────────────

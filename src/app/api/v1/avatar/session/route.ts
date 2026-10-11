@@ -107,15 +107,44 @@ export async function POST(request: Request): Promise<Response> {
     const simliEndpoint =
       process.env.SIMLI_API_URL || 'https://api.simli.ai/startAudioToVideoSession';
 
-    const upstreamRes = await fetch(simliEndpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-simli-api-key': cleanedSimliKey,
-      },
-      signal: AbortSignal.timeout(4500),
-      body: JSON.stringify(simliPayload),
-    });
+    const simliTimeoutMs =
+      Number(process.env.SIMLI_TIMEOUT_MS) > 0
+        ? Number(process.env.SIMLI_TIMEOUT_MS)
+        : 15000;
+
+    let upstreamRes: Response;
+    try {
+      upstreamRes = await fetch(simliEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-simli-api-key': cleanedSimliKey,
+        },
+        signal: AbortSignal.timeout(simliTimeoutMs),
+        body: JSON.stringify(simliPayload),
+      });
+    } catch (fetchErr: unknown) {
+      const isTimeout =
+        fetchErr instanceof Error &&
+        (fetchErr.name === 'TimeoutError' ||
+          fetchErr.message.toLowerCase().includes('timeout') ||
+          fetchErr.message.toLowerCase().includes('aborted due to timeout'));
+
+      if (isTimeout) {
+        console.warn(`[SimliSession] Upstream request timed out after ${simliTimeoutMs}ms`);
+        return NextResponse.json(
+          {
+            error: {
+              code: 'SIMLI_SESSION_TIMEOUT',
+              message: `Simli session initiation timed out after ${simliTimeoutMs}ms. Upstream avatar service took too long to respond.`,
+              face_id: faceId,
+            },
+          },
+          { status: 504 },
+        );
+      }
+      throw fetchErr;
+    }
 
     if (!upstreamRes.ok) {
       const errText = await upstreamRes.text().catch(() => 'Unknown Simli error');
@@ -160,29 +189,10 @@ export async function POST(request: Request): Promise<Response> {
       { urls: 'stun:stun1.l.google.com:19302' },
     ];
 
-    let iceServers = upstreamData.ice_servers || upstreamData.iceServers;
-    if (!iceServers || iceServers.length === 0) {
-      try {
-        const iceRes = await fetch('https://api.simli.ai/compose/ice', {
-          headers: {
-            'Content-Type': 'application/json',
-            'x-simli-api-key': cleanedSimliKey,
-          },
-          signal: AbortSignal.timeout(2500),
-        });
-        if (iceRes.ok) {
-          const remoteIce = await iceRes.json().catch(() => null);
-          if (Array.isArray(remoteIce) && remoteIce.length > 0) {
-            iceServers = remoteIce;
-          }
-        }
-      } catch {
-        // Fall back to default STUN
-      }
-    }
-    if (!iceServers || iceServers.length === 0) {
-      iceServers = defaultIceServers;
-    }
+    const iceServers =
+      upstreamData.ice_servers ||
+      upstreamData.iceServers ||
+      defaultIceServers;
 
     const responsePayload: SimliSessionResponse = {
       session_id: sessionId,
