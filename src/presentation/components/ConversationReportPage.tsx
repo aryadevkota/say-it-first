@@ -187,7 +187,7 @@ export const ConversationReportPage: React.FC<ConversationReportPageProps> = ({
                 className="p-4 rounded-2xl bg-canvas-subtle border border-canvas-borderSubtle space-y-1.5"
               >
                 <div className="flex items-center gap-2">
-                  <span className="text-sif-primary font-semibold text-sm">✦</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-sif-primary flex-shrink-0"></span>
                   <h3 className="text-xs sm:text-sm font-semibold text-ink-primary">
                     {habitItem.habit}
                   </h3>

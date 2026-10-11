@@ -187,25 +187,24 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
               }}
               className="flex items-center gap-3 text-left group"
             >
-              <div className="w-10 h-10 rounded-2xl overflow-hidden bg-white/90 p-1 border border-sif-border shadow-glass-card group-hover:scale-105 group-hover:shadow-glass-glow transition-all flex items-center justify-center shrink-0">
+              <div className="relative w-11 h-9 flex items-center justify-center shrink-0">
                 <img
-                  src="/logo.png"
+                  src="/logo-mark.png"
                   alt="Say It First"
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-contain filter drop-shadow-xs group-hover:scale-105 transition-transform"
                   onError={(e) => {
+                    // Fallback to text logo if image fails
                     (e.target as HTMLElement).style.display = 'none';
                   }}
                 />
               </div>
 
-              <div>
-                <div className="flex items-center gap-1.5">
-                  <span className="font-display font-bold text-lg text-ink-primary tracking-tight leading-none group-hover:text-sif-primary transition-colors">
-                    Say It First
-                  </span>
-                </div>
-                <span className="text-[11px] text-ink-muted tracking-wide font-medium block mt-0.5">
-                  Conversational Learning
+              <div className="flex flex-col">
+                <span className="font-display font-bold text-lg text-ink-primary tracking-tight leading-none group-hover:text-sif-primary transition-colors">
+                  Say It First
+                </span>
+                <span className="text-[11px] text-ink-muted tracking-wide font-medium block mt-1">
+                  Conversational Practice
                 </span>
               </div>
             </button>

@@ -81,8 +81,10 @@ export const ReportGenerationView: React.FC<ReportGenerationViewProps> = ({
       <div className="max-w-md w-full bg-white/90 backdrop-blur-md border border-sif-border rounded-3xl p-8 sm:p-10 shadow-glass-elevated text-center space-y-8">
         {/* Calming icon & header */}
         <div className="space-y-3">
-          <div className="w-16 h-16 rounded-2xl bg-sif-primarySubtle text-sif-primary mx-auto flex items-center justify-center text-2xl shadow-2xs relative">
-            <span className="animate-pulse">✨</span>
+          <div className="w-16 h-16 rounded-2xl bg-sif-primarySubtle text-sif-primary mx-auto flex items-center justify-center shadow-2xs relative">
+            <svg className="w-8 h-8 text-sif-primary animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
             <div className="absolute -inset-1 rounded-2xl border border-sif-border/40 animate-ping opacity-25" />
           </div>
 

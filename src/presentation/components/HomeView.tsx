@@ -141,7 +141,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
         <div className="w-full md:w-72 p-5 rounded-2xl bg-white/80 backdrop-blur-md border border-sif-border shadow-glass-card text-xs space-y-3 shrink-0 relative z-10">
           <div className="flex items-center justify-between">
             <span className="font-semibold text-ink-primary">Current Coaching Focus</span>
-            <span className="text-sif-primary font-bold text-sm">✦</span>
+            <span className="w-2 h-2 rounded-full bg-sif-primary shadow-xs" />
           </div>
           <p className="text-ink-secondary leading-relaxed">
             "Acknowledge the other person’s tone or context before asserting your preference."
@@ -179,7 +179,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
       <ScenarioRail
         title="Recommended Next Practice"
         subtitle="Tailored to your selected conversational comfort areas."
-        icon="⭐"
+        icon="🎯"
         scenarios={recommendedScenarios}
         savedMap={savedMap}
         progressMap={progressMap}

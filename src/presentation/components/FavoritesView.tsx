@@ -65,8 +65,10 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
       {/* Grid of Saved Scenario Cards */}
       {savedScenarios.length === 0 ? (
         <div className="p-10 sm:p-14 rounded-3xl bg-white/80 backdrop-blur-md border border-canvas-border shadow-glass-card text-center space-y-4">
-          <div className="w-14 h-14 rounded-2xl bg-sif-primarySubtle text-sif-primary border border-sif-border flex items-center justify-center mx-auto text-2xl shadow-glass-card">
-            ★
+          <div className="w-14 h-14 rounded-2xl bg-sif-primarySubtle text-sif-primary border border-sif-border flex items-center justify-center mx-auto shadow-glass-card">
+            <svg className="w-7 h-7 text-sif-primary" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+            </svg>
           </div>
           <div>
             <h2 className="text-lg font-semibold text-ink-primary">No saved scenarios yet</h2>

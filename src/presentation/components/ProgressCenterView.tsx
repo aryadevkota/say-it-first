@@ -175,19 +175,28 @@ export const ProgressCenterView: React.FC<ProgressCenterViewProps> = ({
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="p-5 rounded-2xl bg-canvas-surface border border-canvas-border space-y-1.5 text-xs">
-            <span className="text-teal-brand font-bold text-sm block">✦ Acknowledge First</span>
+            <span className="text-sif-primary font-bold text-sm flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-sif-primary"></span>
+              Acknowledge First
+            </span>
             <p className="text-ink-secondary leading-relaxed">
               Mirror one detail or feeling word before moving to a new point to confirm you heard them.
             </p>
           </div>
           <div className="p-5 rounded-2xl bg-canvas-surface border border-canvas-border space-y-1.5 text-xs">
-            <span className="text-teal-brand font-bold text-sm block">✦ Tentative Phrasing</span>
+            <span className="text-sif-primary font-bold text-sm flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-sif-primary"></span>
+              Tentative Phrasing
+            </span>
             <p className="text-ink-secondary leading-relaxed">
               Use "I would prefer" or "Could we try" when asserting sensory or personal boundaries.
             </p>
           </div>
           <div className="p-5 rounded-2xl bg-canvas-surface border border-canvas-border space-y-1.5 text-xs">
-            <span className="text-teal-brand font-bold text-sm block">✦ Conversational Ping-Pong</span>
+            <span className="text-sif-primary font-bold text-sm flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-sif-primary"></span>
+              Conversational Ping-Pong
+            </span>
             <p className="text-ink-secondary leading-relaxed">
               Ask a short return question ("How about yours?") to share the speaking load equally.
             </p>

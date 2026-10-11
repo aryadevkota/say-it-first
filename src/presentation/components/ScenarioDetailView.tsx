@@ -79,7 +79,10 @@ export const ScenarioDetailView: React.FC<ScenarioDetailViewProps> = ({
                   : 'bg-white/80 border-canvas-border text-ink-secondary hover:bg-white'
               }`}
             >
-              <span>{isSaved ? '★ Saved to Favorites' : '☆ Save Scenario'}</span>
+              <svg className={`w-3.5 h-3.5 ${isSaved ? 'text-sif-primary fill-current' : 'text-ink-secondary fill-none'}`} stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+              </svg>
+              <span>{isSaved ? 'Saved to Favorites' : 'Save Scenario'}</span>
             </button>
           )}
 
