@@ -132,6 +132,11 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
 
+  const activeAttemptIndexRef = useRef<number>(activeAttemptIndex);
+  useEffect(() => {
+    activeAttemptIndexRef.current = activeAttemptIndex;
+  }, [activeAttemptIndex]);
+
   // ElevenLabs Voice Hook
   const {
     isPlaying: isSpeakingAudio,
@@ -149,7 +154,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
     onTranscription: (role, text) => {
       setAttempts((prev) => {
         const copy = [...prev];
-        const currentAttemptIdx = activeAttemptIndex;
+        const currentAttemptIdx = activeAttemptIndexRef.current;
         if (copy[currentAttemptIdx]) {
           // If the role is 'user', the user's turn was already appended optimistically in handleSubmitTurn
           // So we only append 'agent' turns to avoid duplicates for user.

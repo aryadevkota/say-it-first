@@ -115,6 +115,7 @@ export const AppShell: React.FC<AppShellProps> = ({
   if (activeCallScenario) {
     return (
       <PracticeStage
+        key={activeCallScenario.id}
         topic={activeCallScenario}
         preferences={preferences}
         onExit={handleExitPractice}

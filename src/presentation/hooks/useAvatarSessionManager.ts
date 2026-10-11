@@ -30,6 +30,7 @@ export interface AvatarSessionData {
   conversationUrl?: string;
   sessionToken?: string;
   wsUrl?: string;
+  scenarioId?: string;
 }
 
 export interface UseAvatarSessionManagerOptions {
@@ -50,6 +51,11 @@ interface GlobalClientSession {
 
 let globalClientActiveSession: GlobalClientSession | null = null;
 let globalClientInFlightPromise: Promise<AvatarSessionData> | null = null;
+
+export function resetGlobalClientSessionForTesting() {
+  globalClientActiveSession = null;
+  globalClientInFlightPromise = null;
+}
 
 export function useAvatarSessionManager({
   scenarioId,
@@ -134,12 +140,13 @@ export function useAvatarSessionManager({
       onLiveKitConnect: currentOnLiveKitConnect,
     } = optionsRef.current;
 
-    // 1. If we already have an active session for this scenario in state, reuse it
-    if (!forced && sessionDataRef.current && sessionStateRef.current === 'active') {
+    // 1. If we already have an active session for THIS scenario in state, reuse it
+    if (!forced && sessionDataRef.current && sessionDataRef.current.scenarioId === currentScenarioId && sessionStateRef.current === 'active') {
+      console.log('[AvatarSessionManager] Reusing component-active session for scenario:', currentScenarioId);
       return sessionDataRef.current;
     }
 
-    // 2. Check if a global reusable session exists (handles Strict Mode remount)
+    // 2. Check if a global reusable session exists for this scenario (handles Strict Mode remount)
     if (!forced && globalClientActiveSession && globalClientActiveSession.scenarioId === currentScenarioId) {
       const ageMs = Date.now() - globalClientActiveSession.createdAt;
       if (ageMs < 10 * 60 * 1000) {
@@ -213,6 +220,7 @@ export function useAvatarSessionManager({
         conversationUrl: raw.conversation_url,
         sessionToken: raw.session_token,
         wsUrl: raw.ws_url,
+        scenarioId: currentScenarioId,
       };
 
       // Store in client-wide cache
@@ -291,7 +299,16 @@ export function useAvatarSessionManager({
     isMountedRef.current = true;
 
     if (bootstrappedScenarioIdRef.current !== scenarioId) {
+      const prevScenarioId = bootstrappedScenarioIdRef.current;
       bootstrappedScenarioIdRef.current = scenarioId;
+
+      if (prevScenarioId !== null) {
+        // Scenario changed within the same mounted hook instance: reset state
+        console.log(`[AvatarSessionManager] Transitioning scenario: ${prevScenarioId} -> ${scenarioId}`);
+        setSessionData(null);
+        setSessionState('idle');
+      }
+
       initiateSession().catch(() => {});
     }
 
