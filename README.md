@@ -1,6 +1,8 @@
 <div align="center">
 
-# Say It First <img src="https://media.giphy.com/media/mGcNjsfWAjY5AEZNw6/giphy.gif" width="38" alt="wave" />
+<img src="public/say-it-first-logo.png" alt="Say It First Logo" width="180" style="border-radius: 36px; margin-bottom: 12px; box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.25);" />
+
+# Say It First
 
 ### *A Neurodiversity-Affirming Conversational Sandbox Powered by Affective Computing & Bilateral Subtext Translation*
 
@@ -12,7 +14,7 @@
 [![Anam AI WebRTC](https://img.shields.io/badge/Anam_AI-WebRTC_Avatar-6366F1?style=for-the-badge)](https://anam.ai/)
 [![ElevenLabs](https://img.shields.io/badge/ElevenLabs-Conversational_AI-F59E0B?style=for-the-badge)](https://elevenlabs.io/)
 [![Gemini 1.5](https://img.shields.io/badge/Gemini_1.5-Flash_JSON-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
-[![Vitest](https://img.shields.io/badge/Vitest-202_Passed-6E9F18?style=for-the-badge&logo=vitest&logoColor=white)](https://vitest.dev/)
+[![Vitest](https://img.shields.io/badge/Vitest-221_Passed-6E9F18?style=for-the-badge&logo=vitest&logoColor=white)](https://vitest.dev/)
 [![Accessibility](https://img.shields.io/badge/WCAG-2.1_AAA-10B981?style=for-the-badge)](https://www.w3.org/WAI/standards-guidelines/wcag/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
 
@@ -38,13 +40,14 @@ For millions of autistic and neurodivergent individuals, high-stakes conversatio
 ```typescript
 const sayItFirst = {
   mission: "Bilateral subtext translation without forced masking",
-  liveAvatar: "Anam Real-Time WebRTC Video Stream with ElevenLabs Native Lip-Sync",
+  liveAvatar: "Anam Cara 4 Real-Time WebRTC Video Stream with ElevenLabs Server-Side Native Voice",
   coreMathematics: "Mehrabian-Russell 3D VAD Vector Space [-1.0, 1.0]³",
   audioDSP: "Browser-native 44.1kHz AnalyserNode Autocorrelation F0/RMS (0 kbps cloud upload)",
+  turnTaking: "Pre-stream echo protection, streaming delta accumulation, and barge-in immunity",
   safetyProtocol: "Autonomous 3-Tier Tension Index with 4-count visual box breathing reset",
   reasoningCore: "Gemini 1.5 Flash structured JSON inference (p95 < 1400ms)",
   privacy: "100% Zero-Retention ephemeral in-memory DAG session graph",
-  unitTesting: "202 unit & integration tests passing across 31 test suites"
+  unitTesting: "221 unit & integration tests passing across 32 test suites"
 };
 ```
 
@@ -55,11 +58,11 @@ const sayItFirst = {
 <table>
   <tr>
     <td width="50%">
-      <h3>🎭 Sophia Live Avatar (Anam + ElevenLabs)</h3>
+      <h3>🎭 Sophia Live Avatar (Anam Cara 4 + ElevenLabs)</h3>
       <p>Photorealistic real-time video conversational partner streaming over ultra-low latency WebRTC via <b>Anam AI</b>, synchronized directly to <b>ElevenLabs Conversational AI Agent</b> voice audio for natural speech and perfect lip-sync.</p>
       <ul>
-        <li><b>Scenario-Adaptive Persona:</b> Outfits, environment backdrops, and roles dynamically adapt per scenario (Office, Casual Coffee, Studio, etc.).</li>
-        <li><b>Single Audio Pipeline:</b> Synchronized WebRTC media stream to HTML5 <code>&lt;video&gt;</code> with zero duplicate audio and zero PCM noise.</li>
+        <li><b>Scenario-Grounded Openers:</b> Dynamically initializes sessions directly in character with zero generic greeting fallbacks.</li>
+        <li><b>Single Lip-Synced Media Stream:</b> Synchronized WebRTC media stream to HTML5 <code>&lt;video&gt;</code> with zero duplicate audio, zero PCM playback artifacts, and server-side signed token exchange.</li>
         <li><b>Dynamic Status Badges:</b> Non-verbal indicators show partner state (<i>Speaking</i>, <i>Listening</i>, <i>Reflecting</i>).</li>
       </ul>
     </td>
@@ -126,6 +129,7 @@ Say It First is structured into **three distinct user interaction layers** manag
 │  ├── WebRTC Video Stream (<video id="anam-avatar-video">)              │
 │  ├── Live Dialogue Captions & Turn History                             │
 │  ├── Response Dock (Natural typing + Web Audio voice input)            │
+│  ├── Turn Pipeline (Delta accumulation, mic pre-mute, speech sync)     │
 │  ├── Guidance Drawer (Independent / Cues / Subtext)                    │
 │  ├── Calm Pause Modal & Co-Regulation Reset                            │
 │  └── Post-Session Comprehensive Conversation Report                    │
@@ -207,7 +211,7 @@ src/
 └── presentation/                         # User Interface, Hooks & API Controllers
     ├── api/routes/conversation.ts        # Turn Controller (POST /api/v1/conversation/turn)
     ├── hooks/
-    │   ├── useAnamAvatarSession.ts       # Stable Anam WebRTC session lifecycle hook
+    │   ├── useAnamAvatarSession.ts       # Stable Anam WebRTC session lifecycle & stream hook
     │   ├── useTimelineBranching.ts       # React state interface for DAG timeline
     │   ├── useWebAudioProsody.ts         # Browser microphone capture & local DSP hook
     │   └── usePartnerVoice.ts            # Voice synthesis playback coordinator
@@ -269,7 +273,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 🧪 Verification Benchmarks & Testing
 
-### Full Vitest Suite (202 / 202 Passing across 31 Test Suites)
+### Full Vitest Suite (221 / 221 Passing across 32 Test Suites)
 ```bash
 npm test
 ```
@@ -279,7 +283,7 @@ npm test
  ✓ tests/domain/ConversationNode.test.ts (4 tests)
  ✓ tests/domain/ConversationTimelineGraph.test.ts (3 tests)
  ✓ tests/domain/ProsodyMetrics.test.ts (4 tests)
- ✓ tests/domain/ReportGeneratorService.test.ts (3 tests)
+ ✓ tests/domain/ReportGeneratorService.test.ts (7 tests)
  ✓ tests/domain/ScaffoldingLevel.test.ts (4 tests)
  ✓ tests/domain/ScenarioGenerator.test.ts (4 tests)
  ✓ tests/domain/SophiaScenarioPresentation.test.ts (13 tests)
@@ -293,21 +297,22 @@ npm test
  ✓ tests/infrastructure/GeminiStructuredAdapter.test.ts (8 tests)
  ✓ tests/infrastructure/InMemorySessionRepo.test.ts (2 tests)
  ✓ tests/infrastructure/PromptTemplates.test.ts (2 tests)
- ✓ tests/presentation/AnamSessionRoute.test.ts (7 tests)
- ✓ tests/presentation/ConversationReport.test.ts (3 tests)
+ ✓ tests/presentation/AnamSessionRoute.test.ts (8 tests)
+ ✓ tests/presentation/ConversationReport.test.ts (4 tests)
  ✓ tests/presentation/LatencyReduction.test.ts (13 tests)
- ✓ tests/presentation/SophiaLiveAvatar.test.ts (10 tests)
+ ✓ tests/presentation/PracticeStagePrompt.test.ts (2 tests)
+ ✓ tests/presentation/SophiaLiveAvatar.test.ts (11 tests)
  ✓ tests/presentation/VoiceContractPreservation.test.ts (10 tests)
  ✓ tests/presentation/conversationRoute.test.ts (3 tests)
- ✓ tests/presentation/useAnamAvatarSession.test.ts (5 tests)
+ ✓ tests/presentation/useAnamAvatarSession.test.ts (15 tests)
  ✓ tests/presentation/useTimelineBranching.test.ts (2 tests)
  ✓ tests/presentation/useWebAudioProsody.test.ts (2 tests)
  ✓ tests/presentation/components/CoRegulationModal.test.ts (2 tests)
  ✓ tests/presentation/components/PostSessionDebrief.test.ts (1 test)
  ✓ tests/presentation/components/SubtextHud.test.ts (3 tests)
 
- Test Files  31 passed (31)
-      Tests  202 passed (202)
+ Test Files  32 passed (32)
+      Tests  221 passed (221)
 ```
 
 ### Production Build Verification
@@ -326,6 +331,7 @@ npm run build
 ## 🔒 Security, Privacy & Accessibility Guarantees
 
 - **0 kbps Cloud Audio Uploads for DSP**: Acoustic prosody (WPM, RMS volume, F0 pitch autocorrelation) is computed purely in the browser via Web Audio API. Raw microphone audio never leaves your device for feature analysis.
+- **Pre-Stream Microphone Echo Protection**: Input audio starts pre-muted during session establishment to eliminate speaker-to-mic feedback loops and prevent ElevenLabs server-side VAD barge-in during assistant speech.
 - **Ephemeral Session State**: Conversation timeline DAGs are maintained purely in-memory (`InMemorySessionRepo`). Sensitive accommodations and private boundary disclosures are never persisted to databases or cloud storage.
 - **Server-Kept Credentials**: Anam AI and ElevenLabs API keys are held strictly in server-side runtime memory. Clients only receive short-lived, single-session ephemeral tokens.
 - **WCAG 2.1 AAA Accessibility**: High-contrast typography, screen-reader friendly ARIA landmarks, keyboard-navigable controls, and reduced-motion compliance.
@@ -339,8 +345,9 @@ npm run build
 | **ADR-001** | Hexagonal Ports and Adapters | Decouples browser audio DSP, LLM reasoning, and WebRTC streaming, guaranteeing 100% test coverage of domain logic. |
 | **ADR-002** | In-Memory Ephemeral DAG | Guarantees instant timeline branching, non-destructive attempt resets, and zero cloud persistence of personal disclosures. |
 | **ADR-003** | Client-Side Web Audio DSP | Zero server bandwidth consumption for acoustic pitch and cadence extraction; eliminates audio privacy risks. |
-| **ADR-004** | Anam Real-Time WebRTC Video & ElevenLabs Agent | Delivers photorealistic conversational partner video with synchronized lip-sync and voice over a single WebRTC stream without client-side PCM noise. |
+| **ADR-004** | Anam Cara 4 Real-Time WebRTC Video & ElevenLabs Agent | Delivers photorealistic conversational partner video with synchronized lip-sync and voice over a single WebRTC stream without client-side PCM noise. |
 | **ADR-005** | Gemini 1.5 Flash Structured JSON Inference | Enforces strict Zod schema validation on all LLM responses with p95 latency under 1400ms for seamless turn pacing. |
+| **ADR-006** | Pre-Stream Mic Mute & Delta Chunk Accumulation | Prevents speaker-to-mic feedback loop and premature barge-in; ensures complete scenario opener delivery without mid-sentence truncation. |
 
 ---
 
