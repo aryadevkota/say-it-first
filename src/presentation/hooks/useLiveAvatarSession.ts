@@ -14,6 +14,9 @@ export interface UseLiveAvatarSessionOptions {
 export function useLiveAvatarSession(options: UseLiveAvatarSessionOptions = {}) {
   const { onPlaybackStateChange, onTranscription, onStateChange, mediaRefs } = options;
 
+  const callbacksRef = useRef({ onPlaybackStateChange, onTranscription, onStateChange, mediaRefs });
+  callbacksRef.current = { onPlaybackStateChange, onTranscription, onStateChange, mediaRefs };
+
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [sessionStatus, setSessionStatus] = useState<'idle' | 'connecting' | 'connected' | 'error'>('idle');
   const [isMuted, setIsMuted] = useState<boolean>(false);
@@ -23,7 +26,7 @@ export function useLiveAvatarSession(options: UseLiveAvatarSessionOptions = {}) 
 
   const updateStatus = (status: 'idle' | 'connecting' | 'connected' | 'error') => {
     setSessionStatus(status);
-    onStateChange?.(status);
+    callbacksRef.current.onStateChange?.(status);
   };
 
   const connect = useCallback(async (token: string, url: string) => {
@@ -36,11 +39,12 @@ export function useLiveAvatarSession(options: UseLiveAvatarSessionOptions = {}) 
       roomRef.current = room;
 
       room.on(RoomEvent.TrackSubscribed, (track, publication, participant) => {
-        if (track.kind === 'video' && mediaRefs?.video?.current) {
-          track.attach(mediaRefs.video.current);
+        const currentMediaRefs = callbacksRef.current.mediaRefs;
+        if (track.kind === 'video' && currentMediaRefs?.video?.current) {
+          track.attach(currentMediaRefs.video.current);
         }
-        if (track.kind === 'audio' && mediaRefs?.audio?.current) {
-          track.attach(mediaRefs.audio.current);
+        if (track.kind === 'audio' && currentMediaRefs?.audio?.current) {
+          track.attach(currentMediaRefs.audio.current);
         }
       });
 
@@ -56,16 +60,16 @@ export function useLiveAvatarSession(options: UseLiveAvatarSessionOptions = {}) 
               const type = parsed.elevenlabs_event_type;
               const data = parsed.data || {};
               if (type === 'agent_response') {
-                onTranscription?.('agent', data.agent_response_event?.agent_response || data.text || '');
+                callbacksRef.current.onTranscription?.('agent', data.agent_response_event?.agent_response || data.text || '');
               } else if (type === 'user_transcript') {
-                onTranscription?.('user', data.user_transcription_event?.user_transcript || data.text || '');
+                callbacksRef.current.onTranscription?.('user', data.user_transcription_event?.user_transcript || data.text || '');
               }
             } else if (parsed.event_type === 'avatar.speak_started') {
               setIsPlaying(true);
-              onPlaybackStateChange?.(true);
+              callbacksRef.current.onPlaybackStateChange?.(true);
             } else if (parsed.event_type === 'avatar.speak_ended') {
               setIsPlaying(false);
-              onPlaybackStateChange?.(false);
+              callbacksRef.current.onPlaybackStateChange?.(false);
             }
           } catch (err) {
             console.error('Error parsing data channel message', err);
@@ -83,7 +87,7 @@ export function useLiveAvatarSession(options: UseLiveAvatarSessionOptions = {}) 
       console.error('Failed to connect to LiveKit room', err);
       updateStatus('error');
     }
-  }, [onPlaybackStateChange, onTranscription, onStateChange, mediaRefs]);
+  }, []);
 
   const disconnect = useCallback(() => {
     if (roomRef.current) {
@@ -91,7 +95,7 @@ export function useLiveAvatarSession(options: UseLiveAvatarSessionOptions = {}) 
       roomRef.current = null;
     }
     updateStatus('idle');
-  }, [onStateChange]);
+  }, []);
 
   const sendText = useCallback((text: string) => {
     if (roomRef.current && sessionStatus === 'connected') {

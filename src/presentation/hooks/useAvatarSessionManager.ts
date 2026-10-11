@@ -66,6 +66,38 @@ export function useAvatarSessionManager({
   const abortControllerRef = useRef<AbortController | null>(null);
   const activeSessionIdRef = useRef<string | null>(null);
   const isMountedRef = useRef<boolean>(true);
+  const sessionDataRef = useRef<AvatarSessionData | null>(null);
+  const sessionStateRef = useRef<AvatarSessionLifecycleState>('idle');
+  const bootstrappedScenarioIdRef = useRef<string | null>(null);
+
+  // Keep options in a ref to avoid recreating initiateSession on prop identity changes
+  const optionsRef = useRef({
+    scenarioId,
+    partnerName,
+    partnerRole,
+    userGoal,
+    initialDialogue,
+    onLiveKitConnect,
+  });
+
+  useEffect(() => {
+    optionsRef.current = {
+      scenarioId,
+      partnerName,
+      partnerRole,
+      userGoal,
+      initialDialogue,
+      onLiveKitConnect,
+    };
+  });
+
+  useEffect(() => {
+    sessionDataRef.current = sessionData;
+  }, [sessionData]);
+
+  useEffect(() => {
+    sessionStateRef.current = sessionState;
+  }, [sessionState]);
 
   // Send Beacon on beforeunload / window close for guaranteed termination
   useEffect(() => {
@@ -92,22 +124,31 @@ export function useAvatarSessionManager({
     };
   }, []);
 
-  const initiateSession = useCallback(async () => {
+  const initiateSession = useCallback(async (forced: boolean = false) => {
+    const {
+      scenarioId: currentScenarioId,
+      partnerName: currentPartnerName,
+      partnerRole: currentPartnerRole,
+      userGoal: currentUserGoal,
+      initialDialogue: currentInitialDialogue,
+      onLiveKitConnect: currentOnLiveKitConnect,
+    } = optionsRef.current;
+
     // 1. If we already have an active session for this scenario in state, reuse it
-    if (sessionData && sessionState === 'active') {
-      return sessionData;
+    if (!forced && sessionDataRef.current && sessionStateRef.current === 'active') {
+      return sessionDataRef.current;
     }
 
     // 2. Check if a global reusable session exists (handles Strict Mode remount)
-    if (globalClientActiveSession && globalClientActiveSession.scenarioId === scenarioId) {
+    if (!forced && globalClientActiveSession && globalClientActiveSession.scenarioId === currentScenarioId) {
       const ageMs = Date.now() - globalClientActiveSession.createdAt;
       if (ageMs < 10 * 60 * 1000) {
-        console.log('[AvatarSessionManager] Reusing client active session for scenario:', scenarioId);
+        console.log('[AvatarSessionManager] Reusing client active session for scenario:', currentScenarioId);
         activeSessionIdRef.current = globalClientActiveSession.data.conversationId || null;
         setSessionData(globalClientActiveSession.data);
         setSessionState('active');
-        if (globalClientActiveSession.data.sessionToken && onLiveKitConnect) {
-          onLiveKitConnect(
+        if (globalClientActiveSession.data.sessionToken && currentOnLiveKitConnect) {
+          currentOnLiveKitConnect(
             globalClientActiveSession.data.sessionToken,
             globalClientActiveSession.data.wsUrl || 'wss://agent.heygen.com'
           );
@@ -138,6 +179,7 @@ export function useAvatarSessionManager({
     }
 
     // 4. Start fresh creation with single-flight guard
+    console.log('[AvatarSessionManager] Initiating session bootstrap for scenario:', currentScenarioId);
     setSessionState('creating');
     setErrorMessage(null);
 
@@ -150,11 +192,11 @@ export function useAvatarSessionManager({
         headers: { 'Content-Type': 'application/json' },
         signal: controller.signal,
         body: JSON.stringify({
-          scenarioId,
-          partnerName,
-          partnerRole,
-          userGoal,
-          initialDialogue,
+          scenarioId: currentScenarioId,
+          partnerName: currentPartnerName,
+          partnerRole: currentPartnerRole,
+          userGoal: currentUserGoal,
+          initialDialogue: currentInitialDialogue,
         }),
       });
 
@@ -175,7 +217,7 @@ export function useAvatarSessionManager({
 
       // Store in client-wide cache
       globalClientActiveSession = {
-        scenarioId,
+        scenarioId: currentScenarioId,
         data: parsed,
         createdAt: Date.now(),
       };
@@ -191,8 +233,8 @@ export function useAvatarSessionManager({
         activeSessionIdRef.current = data.conversationId || null;
         setSessionData(data);
         setSessionState('active');
-        if (data.sessionToken && onLiveKitConnect) {
-          onLiveKitConnect(data.sessionToken, data.wsUrl || 'wss://agent.heygen.com');
+        if (data.sessionToken && currentOnLiveKitConnect) {
+          currentOnLiveKitConnect(data.sessionToken, data.wsUrl || 'wss://agent.heygen.com');
         }
       }
       return data;
@@ -209,7 +251,7 @@ export function useAvatarSessionManager({
     } finally {
       globalClientInFlightPromise = null;
     }
-  }, [scenarioId, partnerName, partnerRole, userGoal, initialDialogue, onLiveKitConnect, sessionData, sessionState]);
+  }, []);
 
   // Clean terminate function
   const endSession = useCallback(async (conversationIdToTerminate?: string) => {
@@ -244,26 +286,32 @@ export function useAvatarSessionManager({
     }
   }, []);
 
-  // Lifecycle bootstrap and clean teardown
+  // Lifecycle bootstrap: execute strictly once per scenarioId
   useEffect(() => {
     isMountedRef.current = true;
-    initiateSession().catch(() => {});
+
+    if (bootstrappedScenarioIdRef.current !== scenarioId) {
+      bootstrappedScenarioIdRef.current = scenarioId;
+      initiateSession().catch(() => {});
+    }
 
     return () => {
       isMountedRef.current = false;
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
-      // Note: In development Strict Mode, React unmounts and immediately remounts.
-      // We don't instantly tear down Tavus here unless the user exits or unloads the component permanently.
     };
+  }, [scenarioId, initiateSession]);
+
+  const retrySession = useCallback(() => {
+    return initiateSession(true);
   }, [initiateSession]);
 
   return {
     sessionState,
     sessionData,
     errorMessage,
-    retrySession: initiateSession,
+    retrySession,
     endSession,
   };
 }
