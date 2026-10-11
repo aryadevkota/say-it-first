@@ -140,8 +140,7 @@ describe('Eva Live Avatar Integration Suite (Simli WebRTC)', () => {
       expect(capturedBody).toEqual({
         apiKey: 'simli-test-valid-key-abcdef123456',
         faceId: SIMLI_DEFAULT_FACE_ID,
-        ttsProvider: 'ElevenLabs',
-        language: 'en',
+        syncAudio: true,
       });
       expect(capturedHeaders['x-simli-api-key']).toBe('simli-test-valid-key-abcdef123456');
     });

@@ -27,8 +27,7 @@ export const runtime = 'nodejs';
 export interface SimliSessionPayload {
   apiKey: string;
   faceId: string;
-  ttsProvider: 'ElevenLabs';
-  language: string;
+  syncAudio?: boolean;
 }
 
 export interface SimliSessionResponse {
@@ -96,12 +95,13 @@ export async function POST(request: Request): Promise<Response> {
 
     const cleanedSimliKey = simliKey!.trim().replace(/^["']|["']$/g, '');
 
-    // Enforce required Simli session initiation payload contract
+    // Simli Speech-to-Video initiation payload
+    // Note: Do NOT include ttsProvider or llmProvider here. Simli explicitly forbids them when
+    // external TTS (ElevenLabs) audio is streamed over WebRTC, throwing status 401.
     const simliPayload: SimliSessionPayload = {
       apiKey: cleanedSimliKey,
       faceId: faceId,
-      ttsProvider: 'ElevenLabs',
-      language: 'en',
+      syncAudio: true,
     };
 
     const simliEndpoint =
@@ -136,17 +136,18 @@ export async function POST(request: Request): Promise<Response> {
     }
 
     const upstreamData = await upstreamRes.json().catch(() => ({}));
-    const sessionId =
-      upstreamData.session_id ||
-      upstreamData.sessionId ||
-      upstreamData.id ||
-      `simli-${Date.now()}`;
-
     const sessionToken =
       upstreamData.session_token ||
       upstreamData.sessionToken ||
       upstreamData.token ||
       null;
+
+    const sessionId =
+      upstreamData.session_id ||
+      upstreamData.sessionId ||
+      upstreamData.id ||
+      sessionToken ||
+      `simli-${Date.now()}`;
 
     const webrtcUrl =
       upstreamData.webrtc_url ||
@@ -159,8 +160,29 @@ export async function POST(request: Request): Promise<Response> {
       { urls: 'stun:stun1.l.google.com:19302' },
     ];
 
-    const iceServers =
-      upstreamData.ice_servers || upstreamData.iceServers || defaultIceServers;
+    let iceServers = upstreamData.ice_servers || upstreamData.iceServers;
+    if (!iceServers || iceServers.length === 0) {
+      try {
+        const iceRes = await fetch('https://api.simli.ai/compose/ice', {
+          headers: {
+            'Content-Type': 'application/json',
+            'x-simli-api-key': cleanedSimliKey,
+          },
+          signal: AbortSignal.timeout(2500),
+        });
+        if (iceRes.ok) {
+          const remoteIce = await iceRes.json().catch(() => null);
+          if (Array.isArray(remoteIce) && remoteIce.length > 0) {
+            iceServers = remoteIce;
+          }
+        }
+      } catch {
+        // Fall back to default STUN
+      }
+    }
+    if (!iceServers || iceServers.length === 0) {
+      iceServers = defaultIceServers;
+    }
 
     const responsePayload: SimliSessionResponse = {
       session_id: sessionId,
