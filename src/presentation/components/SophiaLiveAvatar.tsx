@@ -2,7 +2,6 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import type { SophiaScenarioPresentation } from '../../domain/entities/SophiaScenarioPresentation';
-import { useLiveAvatarSession } from '../hooks/useLiveAvatarSession';
 
 export interface SophiaLiveAvatarProps {
   presentation: SophiaScenarioPresentation;
@@ -12,8 +11,6 @@ export interface SophiaLiveAvatarProps {
   onToggleMute?: () => void;
   onToggleTextMode?: () => void;
   className?: string;
-  sessionToken?: string;
-  wsUrl?: string;
   conversationUrl?: string;
   videoRef?: React.RefObject<HTMLVideoElement>;
   audioRef?: React.RefObject<HTMLAudioElement>;
@@ -30,8 +27,6 @@ export const SophiaLiveAvatar: React.FC<SophiaLiveAvatarProps> = ({
   onToggleMute,
   onToggleTextMode,
   className = '',
-  sessionToken,
-  wsUrl,
   conversationUrl,
   videoRef,
   audioRef,
@@ -40,6 +35,32 @@ export const SophiaLiveAvatar: React.FC<SophiaLiveAvatarProps> = ({
   onRetry,
 }) => {
   const [showSceneDetails, setShowSceneDetails] = useState<boolean>(false);
+  const [iframeLoaded, setIframeLoaded] = useState<boolean>(false);
+  const [hasTimedOut, setHasTimedOut] = useState<boolean>(false);
+  const iframeLoadedRef = useRef<boolean>(false);
+
+  useEffect(() => {
+    iframeLoadedRef.current = false;
+    setIframeLoaded(false);
+    setHasTimedOut(false);
+
+    // Timeout guard: 20 seconds to load iframe or establish session
+    const timer = setTimeout(() => {
+      if (!iframeLoadedRef.current) {
+        console.warn('[SophiaLiveAvatar] Connection timed out after 20s without iframe load');
+        setHasTimedOut(true);
+      }
+    }, 20000);
+
+    return () => clearTimeout(timer);
+  }, [conversationUrl, sessionState]);
+
+  const handleIframeLoad = () => {
+    console.log('[SophiaLiveAvatar] Tavus iframe loaded successfully');
+    iframeLoadedRef.current = true;
+    setIframeLoaded(true);
+    setHasTimedOut(false);
+  };
 
   const badgeText = presentation.badgeText || presentation.visualSummary || `Sophia • ${presentation.outfitLabel} • ${presentation.backgroundLabel}`;
 
@@ -50,7 +71,51 @@ export const SophiaLiveAvatar: React.FC<SophiaLiveAvatarProps> = ({
       className={`w-full max-w-4xl aspect-[4/3] sm:aspect-video rounded-3xl overflow-hidden relative shadow-xl border border-canvas-border flex flex-col justify-between transition-all select-none bg-canvas-dark ${className}`}
     >
       <div className="absolute inset-0 z-0 overflow-hidden bg-slate-950 flex items-center justify-center">
-        {sessionState === 'creating' ? (
+        {hasTimedOut || sessionState === 'failed' ? (
+          <div className="flex flex-col items-center justify-center gap-3 text-center p-6 z-30 max-w-sm">
+            <p className="text-sm font-semibold text-rose-300">Partner Connection Paused</p>
+            <p className="text-xs text-white/70 leading-relaxed">
+              {hasTimedOut
+                ? 'The video room took too long to load (over 20 seconds). The session may have expired.'
+                : errorMessage || 'The avatar session is settling. You can retry or continue in text mode.'}
+            </p>
+            {onRetry && (
+              <button
+                type="button"
+                onClick={() => {
+                  setHasTimedOut(false);
+                  setIframeLoaded(false);
+                  iframeLoadedRef.current = false;
+                  onRetry();
+                }}
+                className="mt-1 px-4 py-2 rounded-xl bg-sif-primary hover:bg-sif-primaryHover text-white text-xs font-semibold shadow-xs transition"
+              >
+                Start a fresh call
+              </button>
+            )}
+          </div>
+        ) : conversationUrl ? (
+          <>
+            <iframe
+              src={conversationUrl}
+              title="Sophia Tavus Live Avatar"
+              allow="camera; microphone; fullscreen; display-capture; autoplay"
+              className="w-full h-full border-0 absolute inset-0 z-10"
+              onLoad={handleIframeLoad}
+            />
+            {!iframeLoaded && (
+              <div className="flex flex-col items-center justify-center gap-3 text-center p-6 z-20 pointer-events-none">
+                <div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center animate-pulse">
+                  <span className="w-3 h-3 rounded-full bg-sif-primary" />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm font-semibold text-white tracking-wide">Connecting with Sophia...</p>
+                  <p className="text-xs text-white/60">Securing your private conversational simulation</p>
+                </div>
+              </div>
+            )}
+          </>
+        ) : sessionState === 'creating' ? (
           <div className="flex flex-col items-center justify-center gap-3 text-center p-6 z-20">
             <div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center animate-pulse">
               <span className="w-3 h-3 rounded-full bg-sif-primary" />
@@ -60,29 +125,6 @@ export const SophiaLiveAvatar: React.FC<SophiaLiveAvatarProps> = ({
               <p className="text-xs text-white/60">Securing your private conversational simulation</p>
             </div>
           </div>
-        ) : sessionState === 'failed' ? (
-          <div className="flex flex-col items-center justify-center gap-3 text-center p-6 z-20 max-w-sm">
-            <p className="text-sm font-semibold text-rose-300">Partner Connection Paused</p>
-            <p className="text-xs text-white/70 leading-relaxed">
-              {errorMessage || 'The avatar session is settling. You can retry or continue in text mode.'}
-            </p>
-            {onRetry && (
-              <button
-                type="button"
-                onClick={onRetry}
-                className="mt-1 px-4 py-1.5 rounded-xl bg-sif-primary hover:bg-sif-primaryHover text-white text-xs font-semibold shadow-xs transition"
-              >
-                Reconnect
-              </button>
-            )}
-          </div>
-        ) : conversationUrl ? (
-          <iframe
-            src={conversationUrl}
-            title="Sophia Tavus Live Avatar"
-            allow="camera; microphone; fullscreen; display-capture; autoplay"
-            className="w-full h-full border-0 absolute inset-0 z-10"
-          />
         ) : (
           <>
             <video

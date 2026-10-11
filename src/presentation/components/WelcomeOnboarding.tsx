@@ -214,7 +214,7 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
                   Sophia Live Avatar
                 </span>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-sif-primaryDeep text-sif-secondarySubtle border border-sif-primary/40">
-                  LiveAvatar WebRTC • 24kHz
+                  Tavus Video • 24kHz
                 </span>
               </div>
 

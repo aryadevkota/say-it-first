@@ -101,8 +101,8 @@ export const AboutSiFView: React.FC<AboutSiFViewProps> = ({ onStartExplore, onOp
       <div className="space-y-4">
         <h2 className="text-xl font-semibold text-ink-primary">Built for Real-World Transfer</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="p-5 rounded-2xl bg-canvas-surface border border-canvas-border space-y-2">
-            <div className="w-8 h-8 rounded-xl bg-canvas-subtle text-teal-brand flex items-center justify-center font-bold text-sm">
+          <div className="p-5 rounded-card bg-canvas-surface border border-canvas-border space-y-2">
+            <div className="w-8 h-8 rounded-xl bg-sif-primarySubtle text-sif-primary font-bold text-sm flex items-center justify-center">
               1
             </div>
             <h3 className="text-sm font-semibold text-ink-primary">Understand the Idea</h3>
@@ -111,8 +111,8 @@ export const AboutSiFView: React.FC<AboutSiFViewProps> = ({ onStartExplore, onOp
             </p>
           </div>
 
-          <div className="p-5 rounded-2xl bg-canvas-surface border border-canvas-border space-y-2">
-            <div className="w-8 h-8 rounded-xl bg-canvas-subtle text-teal-brand flex items-center justify-center font-bold text-sm">
+          <div className="p-5 rounded-card bg-canvas-surface border border-canvas-border space-y-2">
+            <div className="w-8 h-8 rounded-xl bg-sif-primarySubtle text-sif-primary font-bold text-sm flex items-center justify-center">
               2
             </div>
             <h3 className="text-sm font-semibold text-ink-primary">Low-Stakes Practice</h3>
@@ -121,8 +121,8 @@ export const AboutSiFView: React.FC<AboutSiFViewProps> = ({ onStartExplore, onOp
             </p>
           </div>
 
-          <div className="p-5 rounded-2xl bg-canvas-surface border border-canvas-border space-y-2">
-            <div className="w-8 h-8 rounded-xl bg-canvas-subtle text-teal-brand flex items-center justify-center font-bold text-sm">
+          <div className="p-5 rounded-card bg-canvas-surface border border-canvas-border space-y-2">
+            <div className="w-8 h-8 rounded-xl bg-sif-primarySubtle text-sif-primary font-bold text-sm flex items-center justify-center">
               3
             </div>
             <h3 className="text-sm font-semibold text-ink-primary">Actionable Takeaways</h3>
@@ -134,7 +134,7 @@ export const AboutSiFView: React.FC<AboutSiFViewProps> = ({ onStartExplore, onOp
       </div>
 
       {/* Bottom CTA */}
-      <div className="p-6 rounded-3xl bg-canvas-surface border border-canvas-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="p-6 rounded-card-lg bg-canvas-surface border border-canvas-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-card">
         <div>
           <h2 className="text-base font-semibold text-ink-primary">Ready to practice a conversation?</h2>
           <p className="text-xs text-ink-secondary mt-0.5">Explore our library of curated scenarios or create your own.</p>
@@ -146,7 +146,7 @@ export const AboutSiFView: React.FC<AboutSiFViewProps> = ({ onStartExplore, onOp
               playCozySound('pop');
               onOpenTutorial();
             }}
-            className="px-4 py-2 rounded-xl bg-canvas-subtle hover:bg-canvas-border text-ink-primary text-xs font-medium transition"
+            className="px-4 py-2 rounded-pill bg-canvas-subtle hover:bg-canvas-border text-ink-primary text-xs font-semibold transition"
           >
             Review Tutorial
           </button>
@@ -155,7 +155,7 @@ export const AboutSiFView: React.FC<AboutSiFViewProps> = ({ onStartExplore, onOp
               playCozySound('tap');
               onStartExplore();
             }}
-            className="px-5 py-2 rounded-xl bg-teal-brand text-canvas-surface text-xs font-semibold hover:bg-teal-hover transition shadow-2xs"
+            className="px-5 py-2.5 rounded-pill bg-sif-primary text-white text-xs font-semibold hover:bg-sif-primaryHover transition shadow-card"
           >
             Browse Scenarios →
           </button>

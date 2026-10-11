@@ -25,11 +25,9 @@ export type AvatarSessionLifecycleState =
   | 'failed';
 
 export interface AvatarSessionData {
-  provider?: 'tavus' | 'liveavatar';
+  provider: 'tavus';
   conversationId?: string;
   conversationUrl?: string;
-  sessionToken?: string;
-  wsUrl?: string;
   scenarioId?: string;
 }
 
@@ -39,21 +37,12 @@ export interface UseAvatarSessionManagerOptions {
   partnerRole: string;
   userGoal: string;
   initialDialogue: string;
-  onLiveKitConnect?: (token: string, wsUrl: string) => void;
 }
 
-// Global client cache across React Strict Mode re-mounts
-interface GlobalClientSession {
-  scenarioId: string;
-  data: AvatarSessionData;
-  createdAt: number;
-}
-
-let globalClientActiveSession: GlobalClientSession | null = null;
+// Single-flight promise cache to coalesce concurrent calls (e.g. React Strict Mode double-mount)
 let globalClientInFlightPromise: Promise<AvatarSessionData> | null = null;
 
 export function resetGlobalClientSessionForTesting() {
-  globalClientActiveSession = null;
   globalClientInFlightPromise = null;
 }
 
@@ -63,7 +52,6 @@ export function useAvatarSessionManager({
   partnerRole,
   userGoal,
   initialDialogue,
-  onLiveKitConnect,
 }: UseAvatarSessionManagerOptions) {
   const [sessionState, setSessionState] = useState<AvatarSessionLifecycleState>('idle');
   const [sessionData, setSessionData] = useState<AvatarSessionData | null>(null);
@@ -83,7 +71,6 @@ export function useAvatarSessionManager({
     partnerRole,
     userGoal,
     initialDialogue,
-    onLiveKitConnect,
   });
 
   useEffect(() => {
@@ -93,7 +80,6 @@ export function useAvatarSessionManager({
       partnerRole,
       userGoal,
       initialDialogue,
-      onLiveKitConnect,
     };
   });
 
@@ -131,13 +117,14 @@ export function useAvatarSessionManager({
   }, []);
 
   const initiateSession = useCallback(async (forced: boolean = false) => {
+    const currentScenarioId = (optionsRef.current.scenarioId && optionsRef.current.scenarioId.trim())
+      ? optionsRef.current.scenarioId.trim()
+      : `scenario-${Date.now()}`;
     const {
-      scenarioId: currentScenarioId,
       partnerName: currentPartnerName,
       partnerRole: currentPartnerRole,
       userGoal: currentUserGoal,
       initialDialogue: currentInitialDialogue,
-      onLiveKitConnect: currentOnLiveKitConnect,
     } = optionsRef.current;
 
     // 1. If we already have an active session for THIS scenario in state, reuse it
@@ -146,25 +133,7 @@ export function useAvatarSessionManager({
       return sessionDataRef.current;
     }
 
-    // 2. Check if a global reusable session exists for this scenario (handles Strict Mode remount)
-    if (!forced && globalClientActiveSession && globalClientActiveSession.scenarioId === currentScenarioId) {
-      const ageMs = Date.now() - globalClientActiveSession.createdAt;
-      if (ageMs < 10 * 60 * 1000) {
-        console.log('[AvatarSessionManager] Reusing client active session for scenario:', currentScenarioId);
-        activeSessionIdRef.current = globalClientActiveSession.data.conversationId || null;
-        setSessionData(globalClientActiveSession.data);
-        setSessionState('active');
-        if (globalClientActiveSession.data.sessionToken && currentOnLiveKitConnect) {
-          currentOnLiveKitConnect(
-            globalClientActiveSession.data.sessionToken,
-            globalClientActiveSession.data.wsUrl || 'wss://agent.heygen.com'
-          );
-        }
-        return globalClientActiveSession.data;
-      }
-    }
-
-    // 3. If a creation request is already in-flight, await the same promise
+    // 2. If a creation request is already in-flight (Strict Mode double mount), await the same promise
     if (globalClientInFlightPromise) {
       console.log('[AvatarSessionManager] Awaiting existing in-flight session creation...');
       setSessionState('creating');
@@ -185,7 +154,7 @@ export function useAvatarSessionManager({
       }
     }
 
-    // 4. Start fresh creation with single-flight guard
+    // 3. Start fresh creation with single-flight guard
     console.log('[AvatarSessionManager] Initiating session bootstrap for scenario:', currentScenarioId);
     setSessionState('creating');
     setErrorMessage(null);
@@ -215,19 +184,10 @@ export function useAvatarSessionManager({
 
       const raw = await res.json();
       const parsed: AvatarSessionData = {
-        provider: raw.provider,
+        provider: 'tavus',
         conversationId: raw.conversation_id,
         conversationUrl: raw.conversation_url,
-        sessionToken: raw.session_token,
-        wsUrl: raw.ws_url,
         scenarioId: currentScenarioId,
-      };
-
-      // Store in client-wide cache
-      globalClientActiveSession = {
-        scenarioId: currentScenarioId,
-        data: parsed,
-        createdAt: Date.now(),
       };
 
       return parsed;
@@ -241,9 +201,6 @@ export function useAvatarSessionManager({
         activeSessionIdRef.current = data.conversationId || null;
         setSessionData(data);
         setSessionState('active');
-        if (data.sessionToken && currentOnLiveKitConnect) {
-          currentOnLiveKitConnect(data.sessionToken, data.wsUrl || 'wss://agent.heygen.com');
-        }
       }
       return data;
     } catch (err: any) {
@@ -264,11 +221,6 @@ export function useAvatarSessionManager({
   // Clean terminate function
   const endSession = useCallback(async (conversationIdToTerminate?: string) => {
     const targetId = conversationIdToTerminate || activeSessionIdRef.current;
-    
-    // Clear client cache immediately
-    if (globalClientActiveSession?.data.conversationId === targetId) {
-      globalClientActiveSession = null;
-    }
 
     if (!targetId) {
       setSessionState('terminated');
@@ -320,7 +272,22 @@ export function useAvatarSessionManager({
     };
   }, [scenarioId, initiateSession]);
 
-  const retrySession = useCallback(() => {
+  const retrySession = useCallback(async () => {
+    const prevId = activeSessionIdRef.current;
+    if (prevId) {
+      activeSessionIdRef.current = null;
+      try {
+        await fetch('/api/v1/avatar/session', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ conversationId: prevId }),
+        });
+      } catch (err) {
+        console.warn('[AvatarSessionManager] Error ending prior conversation on retry:', err);
+      }
+    }
+    setSessionData(null);
+    sessionDataRef.current = null;
     return initiateSession(true);
   }, [initiateSession]);
 

@@ -198,12 +198,12 @@ Configure your environment variables:
 | `GEMINI_API_KEY` | **Yes** | Powers generative dialogue and intent translation ([Google AI Studio](https://aistudio.google.com/app/apikey)). |
 | `ELEVENLABS_API_KEY` | **Yes** | Required for agent provisioning. |
 | `ELEVENLABS_AGENT_ID` | **Yes** | The ElevenLabs conversational agent ID configured for PCM 24000 Hz. |
-| `HEYGEN_API_KEY` | **Yes** | Powers real-time WebRTC live video streaming via HeyGen LiveAvatar's Speech-to-Video API. |
-| `HEYGEN_AVATAR_ID` | **Yes** | HeyGen LiveAvatar identifier (defaults to `Sophia`). |
+| `TAVUS_API_KEY` | **Yes** | Powers real-time conversational video streaming via Tavus CVI API ([Tavus](https://tavus.io)). |
+| `TAVUS_FACE_ID` | Optional | Tavus replica face identifier (defaults to `r3f427f43c9d`). |
 
 > **Note on Live Video Avatar Pipeline:**
-> - **With HeyGen + ElevenLabs Agent**: Initiates a low-latency WebRTC video stream directly via LiveKit with 24kHz linear PCM audio viseme synchronization.
-> - **Fail-Fast Diagnostics**: If `HEYGEN_API_KEY` is not configured, the session endpoint safely returns a 503 instead of exposing credentials.
+> - **With Tavus CVI**: Initiates a real-time conversational video interface directly via Daily.co WebRTC stream coordinated through the backend session coordinator.
+> - **Fail-Fast Diagnostics**: If `TAVUS_API_KEY` is not configured, the session endpoint safely returns a 503 instead of exposing credentials.
 
 ### 4. Run Development Server
 ```bash

@@ -7,7 +7,7 @@
  * - Simple, clean personal library of bookmarked scenarios
  * - Quick practice launch
  * - 1-click unbookmarking
- * - Empty state with gentle discovery CTA
+ * - Opaque rounded-card surfaces & accessible empty state
  */
 
 import React from 'react';
@@ -32,14 +32,14 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
 }) => {
   return (
     <div
-      className="max-w-5xl mx-auto w-full py-8 px-4 sm:px-6 space-y-8 animate-fadeIn text-ink-primary"
+      className="max-w-6xl mx-auto w-full py-8 px-4 sm:px-6 space-y-8 animate-page-enter text-ink-primary"
       data-testid="favorites-view"
     >
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-sif-primarySubtle text-sif-primary border border-sif-border shadow-2xs">
+            <span className="px-3 py-1 rounded-pill text-xs font-semibold uppercase tracking-wider bg-sif-primarySubtle text-sif-primaryDeep border border-sif-border">
               Personal Library
             </span>
           </div>
@@ -56,7 +56,7 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
             playCozySound('tap');
             onBrowseMore();
           }}
-          className="px-4 py-2 rounded-xl bg-white/80 border border-canvas-border hover:bg-white text-ink-primary text-xs font-medium transition shadow-2xs"
+          className="px-4 py-2 rounded-pill bg-canvas-surface border border-canvas-border hover:bg-canvas-subtle text-ink-primary text-xs font-semibold transition shadow-xs"
         >
           Browse All Scenarios →
         </button>
@@ -64,16 +64,16 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
 
       {/* Grid of Saved Scenario Cards */}
       {savedScenarios.length === 0 ? (
-        <div className="p-10 sm:p-14 rounded-3xl bg-white/80 backdrop-blur-md border border-canvas-border shadow-glass-card text-center space-y-4">
-          <div className="w-14 h-14 rounded-2xl bg-sif-primarySubtle text-sif-primary border border-sif-border flex items-center justify-center mx-auto shadow-glass-card">
-            <svg className="w-7 h-7 text-sif-primary" fill="currentColor" viewBox="0 0 24 24">
+        <div className="p-10 sm:p-14 rounded-card-lg bg-canvas-surface border border-canvas-border shadow-card text-center space-y-4">
+          <div className="w-12 h-12 rounded-xl bg-sif-primarySubtle text-sif-primary border border-sif-border flex items-center justify-center mx-auto shadow-2xs">
+            <svg className="w-6 h-6 text-sif-primary" fill="currentColor" viewBox="0 0 24 24">
               <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
             </svg>
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-ink-primary">No saved scenarios yet</h2>
+            <h2 className="text-base font-semibold text-ink-primary">No saved scenarios yet</h2>
             <p className="text-xs text-ink-muted max-w-md mx-auto mt-1 leading-relaxed">
-              When browsing scenarios on Home, click the bookmark icon on any card to save it here for quick access.
+              When browsing scenarios on Home or Scenarios, click the bookmark icon on any card to save it here for quick access.
             </p>
           </div>
           <button
@@ -81,7 +81,7 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
               playCozySound('tap');
               onBrowseMore();
             }}
-            className="px-5 py-2.5 rounded-xl bg-sif-primary text-white text-xs font-semibold hover:bg-sif-primaryHover transition shadow-glass-card"
+            className="px-5 py-2.5 rounded-pill bg-sif-primary text-white text-xs font-semibold hover:bg-sif-primaryHover transition shadow-card"
           >
             Explore Scenarios
           </button>

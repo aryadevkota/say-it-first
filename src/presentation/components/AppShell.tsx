@@ -3,19 +3,18 @@
 /**
  * AppShell.tsx — Production Application Shell for Say It First (SiF)
  *
- * Implements the complete media-learning platform IA:
- * - Persistent desktop left sidebar + responsive mobile drawer
- * - 5 primary tabs:
- *    1. Home (Media discovery rails)
- *    2. Progress Center (Reports, habits, saved phrasing)
- *    3. Favorites / Saved Scenarios (Bookmarked library)
- *    4. Settings (Comfort, voice, avatar, accessibility)
- *    5. About SiF (Differentiation & educational philosophy)
- * - 3-Layer Scenario Flow:
- *    - Layer 1 & 2: ScenarioDetailView (Overview $\rightarrow$ Preparation Advice)
- *    - Layer 3: PracticeStage (Centered, immersive, enlarged SophiaLiveAvatar call)
- * - Static, dismissible tutorial guide modal
- * - Custom scenario creator integration
+ * Implements the 7 core navigation tabs:
+ * 1. Home (Resume practice, suggested next, latest report, rails)
+ * 2. Practice (Interactive studio launcher)
+ * 3. Scenarios (Categorized catalog & search)
+ * 4. Reports (Guided coaching feedback, transcripts, insights)
+ * 5. Progress (Reflective strengths, repeatable habits & growth)
+ * 6. Saved (Bookmarked personal scenario library)
+ * 7. Settings (Comfort, voice, avatar, accessibility)
+ *
+ * 3-Layer Scenario Flow:
+ * - Layer 1 & 2: ScenarioDetailView (Overview $\rightarrow$ Preparation Advice)
+ * - Layer 3: PracticeStage (Centered, immersive SophiaLiveAvatar call)
  */
 
 import React, { useState } from 'react';
@@ -26,11 +25,13 @@ import type { SavedTakeaway } from './MyProgress';
 import type { SessionReport } from '../../domain/entities/SessionReport';
 import { AppSidebar, type SidebarTab } from './AppSidebar';
 import { HomeView } from './HomeView';
+import { PracticeView } from './PracticeView';
+import { ScenariosView } from './ScenariosView';
 import { ScenarioDetailView } from './ScenarioDetailView';
 import { ProgressCenterView } from './ProgressCenterView';
 import { FavoritesView } from './FavoritesView';
 import { SettingsView } from './SettingsView';
-import { AboutSiFView } from './AboutSiFView';
+import { ConversationReportPage } from './ConversationReportPage';
 import { TutorialGuideModal } from './TutorialGuideModal';
 import { ScenarioCreator } from './ScenarioCreator';
 import { PracticeStage } from './PracticeStage';
@@ -91,7 +92,7 @@ export const AppShell: React.FC<AppShellProps> = ({
     return all.filter((s) => savedScenarioIds.includes(s.id));
   }, [customScenarios, savedScenarioIds]);
 
-  // Handle switching tabs (resets sub-flows so user lands cleanly in that tab)
+  // Handle switching tabs
   const handleSelectTab = (tab: SidebarTab) => {
     setActiveTab(tab);
     setSelectedScenarioForDetail(null);
@@ -140,12 +141,12 @@ export const AppShell: React.FC<AppShellProps> = ({
       />
 
       {/* ── MAIN CONTENT CANVAS ────────────────────────────────────────────── */}
-      <div className="flex-1 md:pl-72 flex flex-col min-w-0 min-h-screen">
+      <div className="flex-1 md:pl-72 flex flex-col min-w-0 min-h-screen pb-14 md:pb-0">
         {/* Mobile Top Header */}
-        <header className="md:hidden border-b border-canvas-border bg-canvas-surface/90 backdrop-blur-xs px-4 py-3 flex items-center justify-between sticky top-0 z-30">
+        <header className="md:hidden border-b border-canvas-border bg-canvas-surface px-4 py-3 flex items-center justify-between sticky top-0 z-30">
           <button
             onClick={() => setIsMobileSidebarOpen(true)}
-            className="p-2 rounded-xl text-ink-secondary hover:bg-canvas-subtle"
+            className="p-2 rounded-lg text-ink-secondary hover:bg-canvas-subtle"
             aria-label="Open sidebar"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -159,33 +160,35 @@ export const AppShell: React.FC<AppShellProps> = ({
 
           <button
             onClick={() => setIsTutorialOpen(true)}
-            className="p-1.5 rounded-xl text-sif-primary bg-sif-primarySubtle text-xs font-semibold"
+            className="p-1.5 rounded-lg text-sif-primary bg-sif-primarySubtle text-xs font-semibold"
             aria-label="Open tutorial"
           >
             💡
           </button>
         </header>
 
-        {/* Content Body */}
-        <main className="flex-1 w-full pb-16">
+        {/* Content Body with Perplexity-style animation container */}
+        <main className="flex-1 w-full pb-12">
           {/* SUB-FLOW A: SCENARIO DETAIL (LAYER 1 & LAYER 2) */}
           {selectedScenarioForDetail ? (
-            <ScenarioDetailView
-              scenario={selectedScenarioForDetail}
-              isSaved={savedScenarioIds.includes(selectedScenarioForDetail.id)}
-              onBack={() => setSelectedScenarioForDetail(null)}
-              onToggleSave={onToggleSaveScenario}
-              onLaunchLivePractice={handleLaunchPractice}
-            />
+            <div className="animate-page-enter">
+              <ScenarioDetailView
+                scenario={selectedScenarioForDetail}
+                isSaved={savedScenarioIds.includes(selectedScenarioForDetail.id)}
+                onBack={() => setSelectedScenarioForDetail(null)}
+                onToggleSave={onToggleSaveScenario}
+                onLaunchLivePractice={handleLaunchPractice}
+              />
+            </div>
           ) : isCreatingScenario ? (
             /* SUB-FLOW B: CREATE CUSTOM SCENARIO */
-            <div className="max-w-4xl mx-auto w-full py-6 px-4 sm:px-6">
+            <div className="max-w-4xl mx-auto w-full py-6 px-4 sm:px-6 animate-page-enter">
               <div className="mb-4">
                 <button
                   onClick={() => setIsCreatingScenario(false)}
-                  className="text-xs font-medium text-ink-muted hover:text-ink-primary px-3 py-1.5 rounded-xl hover:bg-canvas-subtle transition"
+                  className="text-xs font-semibold text-ink-muted hover:text-ink-primary px-3 py-1.5 rounded-pill hover:bg-canvas-subtle transition"
                 >
-                  ← Back to Home
+                  ← Back to Scenarios
                 </button>
               </div>
               <ScenarioCreator
@@ -203,15 +206,54 @@ export const AppShell: React.FC<AppShellProps> = ({
               />
             </div>
           ) : (
-            /* TAB SURFACES */
-            <>
-              {/* TAB 1: HOME (MEDIA LEARNING RAILS) */}
+            /* 7 TAB SURFACES WITH SMOOTH ENTRANCE TRANSITION */
+            <div key={activeTab} className="animate-page-enter">
+              {/* TAB 1: HOME */}
               {activeTab === 'home' && (
                 <HomeView
                   preferences={preferences}
                   progressMap={progressMap}
                   savedScenarioIds={savedScenarioIds}
                   activeTopicId={activePracticeTopicId}
+                  customScenarios={customScenarios}
+                  latestReport={latestReport}
+                  onSelectScenario={(scenario) => {
+                    playCozySound('tap');
+                    setSelectedScenarioForDetail(scenario);
+                  }}
+                  onLaunchPracticeDirect={handleLaunchPractice}
+                  onToggleSave={onToggleSaveScenario}
+                  onCreateCustomScenario={() => {
+                    playCozySound('tap');
+                    setIsCreatingScenario(true);
+                  }}
+                  onOpenTutorial={() => setIsTutorialOpen(true)}
+                  onNavigateTab={(tab) => handleSelectTab(tab)}
+                />
+              )}
+
+              {/* TAB 2: PRACTICE */}
+              {activeTab === 'practice' && (
+                <PracticeView
+                  progressMap={progressMap}
+                  savedScenarioIds={savedScenarioIds}
+                  customScenarios={customScenarios}
+                  onSelectScenarioForDetail={(scenario) => {
+                    setSelectedScenarioForDetail(scenario);
+                  }}
+                  onLaunchPractice={handleLaunchPractice}
+                  onToggleSave={onToggleSaveScenario}
+                  onCreateCustomScenario={() => {
+                    setIsCreatingScenario(true);
+                  }}
+                />
+              )}
+
+              {/* TAB 3: SCENARIOS */}
+              {activeTab === 'scenarios' && (
+                <ScenariosView
+                  progressMap={progressMap}
+                  savedScenarioIds={savedScenarioIds}
                   customScenarios={customScenarios}
                   onSelectScenario={(scenario) => {
                     playCozySound('tap');
@@ -222,11 +264,40 @@ export const AppShell: React.FC<AppShellProps> = ({
                     playCozySound('tap');
                     setIsCreatingScenario(true);
                   }}
-                  onOpenTutorial={() => setIsTutorialOpen(true)}
                 />
               )}
 
-              {/* TAB 2: PROGRESS CENTER */}
+              {/* TAB 4: REPORTS */}
+              {activeTab === 'reports' && (
+                latestReport ? (
+                  <ConversationReportPage
+                    report={latestReport}
+                    onRestartPractice={() => {
+                      const t = TOPICS.find((top) => top.id === latestReport.scenarioId) || TOPICS[0];
+                      handleLaunchPractice(t);
+                    }}
+                    onReturnDashboard={() => handleSelectTab('home')}
+                  />
+                ) : (
+                  <div className="max-w-4xl mx-auto py-12 px-4 text-center space-y-4">
+                    <div className="p-8 rounded-card bg-canvas-surface border border-canvas-border shadow-card space-y-3">
+                      <span className="text-2xl">📋</span>
+                      <h2 className="text-lg font-semibold text-ink-primary">No Guided Reports Yet</h2>
+                      <p className="text-xs text-ink-secondary max-w-md mx-auto">
+                        Complete your first interactive conversation practice session with Sophia to generate a 9-part coaching report, transcript, and strengths review.
+                      </p>
+                      <button
+                        onClick={() => handleSelectTab('practice')}
+                        className="px-5 py-2.5 rounded-pill bg-sif-primary text-white text-xs font-semibold hover:bg-sif-primaryHover transition"
+                      >
+                        Start Practice Session
+                      </button>
+                    </div>
+                  </div>
+                )
+              )}
+
+              {/* TAB 5: PROGRESS */}
               {activeTab === 'progress' && (
                 <ProgressCenterView
                   progressMap={progressMap}
@@ -236,11 +307,11 @@ export const AppShell: React.FC<AppShellProps> = ({
                     setSelectedScenarioForDetail(scenario);
                   }}
                   onDeleteTakeaway={onDeleteTakeaway}
-                  onOpenPreferences={() => setActiveTab('settings')}
+                  onOpenPreferences={() => handleSelectTab('settings')}
                 />
               )}
 
-              {/* TAB 3: FAVORITES & SAVED SCENARIOS */}
+              {/* TAB 6: SAVED */}
               {activeTab === 'favorites' && (
                 <FavoritesView
                   savedScenarios={savedScenarios}
@@ -250,11 +321,11 @@ export const AppShell: React.FC<AppShellProps> = ({
                     setSelectedScenarioForDetail(scenario);
                   }}
                   onToggleSave={onToggleSaveScenario}
-                  onBrowseMore={() => setActiveTab('home')}
+                  onBrowseMore={() => handleSelectTab('scenarios')}
                 />
               )}
 
-              {/* TAB 4: SETTINGS */}
+              {/* TAB 7: SETTINGS */}
               {activeTab === 'settings' && (
                 <SettingsView
                   preferences={preferences}
@@ -262,15 +333,7 @@ export const AppShell: React.FC<AppShellProps> = ({
                   onClearSavedWording={onClearSavedWording}
                 />
               )}
-
-              {/* TAB 5: ABOUT SIF */}
-              {activeTab === 'about' && (
-                <AboutSiFView
-                  onStartExplore={() => setActiveTab('home')}
-                  onOpenTutorial={() => setIsTutorialOpen(true)}
-                />
-              )}
-            </>
+            </div>
           )}
         </main>
       </div>

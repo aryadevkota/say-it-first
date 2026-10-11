@@ -32,20 +32,10 @@ if (process.env.NODE_ENV !== 'production') {
 export class TavusSessionCoordinator {
   /**
    * Acquire an active session if one exists and matches the scenario (or if reusable).
-   * Reusable if created within the last 15 minutes.
+   * NOTE: Session reuse is disabled for hackathon demo to ensure every live practice call
+   * gets a fresh Tavus conversation instead of loading a stale URL.
    */
-  static getReusableSession(scenarioId: string): { conversationId: string; conversationUrl: string } | null {
-    if (store.activeSession) {
-      const ageMs = Date.now() - store.activeSession.createdAt;
-      // If same scenario and created in the last 15 minutes, reuse it
-      if (store.activeSession.scenarioId === scenarioId && ageMs < 15 * 60 * 1000) {
-        console.log(`[TavusCoordinator] Reusing existing active session ${store.activeSession.conversationId} for scenario ${scenarioId}`);
-        return {
-          conversationId: store.activeSession.conversationId,
-          conversationUrl: store.activeSession.conversationUrl,
-        };
-      }
-    }
+  static getReusableSession(_scenarioId?: string): { conversationId: string; conversationUrl: string } | null {
     return null;
   }
 

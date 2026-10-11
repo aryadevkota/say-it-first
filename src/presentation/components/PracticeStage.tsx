@@ -198,7 +198,6 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
     partnerRole: topic.partner.role,
     userGoal: topic.userGoal,
     initialDialogue: topic.partner.initialDialogue,
-    onLiveKitConnect: connect,
   });
 
   const conversationUrl = avatarSessionData?.conversationUrl || null;

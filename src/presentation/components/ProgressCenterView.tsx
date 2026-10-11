@@ -8,8 +8,8 @@
  * - Latest guided coaching report (if available) with quick revisit
  * - "What to keep doing": repeatable communication habits
  * - Saved wording library ("Words to take with you") with 1-click clipboard copy
- * - Recurring skill areas and growth opportunities
  * - Zero scores, clinical ratings, or streak pressure
+ * - Opaque, high-contrast canvas surfaces (WCAG AA compliant)
  */
 
 import React, { useState } from 'react';
@@ -70,13 +70,13 @@ export const ProgressCenterView: React.FC<ProgressCenterViewProps> = ({
 
   return (
     <div
-      className="max-w-5xl mx-auto w-full py-8 px-4 sm:px-6 space-y-10 animate-fadeIn text-ink-primary"
+      className="max-w-5xl mx-auto w-full py-8 px-4 sm:px-6 space-y-10 animate-page-enter text-ink-primary"
       data-testid="progress-center-view"
     >
       {/* Header */}
       <div>
         <div className="flex items-center gap-2">
-          <span className="px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-sif-primarySubtle text-sif-primary border border-sif-border shadow-2xs">
+          <span className="px-3 py-1 rounded-pill text-xs font-semibold uppercase tracking-wider bg-sif-primarySubtle text-sif-primaryDeep border border-sif-border">
             Reflective Learning
           </span>
         </div>
@@ -90,7 +90,7 @@ export const ProgressCenterView: React.FC<ProgressCenterViewProps> = ({
 
       {/* Overview Stat Tiles (No judgment, purely milestones) */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="p-5 rounded-3xl bg-white/80 backdrop-blur-md border border-canvas-border shadow-glass-card">
+        <div className="p-5 rounded-card bg-canvas-surface border border-canvas-border shadow-card">
           <span className="text-xs font-semibold text-ink-muted uppercase tracking-wider block mb-1">
             Topics Explored
           </span>
@@ -98,7 +98,7 @@ export const ProgressCenterView: React.FC<ProgressCenterViewProps> = ({
           <span className="text-xs text-ink-muted block mt-1">of {TOPICS.length} available scenarios</span>
         </div>
 
-        <div className="p-5 rounded-3xl bg-white/80 backdrop-blur-md border border-canvas-border shadow-glass-card">
+        <div className="p-5 rounded-card bg-canvas-surface border border-canvas-border shadow-card">
           <span className="text-xs font-semibold text-ink-muted uppercase tracking-wider block mb-1">
             Conversations Completed
           </span>
@@ -106,18 +106,18 @@ export const ProgressCenterView: React.FC<ProgressCenterViewProps> = ({
           <span className="text-xs text-ink-muted block mt-1">interactive simulations finished</span>
         </div>
 
-        <div className="p-5 rounded-3xl bg-white/80 backdrop-blur-md border border-canvas-border shadow-glass-card">
+        <div className="p-5 rounded-card bg-canvas-surface border border-canvas-border shadow-card">
           <span className="text-xs font-semibold text-ink-muted uppercase tracking-wider block mb-1">
             Saved Pocket Scripts
           </span>
-          <span className="text-2xl font-semibold text-sif-accent">{savedTakeaways.length}</span>
+          <span className="text-2xl font-semibold text-sif-primaryDeep">{savedTakeaways.length}</span>
           <span className="text-xs text-ink-muted block mt-1">ready to reuse anytime</span>
         </div>
       </div>
 
       {/* Latest Guided Report Banner (if one exists) */}
       {latestReport && (
-        <div className="p-6 rounded-3xl bg-gradient-to-br from-white/90 via-canvas-subtle/80 to-sif-secondarySubtle/50 border border-sif-border shadow-glass-card backdrop-blur-md space-y-4">
+        <div className="p-6 sm:p-7 rounded-card-lg bg-canvas-surface border border-sif-border shadow-card space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-sif-primary animate-pulse" />
@@ -138,7 +138,7 @@ export const ProgressCenterView: React.FC<ProgressCenterViewProps> = ({
               <h2 className="text-lg font-semibold text-ink-primary">
                 {latestReport.snapshot.scenarioTitle}
               </h2>
-              <p className="text-xs text-ink-secondary mt-1 line-clamp-2 max-w-xl">
+              <p className="text-xs text-ink-secondary mt-1 line-clamp-2 max-w-xl leading-relaxed">
                 {latestReport.snapshot.plainLanguageSummary}
               </p>
             </div>
@@ -148,17 +148,17 @@ export const ProgressCenterView: React.FC<ProgressCenterViewProps> = ({
                 playCozySound('tap');
                 setShowFullLatestReport(true);
               }}
-              className="px-5 py-2.5 rounded-xl bg-sif-primary text-white text-xs font-semibold hover:bg-sif-primaryHover transition shadow-glass-card shrink-0"
+              className="px-5 py-2.5 rounded-pill bg-sif-primary text-white text-xs font-semibold hover:bg-sif-primaryHover transition shadow-card shrink-0"
             >
               View Full 9-Part Report →
             </button>
           </div>
 
           {/* Key Strengths Snippet */}
-          <div className="pt-2 border-t border-canvas-borderSubtle grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+          <div className="pt-3 border-t border-canvas-borderSubtle grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
             {latestReport.whatYouDidWell.slice(0, 2).map((strength, idx) => (
               <div key={idx} className="flex items-start gap-2 text-ink-primary">
-                <span className="text-emerald-600 font-bold shrink-0">✓</span>
+                <span className="text-emerald-700 font-bold shrink-0">✓</span>
                 <span className="line-clamp-1">{strength}</span>
               </div>
             ))}
@@ -174,7 +174,7 @@ export const ProgressCenterView: React.FC<ProgressCenterViewProps> = ({
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="p-5 rounded-2xl bg-canvas-surface border border-canvas-border space-y-1.5 text-xs">
+          <div className="p-5 rounded-card bg-canvas-surface border border-canvas-border shadow-card space-y-1.5 text-xs">
             <span className="text-sif-primary font-bold text-sm flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-sif-primary"></span>
               Acknowledge First
@@ -183,7 +183,7 @@ export const ProgressCenterView: React.FC<ProgressCenterViewProps> = ({
               Mirror one detail or feeling word before moving to a new point to confirm you heard them.
             </p>
           </div>
-          <div className="p-5 rounded-2xl bg-canvas-surface border border-canvas-border space-y-1.5 text-xs">
+          <div className="p-5 rounded-card bg-canvas-surface border border-canvas-border shadow-card space-y-1.5 text-xs">
             <span className="text-sif-primary font-bold text-sm flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-sif-primary"></span>
               Tentative Phrasing
@@ -192,7 +192,7 @@ export const ProgressCenterView: React.FC<ProgressCenterViewProps> = ({
               Use "I would prefer" or "Could we try" when asserting sensory or personal boundaries.
             </p>
           </div>
-          <div className="p-5 rounded-2xl bg-canvas-surface border border-canvas-border space-y-1.5 text-xs">
+          <div className="p-5 rounded-card bg-canvas-surface border border-canvas-border shadow-card space-y-1.5 text-xs">
             <span className="text-sif-primary font-bold text-sm flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-sif-primary"></span>
               Conversational Ping-Pong
@@ -208,17 +208,17 @@ export const ProgressCenterView: React.FC<ProgressCenterViewProps> = ({
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-ink-primary">Words to take with you</h2>
+            <h2 className="text-lg font-semibold text-ink-primary">Words to Take With You</h2>
             <p className="text-xs text-ink-muted">Phrasing and scripts you customized during practice sessions.</p>
           </div>
         </div>
 
         {savedTakeaways.length === 0 ? (
-          <div className="p-8 rounded-3xl bg-canvas-surface border border-canvas-border text-center space-y-3">
+          <div className="p-8 rounded-card bg-canvas-surface border border-canvas-border text-center space-y-3">
             <div className="w-12 h-12 rounded-full bg-canvas-subtle text-ink-muted flex items-center justify-center mx-auto text-lg">
               ✎
             </div>
-            <p className="text-sm font-medium text-ink-primary">No saved wording yet</p>
+            <p className="text-sm font-semibold text-ink-primary">No saved wording yet</p>
             <p className="text-xs text-ink-muted max-w-sm mx-auto">
               After any conversation, adjust your 2-sentence pocket script and save it here for fast real-world reference.
             </p>
@@ -228,11 +228,11 @@ export const ProgressCenterView: React.FC<ProgressCenterViewProps> = ({
             {savedTakeaways.map((item) => (
               <div
                 key={item.id}
-                className="p-5 rounded-2xl bg-canvas-surface border border-canvas-border flex flex-col justify-between shadow-xs hover:border-teal-border transition text-xs space-y-3"
+                className="p-5 rounded-card bg-canvas-surface border border-canvas-border flex flex-col justify-between shadow-card hover:border-sif-border transition text-xs space-y-3"
               >
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="font-semibold text-teal-brand uppercase tracking-wider text-[11px]">
+                    <span className="font-semibold text-sif-primary uppercase tracking-wider text-[11px]">
                       {item.topicTitle}
                     </span>
                     <span className="text-[11px] text-ink-muted">{item.savedAt}</span>
@@ -245,7 +245,7 @@ export const ProgressCenterView: React.FC<ProgressCenterViewProps> = ({
                 <div className="flex items-center justify-between pt-3 border-t border-canvas-borderSubtle">
                   <button
                     onClick={() => handleCopy(item.id, item.script)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-canvas-subtle hover:bg-teal-subtle hover:text-teal-brand transition text-ink-secondary"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-pill text-xs font-semibold bg-canvas-subtle hover:bg-sif-primarySubtle hover:text-sif-primaryDeep transition text-ink-secondary"
                   >
                     <span>{copiedId === item.id ? '✓ Copied' : 'Copy wording'}</span>
                   </button>
@@ -256,7 +256,7 @@ export const ProgressCenterView: React.FC<ProgressCenterViewProps> = ({
                         playCozySound('tap');
                         onDeleteTakeaway(item.id);
                       }}
-                      className="text-xs text-ink-muted hover:text-topic-apricot transition px-2 py-1 rounded"
+                      className="text-xs text-ink-muted hover:text-rose-600 transition px-2 py-1 rounded"
                     >
                       Delete
                     </button>

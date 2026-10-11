@@ -4,11 +4,11 @@
  * SettingsView.tsx — Reorganized & Polished Settings Surface
  *
  * Implements:
- * - Grouped card layout (avoiding enterprise form energy)
+ * - Grouped card layout with crisp borders (no generic SaaS forms or washed-out glass)
  * - Comfort & guidance levels (Independent / Cues / Subtext)
- * - Voice & Avatar preferences (Show/Hide avatar, spoken audio, microphone)
- * - Accessibility (Reduced motion, cozy UI audio sounds)
- * - Data management & privacy explanations (Local-only storage)
+ * - Voice & Avatar preferences (Show/Hide avatar, UI audio)
+ * - Accessibility (Reduced motion)
+ * - Local-only data management
  */
 
 import React, { useState } from 'react';
@@ -39,13 +39,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
   return (
     <div
-      className="max-w-4xl mx-auto w-full py-8 px-4 sm:px-6 space-y-8 animate-fadeIn text-ink-primary"
+      className="max-w-4xl mx-auto w-full py-8 px-4 sm:px-6 space-y-8 animate-page-enter text-ink-primary"
       data-testid="settings-view"
     >
       {/* Header */}
       <div>
         <div className="flex items-center gap-2">
-          <span className="px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-teal-subtle text-teal-brand border border-teal-border">
+          <span className="px-3 py-1 rounded-pill text-xs font-semibold uppercase tracking-wider bg-sif-primarySubtle text-sif-primaryDeep border border-sif-border">
             Environment & Preferences
           </span>
         </div>
@@ -59,7 +59,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
       <div className="space-y-6">
         {/* Section 1: Guidance Depth */}
-        <div className="p-6 rounded-3xl bg-canvas-surface border border-canvas-border shadow-xs space-y-4">
+        <div className="p-6 rounded-card bg-canvas-surface border border-canvas-border shadow-card space-y-4">
           <div>
             <h2 className="text-base font-semibold text-ink-primary">Guidance Level</h2>
             <p className="text-xs text-ink-muted mt-0.5">Choose how much real-time subtext and cue support is visible during practice.</p>
@@ -81,10 +81,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                     guidanceLevel: lvl.id as 'independent' | 'cues' | 'subtext',
                   });
                 }}
-                className={`p-4 rounded-2xl border text-left flex flex-col justify-between transition ${
+                className={`p-4 rounded-card border text-left flex flex-col justify-between transition ${
                   preferences.guidanceLevel === lvl.id
-                    ? 'bg-sif-primarySubtle border-sif-primary text-sif-primaryDeep font-medium shadow-glass-card'
-                    : 'bg-white/80 border-canvas-border hover:bg-white'
+                    ? 'bg-sif-primarySubtle border-sif-primary text-sif-primaryDeep font-medium shadow-card'
+                    : 'bg-canvas-surface border-canvas-border hover:border-sif-border'
                 }`}
               >
                 <div>
@@ -106,7 +106,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         </div>
 
         {/* Section 2: Avatar & Audio Experience */}
-        <div className="p-6 rounded-3xl bg-white/80 backdrop-blur-md border border-canvas-border shadow-glass-card space-y-4">
+        <div className="p-6 rounded-card bg-canvas-surface border border-canvas-border shadow-card space-y-4">
           <div>
             <h2 className="text-base font-semibold text-ink-primary">Avatar & Voice Presentation</h2>
             <p className="text-xs text-ink-muted mt-0.5">Control visual avatar presence and audio playback options.</p>
@@ -114,7 +114,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
           <div className="space-y-3">
             {/* Show / Hide Avatar Toggle */}
-            <div className="flex items-center justify-between p-3.5 rounded-2xl bg-canvas-subtle border border-canvas-borderSubtle">
+            <div className="flex items-center justify-between p-3.5 rounded-card bg-canvas-subtle border border-canvas-borderSubtle">
               <div>
                 <span className="text-sm font-semibold text-ink-primary block">Sophia Live Video Avatar</span>
                 <span className="text-xs text-ink-muted">Display the live video partner stage during practice calls.</span>
@@ -125,7 +125,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   playCozySound('toggle');
                   onUpdatePreferences({ ...preferences, hideAvatar: !preferences.hideAvatar });
                 }}
-                className={`w-12 h-6 rounded-full transition-colors relative flex items-center p-0.5 ${
+                className={`w-12 h-6 rounded-pill transition-colors relative flex items-center p-0.5 ${
                   !preferences.hideAvatar ? 'bg-sif-primary' : 'bg-canvas-border'
                 }`}
                 aria-pressed={!preferences.hideAvatar}
@@ -139,7 +139,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             </div>
 
             {/* Cozy Tactile Audio Sounds Toggle */}
-            <div className="flex items-center justify-between p-3.5 rounded-2xl bg-canvas-subtle border border-canvas-borderSubtle">
+            <div className="flex items-center justify-between p-3.5 rounded-card bg-canvas-subtle border border-canvas-borderSubtle">
               <div>
                 <span className="text-sm font-semibold text-ink-primary block">Subtle UI Sounds</span>
                 <span className="text-xs text-ink-muted">Gentle synthesized tactile audio clicks on button taps and version branches.</span>
@@ -147,7 +147,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               <button
                 type="button"
                 onClick={() => handleToggleSound(!uiSoundsEnabled)}
-                className={`w-12 h-6 rounded-full transition-colors relative flex items-center p-0.5 ${
+                className={`w-12 h-6 rounded-pill transition-colors relative flex items-center p-0.5 ${
                   uiSoundsEnabled ? 'bg-sif-primary' : 'bg-canvas-border'
                 }`}
                 aria-pressed={uiSoundsEnabled}
@@ -163,13 +163,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         </div>
 
         {/* Section 3: Accessibility & Motion */}
-        <div className="p-6 rounded-3xl bg-canvas-surface border border-canvas-border shadow-xs space-y-4">
+        <div className="p-6 rounded-card bg-canvas-surface border border-canvas-border shadow-card space-y-4">
           <div>
             <h2 className="text-base font-semibold text-ink-primary">Accessibility & Motion</h2>
             <p className="text-xs text-ink-muted mt-0.5">Adapt visual pacing to your sensory comfort.</p>
           </div>
 
-          <div className="flex items-center justify-between p-3.5 rounded-2xl bg-canvas-subtle border border-canvas-borderSubtle">
+          <div className="flex items-center justify-between p-3.5 rounded-card bg-canvas-subtle border border-canvas-borderSubtle">
             <div>
               <span className="text-sm font-semibold text-ink-primary block">Reduced Motion Mode</span>
               <span className="text-xs text-ink-muted">Minimizes animated screen transitions, pulses, and scaling effects.</span>
@@ -180,8 +180,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 playCozySound('toggle');
                 onUpdatePreferences({ ...preferences, reducedMotion: !preferences.reducedMotion });
               }}
-              className={`w-12 h-6 rounded-full transition-colors relative flex items-center p-0.5 ${
-                preferences.reducedMotion ? 'bg-teal-brand' : 'bg-canvas-border'
+              className={`w-12 h-6 rounded-pill transition-colors relative flex items-center p-0.5 ${
+                preferences.reducedMotion ? 'bg-sif-primary' : 'bg-canvas-border'
               }`}
               aria-pressed={preferences.reducedMotion}
             >
@@ -195,13 +195,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         </div>
 
         {/* Section 4: Data & Local Storage */}
-        <div className="p-6 rounded-3xl bg-canvas-surface border border-canvas-border shadow-xs space-y-4">
+        <div className="p-6 rounded-card bg-canvas-surface border border-canvas-border shadow-card space-y-4">
           <div>
             <h2 className="text-base font-semibold text-ink-primary">Data & Local Storage</h2>
             <p className="text-xs text-ink-muted mt-0.5">Your progress, wording, and custom scenarios remain in your browser storage.</p>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-2xl bg-canvas-subtle border border-canvas-borderSubtle">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-card bg-canvas-subtle border border-canvas-borderSubtle">
             <div>
               <span className="text-xs font-semibold text-ink-primary block">Clear Saved Wording</span>
               <span className="text-xs text-ink-muted">Removes locally saved takeaway scripts from this browser.</span>
@@ -216,14 +216,14 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   setTimeout(() => setClearNotice(null), 3000);
                 }
               }}
-              className="px-4 py-2 rounded-xl border border-topic-apricot text-topic-apricot hover:bg-topic-apricotBg text-xs font-medium transition shrink-0"
+              className="px-4 py-2 rounded-pill border border-rose-300 text-rose-700 hover:bg-rose-50 text-xs font-medium transition shrink-0"
             >
               Clear Wording
             </button>
           </div>
 
           {clearNotice && (
-            <p className="text-xs text-teal-brand font-medium animate-fadeIn">{clearNotice}</p>
+            <p className="text-xs text-sif-primary font-medium animate-fadeIn">{clearNotice}</p>
           )}
         </div>
       </div>
