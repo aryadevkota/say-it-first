@@ -27,6 +27,10 @@ type AvatarState = 'listening' | 'speaking' | 'thinking' | 'neutral' | 'receptiv
 import type { SavedTakeaway } from './MyProgress';
 import { useLiveAvatarSession } from '../hooks/useLiveAvatarSession';
 import { playCozySound } from '../utils/cozyAudio';
+import { ReportGenerationView } from './ReportGenerationView';
+import { ConversationReportPage } from './ConversationReportPage';
+import { ReportGeneratorService } from '../../domain/services/ReportGeneratorService';
+import type { SessionReport } from '../../domain/entities/SessionReport';
 
 interface TurnMessage {
   id: string;
@@ -49,16 +53,20 @@ interface AttemptBranch {
 
 interface PracticeStageProps {
   topic: ScenarioDefinition;
-  preferences: UserPreferences;  onExit: () => void;
+  preferences: UserPreferences;
+  onExit: () => void;
   onSaveTakeaway: (takeaway: SavedTakeaway) => void;
   onCompleteTopic: (topicId: string) => void;
+  onReportGenerated?: (report: SessionReport) => void;
 }
 
 export const PracticeStage: React.FC<PracticeStageProps> = ({
   topic,
-  preferences,  onExit,
+  preferences,
+  onExit,
   onSaveTakeaway,
   onCompleteTopic,
+  onReportGenerated,
 }) => {
   // Current active attempt branch (for non-destructive retries)
   const [attempts, setAttempts] = useState<AttemptBranch[]>([
@@ -97,10 +105,13 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
     preferences.guidanceLevel !== 'independent',
   );
 
-  // Modals
+  // Modals & Report Screen States
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [isTakeawayOpen, setIsTakeawayOpen] = useState<boolean>(false);
   const [showHistoryDrawer, setShowHistoryDrawer] = useState<boolean>(false);
+  const [stageMode, setStageMode] = useState<'practice' | 'generating-report' | 'report'>('practice');
+  const [sessionReport, setSessionReport] = useState<SessionReport | null>(null);
+  const [sessionStartTime] = useState<number>(() => Date.now());
 
   // Takeaway script draft
   const [editableTakeaway, setEditableTakeaway] = useState<string>(
@@ -468,7 +479,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
     }
   };
 
-  // Finish practice session and show takeaways
+  // Finish practice session and transition automatically to report generation
   const handleFinishPractice = () => {
     playCozySound('tap');
     disconnect();
@@ -477,7 +488,33 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
       abortControllerRef.current.abort();
     }
     onCompleteTopic(topic.id);
-    setIsTakeawayOpen(true);
+
+    // Synthesize structured report
+    const durationSeconds = Math.max(15, Math.round((Date.now() - sessionStartTime) / 1000));
+    const service = new ReportGeneratorService();
+    const generated = service.generateReport({
+      scenarioId: topic.id,
+      turns: activeBranch.turns.map((t) => ({
+        id: t.id,
+        role: t.role,
+        text: t.text,
+      })),
+      durationSeconds,
+      customScenario: topic.customMetadata
+        ? {
+            situation: topic.customMetadata.userProvidedSituation,
+            partner_role: topic.partner.role,
+            partner_name: topic.partner.name,
+            user_goal: topic.userGoal,
+          }
+        : undefined,
+    });
+
+    setSessionReport(generated);
+    if (onReportGenerated) {
+      onReportGenerated(generated);
+    }
+    setStageMode('generating-report');
   };
 
   // Save takeaway script
@@ -507,6 +544,31 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
     }
     onExit();
   };
+
+  // Render Report Generation Animated Transition
+  if (stageMode === 'generating-report') {
+    return (
+      <ReportGenerationView
+        scenarioTitle={topic.title}
+        onGenerationComplete={() => setStageMode('report')}
+      />
+    );
+  }
+
+  // Render Coached Report Page once analysis complete
+  if (stageMode === 'report' && sessionReport) {
+    return (
+      <ConversationReportPage
+        report={sessionReport}
+        onRestartPractice={() => {
+          setStageMode('practice');
+          setActiveAttemptIndex(0);
+          setUserDraft('');
+        }}
+        onReturnDashboard={handleExitStage}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-canvas-light text-ink-primary flex flex-col justify-between">

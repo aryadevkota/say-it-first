@@ -23,29 +23,32 @@ import {
   DEFAULT_PREFERENCES,
   type UserPreferences,
 } from '../presentation/components/WelcomeOnboarding';
-import { TopicDashboard } from '../presentation/components/TopicDashboard';
-import { PracticeStage } from '../presentation/components/PracticeStage';
+import { AppShell } from '../presentation/components/AppShell';
 import { PreferencesModal } from '../presentation/components/PreferencesModal';
-import { ScenarioCreator } from '../presentation/components/ScenarioCreator';
 import {
   TOPICS,
   type ScenarioDefinition,
   type TopicProgressStatus,
 } from '../domain/scenarios/topics';
 import type { SavedTakeaway } from '../presentation/components/MyProgress';
+import type { SessionReport } from '../domain/entities/SessionReport';
 
 const STORAGE_KEY_PREFS = 'say_it_first_user_prefs';
 const STORAGE_KEY_PROGRESS = 'say_it_first_progress';
 const STORAGE_KEY_TAKEAWAYS = 'say_it_first_takeaways';
 const STORAGE_KEY_CUSTOM_SCENARIOS = 'say_it_first_custom_scenarios';
+const STORAGE_KEY_FAVORITES = 'say_it_first_favorite_scenarios';
+const STORAGE_KEY_LATEST_REPORT = 'say_it_first_latest_report';
 
 export default function SayItFirstRoot() {
-  const [currentView, setCurrentView] = useState<'welcome' | 'dashboard' | 'practice' | 'create-scenario'>('welcome');
+  const [currentView, setCurrentView] = useState<'welcome' | 'app'>('welcome');
   const [preferences, setPreferences] = useState<UserPreferences>(DEFAULT_PREFERENCES);
   const [progressMap, setProgressMap] = useState<Record<string, TopicProgressStatus>>({});
   const [savedTakeaways, setSavedTakeaways] = useState<SavedTakeaway[]>([]);
+  const [savedScenarioIds, setSavedScenarioIds] = useState<string[]>([]);
   const [customScenarios, setCustomScenarios] = useState<ScenarioDefinition[]>([]);
   const [activePracticeTopic, setActivePracticeTopic] = useState<ScenarioDefinition | null>(null);
+  const [latestReport, setLatestReport] = useState<SessionReport | null>(null);
   const [isPreferencesOpen, setIsPreferencesOpen] = useState<boolean>(false);
   const [isReturningUser, setIsReturningUser] = useState<boolean>(false);
   const [isHydrated, setIsHydrated] = useState<boolean>(false);
@@ -57,8 +60,6 @@ export default function SayItFirstRoot() {
       if (storedPrefs) {
         setPreferences(JSON.parse(storedPrefs));
         setIsReturningUser(true);
-        // Note: Per Section 10 requirements, app freshly mounts on welcome screen.
-        // Returning users see "Continue" which takes them right into their saved dashboard.
       }
 
       const storedProgress = localStorage.getItem(STORAGE_KEY_PROGRESS);
@@ -71,9 +72,19 @@ export default function SayItFirstRoot() {
         setSavedTakeaways(JSON.parse(storedTakeaways));
       }
 
+      const storedFavorites = localStorage.getItem(STORAGE_KEY_FAVORITES);
+      if (storedFavorites) {
+        setSavedScenarioIds(JSON.parse(storedFavorites));
+      }
+
       const storedScenarios = localStorage.getItem(STORAGE_KEY_CUSTOM_SCENARIOS);
       if (storedScenarios) {
         setCustomScenarios(JSON.parse(storedScenarios));
+      }
+
+      const storedReport = localStorage.getItem(STORAGE_KEY_LATEST_REPORT);
+      if (storedReport) {
+        setLatestReport(JSON.parse(storedReport));
       }
     } catch {
       // Local storage fallback
@@ -92,15 +103,28 @@ export default function SayItFirstRoot() {
     }
   };
 
+  // Toggle favorite bookmark for a scenario
+  const handleToggleSaveScenario = (scenarioId: string) => {
+    setSavedScenarioIds((prev) => {
+      const updated = prev.includes(scenarioId)
+        ? prev.filter((id) => id !== scenarioId)
+        : [...prev, scenarioId];
+      try {
+        localStorage.setItem(STORAGE_KEY_FAVORITES, JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+  };
+
   // Onboarding completion
   const handleCompleteOnboarding = (prefs: UserPreferences) => {
     handleUpdatePreferences(prefs);
-    setCurrentView('dashboard');
+    setCurrentView('app');
   };
 
   // Direct explore from welcome
   const handleExploreDirectly = () => {
-    setCurrentView('dashboard');
+    setCurrentView('app');
   };
 
   // Mark topic explored
@@ -129,7 +153,6 @@ export default function SayItFirstRoot() {
       } catch {}
       return updated;
     });
-    setCurrentView('practice');
   };
 
   // Complete practice session
@@ -144,6 +167,14 @@ export default function SayItFirstRoot() {
       } catch {}
       return updated;
     });
+  };
+
+  // Persist latest generated report
+  const handleReportGenerated = (report: SessionReport) => {
+    setLatestReport(report);
+    try {
+      localStorage.setItem(STORAGE_KEY_LATEST_REPORT, JSON.stringify(report));
+    } catch {}
   };
 
   // Save takeaway script
@@ -218,68 +249,27 @@ export default function SayItFirstRoot() {
         />
       )}
 
-      {/* VIEW 2: PERSONALIZED DASHBOARD */}
-      {currentView === 'dashboard' && (
-        <TopicDashboard
+      {/* VIEW 2: APP SHELL (MEDIA-LEARNING PLATFORM) */}
+      {currentView === 'app' && (
+        <AppShell
           preferences={preferences}
           progressMap={progressMap}
           savedTakeaways={savedTakeaways}
-          activeTopicId={activePracticeTopic?.id}
+          savedScenarioIds={savedScenarioIds}
           customScenarios={customScenarios}
+          activePracticeTopicId={activePracticeTopic?.id}
+          latestReport={latestReport}
+          onUpdatePreferences={handleUpdatePreferences}
+          onToggleSaveScenario={handleToggleSaveScenario}
           onStartPractice={handleStartPractice}
-          onOpenPreferences={() => setIsPreferencesOpen(true)}
-          onMarkExplored={handleMarkExplored}
-          onDeleteTakeaway={handleDeleteTakeaway}
-          onCreateCustomScenario={() => setCurrentView('create-scenario')}
-          onDeleteCustomScenario={handleDeleteCustomScenario}
-        />
-      )}
-
-      {/* VIEW 3: PRACTICE STAGE */}
-      {currentView === 'practice' && activePracticeTopic && (
-        <PracticeStage
-          topic={activePracticeTopic}
-          preferences={preferences}
-          onExit={() => setCurrentView('dashboard')}
           onSaveTakeaway={handleSaveTakeaway}
           onCompleteTopic={handleCompleteTopic}
+          onReportGenerated={handleReportGenerated}
+          onDeleteTakeaway={handleDeleteTakeaway}
+          onClearSavedWording={handleClearSavedWording}
+          onSaveCustomScenario={handleSaveCustomScenario}
+          onDeleteCustomScenario={handleDeleteCustomScenario}
         />
-      )}
-
-      {/* VIEW 4: CUSTOM SCENARIO CREATOR */}
-      {currentView === 'create-scenario' && (
-        <div className="min-h-screen bg-canvas-light text-ink-primary flex flex-col">
-          <nav className="border-b border-canvas-borderSubtle bg-canvas-surface/80 backdrop-blur-xs sticky top-0 z-30">
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-              <button
-                onClick={() => setCurrentView('dashboard')}
-                className="flex items-center gap-1.5 text-xs font-medium text-ink-muted hover:text-ink-primary transition"
-              >
-                <span>← Back to Dashboard</span>
-              </button>
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-lg bg-teal-brand text-canvas-surface flex items-center justify-center font-bold text-xs">
-                  S
-                </div>
-                <span className="font-semibold text-sm text-ink-primary">New Scenario</span>
-              </div>
-              <div className="w-16" />
-            </div>
-          </nav>
-          <main className="flex-1">
-            <ScenarioCreator
-              onStartPractice={(scenario) => {
-                handleSaveCustomScenario(scenario);
-                handleStartPractice(scenario);
-              }}
-              onSaveScenario={(scenario) => {
-                handleSaveCustomScenario(scenario);
-                setCurrentView('dashboard');
-              }}
-              onCancel={() => setCurrentView('dashboard')}
-            />
-          </main>
-        </div>
       )}
 
       {/* GLOBAL PREFERENCES MODAL */}
@@ -291,7 +281,6 @@ export default function SayItFirstRoot() {
           onClearSavedWording={handleClearSavedWording}
         />
       )}
-
     </>
   );
 }

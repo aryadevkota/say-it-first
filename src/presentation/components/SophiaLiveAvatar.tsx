@@ -41,7 +41,7 @@ export const SophiaLiveAvatar: React.FC<SophiaLiveAvatarProps> = ({
     <section
       aria-label="Sophia Live Avatar Stage"
       data-testid="sophia-live-avatar"
-      className={`w-full max-w-2xl aspect-[4/3] sm:aspect-video rounded-3xl overflow-hidden relative shadow-lg border border-canvas-border flex flex-col justify-between transition-all select-none bg-canvas-dark ${className}`}
+      className={`w-full max-w-4xl aspect-[4/3] sm:aspect-video rounded-3xl overflow-hidden relative shadow-xl border border-canvas-border flex flex-col justify-between transition-all select-none bg-canvas-dark ${className}`}
     >
       <div className="absolute inset-0 z-0 overflow-hidden bg-slate-950 flex items-center justify-center">
         {conversationUrl ? (

@@ -12,9 +12,28 @@ function isKeyConfigured(key?: string): boolean {
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json().catch(() => ({}));
+    const rawBody = await request.text().catch(() => '');
+    let body: any = {};
+    try {
+      body = JSON.parse(rawBody);
+    } catch {
+      body = {};
+    }
+
     const tavusApiKey = process.env.TAVUS_API_KEY?.trim().replace(/^["']|["']$/g, '');
     const tavusFaceId = (process.env.TAVUS_FACE_ID || "r3f427f43c9d").trim().replace(/^["']|["']$/g, '');
+
+    // Beacon / termination handler from tab close
+    if (body.action === 'end' || (body.conversationId && !body.scenarioId)) {
+      if (body.conversationId && isKeyConfigured(tavusApiKey)) {
+        console.log('[Tavus] Immediate tab close termination:', body.conversationId);
+        await fetch(`https://tavusapi.com/v2/conversations/${body.conversationId}/end`, {
+          method: 'POST',
+          headers: { 'x-api-key': tavusApiKey! }
+        }).catch(() => {});
+      }
+      return NextResponse.json({ success: true }, { status: 200 });
+    }
 
     // -------------------------------------------------------------
     // 1. Tavus CVI Integration Path
@@ -29,25 +48,63 @@ export async function POST(request: Request) {
 The user's goal in this practice scenario: "${userGoal}".
 Stay in character, respond naturally, empathetically, and constructively. Keep your replies concise, spoken-length (1-3 sentences), and supportive.`;
 
-      const tavusRes = await fetch('https://tavusapi.com/v2/conversations', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': tavusApiKey!,
-        },
-        body: JSON.stringify({
-          face_id: tavusFaceId,
-          conversation_name: `SayItFirst Practice - ${partnerName}`,
-          conversational_context: conversationalContext,
-          custom_greeting: initialDialogue,
-          properties: {
-            max_call_duration: 1800,
-            participant_left_timeout: 30,
-            participant_absent_timeout: 120,
-            enable_closed_captions: true,
+      const createPayload = {
+        face_id: tavusFaceId,
+        conversation_name: `SayItFirst Practice - ${partnerName}`,
+        conversational_context: conversationalContext,
+        custom_greeting: initialDialogue,
+        properties: {
+          max_call_duration: 1800,
+          participant_left_timeout: 10,
+          participant_absent_timeout: 60,
+          enable_closed_captions: true,
+        }
+      };
+
+      const sendCreate = async () => {
+        return fetch('https://tavusapi.com/v2/conversations', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': tavusApiKey!,
+          },
+          body: JSON.stringify(createPayload)
+        });
+      };
+
+      let tavusRes = await sendCreate();
+
+      // If concurrency limit is reached, auto-end lingering active conversations and retry
+      if (!tavusRes.ok && tavusRes.status === 400) {
+        const errJson = await tavusRes.clone().json().catch(() => ({}));
+        if (errJson.message?.includes('maximum concurrent conversations')) {
+          console.warn('[Tavus] Concurrency limit hit. Cleaning up lingering active sessions...');
+          try {
+            const listRes = await fetch('https://tavusapi.com/v2/conversations', {
+              headers: { 'x-api-key': tavusApiKey! }
+            });
+            if (listRes.ok) {
+              const listData = await listRes.json();
+              const activeSessions = (listData.data || []).filter(
+                (c: any) => c.status === 'active' || c.status === 'created'
+              );
+              await Promise.all(
+                activeSessions.map((c: any) =>
+                  fetch(`https://tavusapi.com/v2/conversations/${c.conversation_id}/end`, {
+                    method: 'POST',
+                    headers: { 'x-api-key': tavusApiKey! }
+                  }).catch(() => {})
+                )
+              );
+              // Small delay to allow webhook / session termination to register
+              await new Promise((resolve) => setTimeout(resolve, 1000));
+              tavusRes = await sendCreate();
+            }
+          } catch (cleanErr) {
+            console.warn('[Tavus] Cleanup of lingering sessions failed:', cleanErr);
           }
-        })
-      });
+        }
+      }
 
       if (!tavusRes.ok) {
         const errData = await tavusRes.json().catch(() => ({}));
@@ -208,7 +265,21 @@ Stay in character, respond naturally, empathetically, and constructively. Keep y
 
 export async function DELETE(request: Request) {
   try {
-    const { conversationId } = await request.json().catch(() => ({}));
+    let conversationId: string | undefined;
+    const contentType = request.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      const body = await request.json().catch(() => ({}));
+      conversationId = body.conversationId;
+    } else {
+      const text = await request.text().catch(() => '');
+      try {
+        const parsed = JSON.parse(text);
+        conversationId = parsed.conversationId;
+      } catch {
+        conversationId = text.trim();
+      }
+    }
+
     const tavusApiKey = process.env.TAVUS_API_KEY?.trim().replace(/^["']|["']$/g, '');
 
     if (!conversationId || !isKeyConfigured(tavusApiKey)) {
