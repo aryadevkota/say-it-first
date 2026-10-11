@@ -69,6 +69,27 @@ export function useAnamAvatarSession(options: UseAnamAvatarSessionOptions = {}) 
   const connectingPromiseRef = useRef<Promise<void> | null>(null);
   const speakingTimerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Mutable refs to prevent connect/disconnect callback recreation on state churn
+  const sessionStateRef = useRef<AvatarSessionLifecycleState>('idle');
+  const isMutedRef = useRef<boolean>(initialMuted);
+  const optionsRef = useRef({
+    videoElementId,
+    initialDialogue,
+    agentId,
+  });
+
+  useEffect(() => {
+    optionsRef.current = {
+      videoElementId,
+      initialDialogue,
+      agentId,
+    };
+  });
+
+  useEffect(() => {
+    isMutedRef.current = isMuted;
+  }, [isMuted]);
+
   const callbacksRef = useRef({
     onPlaybackStateChange,
     onStateChange,
@@ -88,6 +109,7 @@ export function useAnamAvatarSession(options: UseAnamAvatarSessionOptions = {}) 
   });
 
   const updateState = useCallback((nextState: AvatarSessionLifecycleState) => {
+    sessionStateRef.current = nextState;
     setSessionState(nextState);
     callbacksRef.current.onStateChange?.(nextState);
   }, []);
@@ -131,16 +153,28 @@ export function useAnamAvatarSession(options: UseAnamAvatarSessionOptions = {}) 
    * Connect to Anam with the server-side ElevenLabs agent integration.
    */
   const connect = useCallback(async (): Promise<void> => {
+    // 1. In-flight connection guard
     if (connectingPromiseRef.current) {
       return connectingPromiseRef.current;
     }
 
-    if (sessionState === 'active' && clientRef.current) {
+    // 2. Active session or existing client guard
+    if (
+      sessionStateRef.current === 'active' ||
+      sessionStateRef.current === 'creating' ||
+      clientRef.current !== null
+    ) {
       return;
     }
 
     updateState('creating');
     setErrorMessage(null);
+
+    const {
+      videoElementId: targetVideoId,
+      agentId: currentAgentId,
+      initialDialogue: currentInitialDialogue,
+    } = optionsRef.current;
 
     const task = (async () => {
       try {
@@ -149,8 +183,8 @@ export function useAnamAvatarSession(options: UseAnamAvatarSessionOptions = {}) 
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            agentId,
-            initialDialogue,
+            agentId: currentAgentId,
+            initialDialogue: currentInitialDialogue,
           }),
         });
 
@@ -168,6 +202,11 @@ export function useAnamAvatarSession(options: UseAnamAvatarSessionOptions = {}) 
         }
 
         if (!isMountedRef.current) return;
+
+        // Ensure another client was not attached concurrently
+        if (clientRef.current) {
+          return;
+        }
 
         // 2. Initialize Anam client
         const client = createClient(sessionToken);
@@ -235,20 +274,20 @@ export function useAnamAvatarSession(options: UseAnamAvatarSessionOptions = {}) 
 
         // 3. Ensure target video element exists in DOM before starting stream
         let retries = 0;
-        while (!document.getElementById(videoElementId) && retries < 20) {
+        while (!document.getElementById(targetVideoId) && retries < 20) {
           await new Promise((r) => setTimeout(r, 100));
           retries++;
         }
 
-        const videoEl = document.getElementById(videoElementId) as HTMLVideoElement | null;
+        const videoEl = document.getElementById(targetVideoId) as HTMLVideoElement | null;
         if (videoEl) {
-          videoEl.muted = isMuted;
+          videoEl.muted = isMutedRef.current;
         } else {
-          console.warn(`[Anam] Target video element #${videoElementId} not found in DOM`);
+          console.warn(`[Anam] Target video element #${targetVideoId} not found in DOM`);
         }
 
         // 4. Stream avatar video and synchronized ElevenLabs agent audio into video element
-        await client.streamToVideoElement(videoElementId);
+        await client.streamToVideoElement(targetVideoId);
 
         if (isMountedRef.current) {
           updateState('active');
@@ -268,7 +307,7 @@ export function useAnamAvatarSession(options: UseAnamAvatarSessionOptions = {}) 
 
     connectingPromiseRef.current = task;
     return task;
-  }, [agentId, initialDialogue, isMuted, markSpeaking, sessionState, updateState, videoElementId]);
+  }, [markSpeaking, updateState]);
 
   /**
    * Send a programmatic user text message into the ElevenLabs agent conversation.
@@ -298,13 +337,15 @@ export function useAnamAvatarSession(options: UseAnamAvatarSessionOptions = {}) 
   const toggleMute = useCallback(() => {
     setIsMuted((prev) => {
       const next = !prev;
-      const videoEl = document.getElementById(videoElementId) as HTMLVideoElement | null;
+      isMutedRef.current = next;
+      const targetVideoId = optionsRef.current.videoElementId;
+      const videoEl = document.getElementById(targetVideoId) as HTMLVideoElement | null;
       if (videoEl) {
         videoEl.muted = next;
       }
       return next;
     });
-  }, [videoElementId]);
+  }, []);
 
   /**
    * Disconnect and release all resources cleanly.

@@ -157,12 +157,27 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
 
   const voiceNotice = null;
 
-  // Connect Anam avatar session on mount
+  // Guard ref to ensure avatar session initialization only runs once per mount / scenario
+  const hasStartedSessionRef = useRef<boolean>(false);
+  const currentScenarioIdRef = useRef<string>(topic.id);
+
+  // Connect Anam avatar session on mount or scenario change
   useEffect(() => {
+    // Reset guard if scenario changes within the same mounted component
+    if (currentScenarioIdRef.current !== topic.id) {
+      currentScenarioIdRef.current = topic.id;
+      hasStartedSessionRef.current = false;
+    }
+
+    if (hasStartedSessionRef.current) {
+      return;
+    }
+    hasStartedSessionRef.current = true;
+
     connectAvatarSession().catch((err) => {
       console.warn('[PracticeStage] Anam session connection error:', err);
     });
-  }, [connectAvatarSession]);
+  }, [connectAvatarSession, topic.id]);
 
   const activeBranch = attempts[activeAttemptIndex] || attempts[0];
   const latestPartnerTurn = [...activeBranch.turns]
