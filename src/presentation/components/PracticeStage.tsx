@@ -135,7 +135,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
     activeAttemptIndexRef.current = activeAttemptIndex;
   }, [activeAttemptIndex]);
 
-  // Anam Live Avatar & ElevenLabs Voice Passthrough Hook
+  // Anam Live Avatar & Server-Side ElevenLabs Agent Hook
   const {
     sessionState: avatarSessionState,
     isPlaying: isSpeakingAudio,
@@ -143,12 +143,13 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
     errorMessage: avatarSessionError,
     connect: connectAvatarSession,
     disconnect: disconnectAvatarSession,
-    speakText,
+    sendUserMessage,
     interrupt,
     toggleMute,
     retrySession: retryAvatarSession,
   } = useAnamAvatarSession({
     videoElementId: 'anam-avatar-video',
+    initialDialogue: topic.partner.initialDialogue,
     onPlaybackStateChange: (isPlaying) => {
       setPartnerState(isPlaying ? 'speaking' : 'receptive');
     },
@@ -162,19 +163,6 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
       console.warn('[PracticeStage] Anam session connection error:', err);
     });
   }, [connectAvatarSession]);
-
-  // Initial dialogue synthesis when avatar becomes ready
-  const initialSpokenRef = useRef<boolean>(false);
-  useEffect(() => {
-    if (
-      avatarSessionState === 'active' &&
-      !initialSpokenRef.current &&
-      topic.partner.initialDialogue
-    ) {
-      initialSpokenRef.current = true;
-      speakText(topic.partner.initialDialogue).catch(() => {});
-    }
-  }, [avatarSessionState, topic.partner.initialDialogue, speakText]);
 
   const activeBranch = attempts[activeAttemptIndex] || attempts[0];
   const latestPartnerTurn = [...activeBranch.turns]
@@ -240,6 +228,9 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
     try {
       // Barge-in: interrupt any current speech before processing new turn
       interrupt();
+
+      // Send user turn message to ElevenLabs agent via Anam
+      sendUserMessage(trimmedInput);
 
       const res = await fetch('/api/v1/conversation/turn', {
         method: 'POST',
@@ -322,11 +313,6 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
       }
 
       setIsLoading(false);
-
-      // Stream synthesized ElevenLabs speech into Anam audio passthrough + Web Audio
-      speakText(data.spoken_response).catch((speakErr) => {
-        console.warn('[PracticeStage] Speech synthesis error:', speakErr);
-      });
     } catch (err: unknown) {
       if (controller.signal.aborted || (err as any)?.name === 'AbortError') {
         return;

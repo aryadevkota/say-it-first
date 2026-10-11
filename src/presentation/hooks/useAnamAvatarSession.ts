@@ -1,22 +1,22 @@
 'use client';
 
 /**
- * useAnamAvatarSession.ts — Anam Avatar Real-Time Video & ElevenLabs Audio Passthrough Hook
+ * useAnamAvatarSession.ts — Anam Avatar & Server-Side ElevenLabs Agent Session Hook
  *
  * Implements:
  * - Server-minted ephemeral Anam session token retrieval via POST /api/v1/avatar/session
- * - Anam client initialization with disableInputAudio: true
- * - WebRTC avatar video streaming into HTML5 <video id="anam-avatar-video">
- * - Real-time PCM audio passthrough via createAgentAudioInputStream (pcm_s16le, 16kHz, mono)
- * - ElevenLabs TTS streaming output chunk forwarding to Anam
- * - Simultaneous audible audio playback to user via Web Audio PcmAudioPlayer
- * - Guaranteed barge-in interruption handling (stops Web Audio queue & interrupts Anam avatar)
- * - Mute control (mutes audible playback while keeping avatar video lip-sync active)
+ * - Native server-side ElevenLabs Conversational AI Agent connection handled by Anam
+ * - WebRTC avatar video & synchronized voice audio streaming into HTML5 <video id="anam-avatar-video">
+ * - Single playback path: audio is delivered natively via the WebRTC stream to the video element,
+ *   with perfect lip-sync, zero PCM bitshift noise, and zero duplicate audio.
+ * - Real-time streaming conversation transcripts via AnamEvent.MESSAGE_STREAM_EVENT_RECEIVED
+ * - Programmatic user messaging via client.sendUserMessage(text)
+ * - Barge-in interruption handling via client.interruptPersona()
+ * - Clean mute control on the native video element
  */
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { createClient, type AnamClient, AnamEvent } from '@anam-ai/js-sdk';
-import { PcmAudioPlayer } from '../utils/pcmAudioPlayer';
 
 export type AvatarSessionLifecycleState =
   | 'idle'
@@ -26,36 +26,65 @@ export type AvatarSessionLifecycleState =
   | 'terminated'
   | 'failed';
 
+export interface StreamedTranscriptMessage {
+  id: string;
+  role: 'user' | 'persona';
+  content: string;
+  interrupted?: boolean;
+}
+
 export interface UseAnamAvatarSessionOptions {
   videoElementId?: string;
   initialMuted?: boolean;
+  initialDialogue?: string;
+  agentId?: string;
   onPlaybackStateChange?: (isPlaying: boolean) => void;
   onStateChange?: (state: AvatarSessionLifecycleState) => void;
+  onMessageStream?: (message: StreamedTranscriptMessage) => void;
+  onUserSpeechStarted?: () => void;
+  onUserSpeechEnded?: () => void;
 }
 
 export function useAnamAvatarSession(options: UseAnamAvatarSessionOptions = {}) {
   const {
     videoElementId = 'anam-avatar-video',
     initialMuted = false,
+    initialDialogue,
+    agentId,
     onPlaybackStateChange,
     onStateChange,
+    onMessageStream,
+    onUserSpeechStarted,
+    onUserSpeechEnded,
   } = options;
 
   const [sessionState, setSessionState] = useState<AvatarSessionLifecycleState>('idle');
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [isMuted, setIsMuted] = useState<boolean>(initialMuted);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [messages, setMessages] = useState<StreamedTranscriptMessage[]>([]);
 
   const clientRef = useRef<AnamClient | null>(null);
-  const audioStreamRef = useRef<any>(null);
-  const pcmPlayerRef = useRef<PcmAudioPlayer | null>(null);
-  const activeSpeechAbortRef = useRef<AbortController | null>(null);
   const isMountedRef = useRef<boolean>(true);
   const connectingPromiseRef = useRef<Promise<void> | null>(null);
+  const speakingTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const callbacksRef = useRef({ onPlaybackStateChange, onStateChange });
+  const callbacksRef = useRef({
+    onPlaybackStateChange,
+    onStateChange,
+    onMessageStream,
+    onUserSpeechStarted,
+    onUserSpeechEnded,
+  });
+
   useEffect(() => {
-    callbacksRef.current = { onPlaybackStateChange, onStateChange };
+    callbacksRef.current = {
+      onPlaybackStateChange,
+      onStateChange,
+      onMessageStream,
+      onUserSpeechStarted,
+      onUserSpeechEnded,
+    };
   });
 
   const updateState = useCallback((nextState: AvatarSessionLifecycleState) => {
@@ -63,42 +92,31 @@ export function useAnamAvatarSession(options: UseAnamAvatarSessionOptions = {}) 
     callbacksRef.current.onStateChange?.(nextState);
   }, []);
 
-  // Initialize Web Audio PCM player
-  useEffect(() => {
-    isMountedRef.current = true;
+  const markSpeaking = useCallback((speaking: boolean) => {
+    setIsPlaying(speaking);
+    callbacksRef.current.onPlaybackStateChange?.(speaking);
 
-    const player = new PcmAudioPlayer({
-      isMuted: initialMuted,
-      onPlaybackEnded: () => {
+    if (speaking) {
+      if (speakingTimerRef.current) clearTimeout(speakingTimerRef.current);
+      // Auto-reset speaking state after quiet duration if end-of-speech event delayed
+      speakingTimerRef.current = setTimeout(() => {
         if (isMountedRef.current) {
           setIsPlaying(false);
           callbacksRef.current.onPlaybackStateChange?.(false);
         }
-      },
-    });
-    pcmPlayerRef.current = player;
-
-    return () => {
-      isMountedRef.current = false;
-      player.close();
-      pcmPlayerRef.current = null;
-    };
-  }, [initialMuted]);
+      }, 1500);
+    } else {
+      if (speakingTimerRef.current) {
+        clearTimeout(speakingTimerRef.current);
+        speakingTimerRef.current = null;
+      }
+    }
+  }, []);
 
   /**
-   * Stop active speech playback and flush the Anam avatar lip-sync sequence.
+   * Interrupt the speaking persona immediately.
    */
   const interrupt = useCallback(() => {
-    // 1. Abort in-flight ElevenLabs synthesis fetch
-    if (activeSpeechAbortRef.current) {
-      activeSpeechAbortRef.current.abort();
-      activeSpeechAbortRef.current = null;
-    }
-
-    // 2. Flush Web Audio audible playback buffer
-    pcmPlayerRef.current?.stopAndFlush();
-
-    // 3. Signal Anam avatar to interrupt speech and close audio sequence
     if (clientRef.current) {
       try {
         clientRef.current.interruptPersona();
@@ -106,21 +124,11 @@ export function useAnamAvatarSession(options: UseAnamAvatarSessionOptions = {}) 
         console.warn('[Anam] Persona interrupt warning:', err);
       }
     }
-
-    if (audioStreamRef.current) {
-      try {
-        audioStreamRef.current.endSequence();
-      } catch (err) {
-        console.warn('[Anam] Audio stream endSequence warning:', err);
-      }
-    }
-
-    setIsPlaying(false);
-    callbacksRef.current.onPlaybackStateChange?.(false);
-  }, []);
+    markSpeaking(false);
+  }, [markSpeaking]);
 
   /**
-   * Connect to Anam and stream avatar to target video element.
+   * Connect to Anam with the server-side ElevenLabs agent integration.
    */
   const connect = useCallback(async (): Promise<void> => {
     if (connectingPromiseRef.current) {
@@ -136,36 +144,93 @@ export function useAnamAvatarSession(options: UseAnamAvatarSessionOptions = {}) 
 
     const task = (async () => {
       try {
-        // 1. Fetch short-lived session token from server
+        // 1. Fetch short-lived session token with ElevenLabs agent settings from server
         const sessionRes = await fetch('/api/v1/avatar/session', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            agentId,
+            initialDialogue,
+          }),
         });
 
         if (!sessionRes.ok) {
           const errData = await sessionRes.json().catch(() => ({}));
-          throw new Error(errData?.error?.message || `Session negotiation failed (${sessionRes.status})`);
+          throw new Error(
+            errData?.error?.message || `Session negotiation failed (${sessionRes.status})`,
+          );
         }
 
-        const { session_token: sessionToken } = await sessionRes.json();
+        const data = await sessionRes.json();
+        const sessionToken = data?.session_token;
         if (!sessionToken) {
           throw new Error('No session token received from server');
         }
 
         if (!isMountedRef.current) return;
 
-        // 2. Initialize Anam client with input audio disabled (handled externally)
-        const client = createClient(sessionToken, {
-          disableInputAudio: true,
-        });
+        // 2. Initialize Anam client
+        const client = createClient(sessionToken);
         clientRef.current = client;
 
-        // Listen for session lifecycle events
+        // Listen for session lifecycle and streaming message events
         client.addListener(AnamEvent.CONNECTION_CLOSED, () => {
           console.log('[Anam] Connection closed');
           if (isMountedRef.current) {
             updateState('terminated');
+            markSpeaking(false);
           }
+        });
+
+        client.addListener(
+          AnamEvent.MESSAGE_STREAM_EVENT_RECEIVED,
+          (evt: { id: string; content: string; role: string; interrupted: boolean }) => {
+            const role = (evt.role === 'user' ? 'user' : 'persona') as 'user' | 'persona';
+
+            if (role === 'persona' && evt.content) {
+              markSpeaking(true);
+            }
+
+            if (evt.interrupted) {
+              markSpeaking(false);
+            }
+
+            if (isMountedRef.current) {
+              setMessages((prev) => {
+                const idx = prev.findIndex((m) => m.id === evt.id);
+                if (idx >= 0) {
+                  const updated = [...prev];
+                  updated[idx] = {
+                    ...updated[idx],
+                    content: updated[idx].content + evt.content,
+                    interrupted: evt.interrupted,
+                  };
+                  callbacksRef.current.onMessageStream?.(updated[idx]);
+                  return updated;
+                }
+                const newMsg: StreamedTranscriptMessage = {
+                  id: evt.id,
+                  role,
+                  content: evt.content,
+                  interrupted: evt.interrupted,
+                };
+                callbacksRef.current.onMessageStream?.(newMsg);
+                return [...prev, newMsg];
+              });
+            }
+          },
+        );
+
+        client.addListener(AnamEvent.USER_SPEECH_STARTED, () => {
+          callbacksRef.current.onUserSpeechStarted?.();
+        });
+
+        client.addListener(AnamEvent.USER_SPEECH_ENDED, () => {
+          callbacksRef.current.onUserSpeechEnded?.();
+        });
+
+        client.addListener(AnamEvent.TALK_STREAM_INTERRUPTED, () => {
+          markSpeaking(false);
         });
 
         // 3. Ensure target video element exists in DOM before starting stream
@@ -175,20 +240,15 @@ export function useAnamAvatarSession(options: UseAnamAvatarSessionOptions = {}) 
           retries++;
         }
 
-        if (!document.getElementById(videoElementId)) {
+        const videoEl = document.getElementById(videoElementId) as HTMLVideoElement | null;
+        if (videoEl) {
+          videoEl.muted = isMuted;
+        } else {
           console.warn(`[Anam] Target video element #${videoElementId} not found in DOM`);
         }
 
-        // 4. Stream avatar video into video element
+        // 4. Stream avatar video and synchronized ElevenLabs agent audio into video element
         await client.streamToVideoElement(videoElementId);
-
-        // 5. Create audio passthrough input stream (pcm_s16le at 16000Hz, mono)
-        const inputStream = client.createAgentAudioInputStream({
-          encoding: 'pcm_s16le',
-          sampleRate: 16000,
-          channels: 1,
-        });
-        audioStreamRef.current = inputStream;
 
         if (isMountedRef.current) {
           updateState('active');
@@ -208,111 +268,46 @@ export function useAnamAvatarSession(options: UseAnamAvatarSessionOptions = {}) 
 
     connectingPromiseRef.current = task;
     return task;
-  }, [sessionState, updateState, videoElementId]);
+  }, [agentId, initialDialogue, isMuted, markSpeaking, sessionState, updateState, videoElementId]);
 
   /**
-   * Synthesize text via ElevenLabs and pipe raw PCM audio chunks continuously into Anam and Web Audio.
+   * Send a programmatic user text message into the ElevenLabs agent conversation.
    */
-  const speakText = useCallback(
-    async (text: string): Promise<void> => {
-      const cleanText = text.trim();
-      if (!cleanText) return;
+  const sendUserMessage = useCallback(
+    (text: string): void => {
+      const trimmed = text.trim();
+      if (!trimmed) return;
 
-      // Ensure active speech is interrupted before starting new sequence
-      interrupt();
-
-      const controller = new AbortController();
-      activeSpeechAbortRef.current = controller;
-
-      setIsPlaying(true);
-      callbacksRef.current.onPlaybackStateChange?.(true);
+      if (!clientRef.current) {
+        console.warn('[Anam] Cannot send user message: client is not connected');
+        return;
+      }
 
       try {
-        // Request raw 16kHz linear PCM from ElevenLabs synthesis route
-        const res = await fetch('/api/v1/voice/synthesize', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          signal: controller.signal,
-          body: JSON.stringify({
-            text: cleanText,
-            format: 'pcm_16000',
-          }),
-        });
-
-        if (!res.ok) {
-          const errData = await res.json().catch(() => ({}));
-          console.warn('[ElevenLabs] Synthesis returned error:', errData);
-          setIsPlaying(false);
-          callbacksRef.current.onPlaybackStateChange?.(false);
-          return;
-        }
-
-        if (!res.body) {
-          console.warn('[ElevenLabs] Synthesis returned empty body');
-          setIsPlaying(false);
-          callbacksRef.current.onPlaybackStateChange?.(false);
-          return;
-        }
-
-        const reader = res.body.getReader();
-
-        // Stream raw PCM chunks continuously as they arrive
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done || controller.signal.aborted) {
-            break;
-          }
-
-          if (value && value.byteLength > 0) {
-            // Forward PCM chunk immediately to Anam audio passthrough stream
-            if (audioStreamRef.current) {
-              try {
-                audioStreamRef.current.sendAudioChunk(value);
-              } catch (sendErr) {
-                console.warn('[Anam] sendAudioChunk warning:', sendErr);
-              }
-            }
-
-            // Simultaneously feed to Web Audio player for audible sound to user
-            if (pcmPlayerRef.current) {
-              pcmPlayerRef.current.feedChunk(value);
-            }
-          }
-        }
-
-        // Close Anam sequence when all audio chunks for this utterance have been forwarded
-        if (!controller.signal.aborted && audioStreamRef.current) {
-          try {
-            audioStreamRef.current.endSequence();
-          } catch (endErr) {
-            console.warn('[Anam] endSequence warning:', endErr);
-          }
-        }
-      } catch (err: unknown) {
-        if (controller.signal.aborted || (err as any)?.name === 'AbortError') {
-          return;
-        }
-        console.warn('[ElevenLabs/Anam] Error during speech streaming:', err);
-        setIsPlaying(false);
-        callbacksRef.current.onPlaybackStateChange?.(false);
+        clientRef.current.sendUserMessage(trimmed);
+      } catch (err) {
+        console.error('[Anam] Failed to send user message:', err);
       }
     },
-    [interrupt],
+    [],
   );
 
   /**
-   * Toggle mute on audible ElevenLabs playback.
+   * Toggle mute on the HTML5 video element.
    */
   const toggleMute = useCallback(() => {
     setIsMuted((prev) => {
       const next = !prev;
-      pcmPlayerRef.current?.setMuted(next);
+      const videoEl = document.getElementById(videoElementId) as HTMLVideoElement | null;
+      if (videoEl) {
+        videoEl.muted = next;
+      }
       return next;
     });
-  }, []);
+  }, [videoElementId]);
 
   /**
-   * Disconnect and release all resources.
+   * Disconnect and release all resources cleanly.
    */
   const disconnect = useCallback(async () => {
     interrupt();
@@ -326,7 +321,6 @@ export function useAnamAvatarSession(options: UseAnamAvatarSessionOptions = {}) 
       }
       clientRef.current = null;
     }
-    audioStreamRef.current = null;
 
     if (isMountedRef.current) {
       updateState('terminated');
@@ -340,23 +334,26 @@ export function useAnamAvatarSession(options: UseAnamAvatarSessionOptions = {}) 
 
   // Clean shutdown on unmount
   useEffect(() => {
+    isMountedRef.current = true;
     return () => {
-      interrupt();
+      isMountedRef.current = false;
+      if (speakingTimerRef.current) clearTimeout(speakingTimerRef.current);
       if (clientRef.current) {
         clientRef.current.stopStreaming().catch(() => {});
         clientRef.current = null;
       }
     };
-  }, [interrupt]);
+  }, []);
 
   return {
     sessionState,
     isPlaying,
     isMuted,
     errorMessage,
+    messages,
     connect,
     disconnect,
-    speakText,
+    sendUserMessage,
     interrupt,
     toggleMute,
     retrySession,

@@ -83,7 +83,7 @@ export const SophiaLiveAvatar: React.FC<SophiaLiveAvatarProps> = ({
               ref={videoRef}
               playsInline
               autoPlay
-              muted
+              muted={isMuted}
               data-testid="anam-avatar-video"
               className="w-full h-full object-cover relative z-10"
             />

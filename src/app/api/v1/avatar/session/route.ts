@@ -9,10 +9,15 @@ export const runtime = 'nodejs';
 
 export async function POST(request: Request) {
   try {
-    const rawApiKey = process.env.ANAM_API_KEY;
-    const apiKey = rawApiKey ? rawApiKey.trim().replace(/^["']|["']$/g, '') : '';
+    const rawAnamKey = process.env.ANAM_API_KEY;
+    const anamApiKey = rawAnamKey ? rawAnamKey.trim().replace(/^["']|["']$/g, '') : '';
 
-    if (!isKeyConfigured(apiKey)) {
+    const rawElevenLabsKey = process.env.ELEVENLABS_API_KEY;
+    const elevenLabsApiKey = rawElevenLabsKey
+      ? rawElevenLabsKey.trim().replace(/^["']|["']$/g, '')
+      : '';
+
+    if (!isKeyConfigured(anamApiKey)) {
       return NextResponse.json(
         {
           error: {
@@ -26,24 +31,56 @@ export async function POST(request: Request) {
       );
     }
 
+    if (!isKeyConfigured(elevenLabsApiKey)) {
+      return NextResponse.json(
+        {
+          error: {
+            code: 'ELEVENLABS_NOT_CONFIGURED',
+            message:
+              'ELEVENLABS_API_KEY is not configured in environment. Add ELEVENLABS_API_KEY in .env.local.',
+          },
+        },
+        { status: 503 },
+      );
+    }
+
+    const body = await request.json().catch(() => ({}));
+    const agentId = body?.agentId || body?.agent_id || process.env.ELEVENLABS_AGENT_ID || '';
+    const avatarId = body?.avatarId || body?.avatar_id || ANAM_TARGET_AVATAR_ID;
+    const firstMessage = body?.initialDialogue || body?.initial_dialogue || body?.firstMessage;
+    const systemPrompt = body?.systemPrompt || body?.system_prompt;
+
     try {
-      const result = await requestAnamSessionToken(apiKey);
+      const result = await requestAnamSessionToken({
+        anamApiKey,
+        elevenLabsApiKey,
+        agentId,
+        avatarId,
+        firstMessage,
+        systemPrompt,
+      });
+
       return NextResponse.json(
         {
           provider: 'anam',
           session_token: result.sessionToken,
           avatar_id: result.avatarId,
+          agent_id: result.agentId,
           ...(result.deduplicated ? { deduplicated: true } : {}),
         },
         { status: 200 },
       );
     } catch (err: any) {
-      const status = err?.status === 401 || err?.status === 403 ? 502 : (err?.status || 500);
+      const status =
+        err?.status === 401 || err?.status === 403
+          ? 502
+          : err?.status || (err?.code?.endsWith('_NOT_CONFIGURED') ? 503 : 500);
+
       return NextResponse.json(
         {
           error: {
-            code: 'ANAM_SESSION_FAILED',
-            message: err?.message || 'Failed to initialize Anam avatar session token.',
+            code: err?.code || 'AVATAR_SESSION_FAILED',
+            message: err?.message || 'Failed to initialize avatar session.',
             details: err?.details,
           },
         },
@@ -55,7 +92,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error: {
-          code: 'ANAM_GATEWAY_ERROR',
+          code: 'AVATAR_GATEWAY_ERROR',
           message: `Avatar session gateway encountered an error: ${message}`,
         },
       },

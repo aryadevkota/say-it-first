@@ -75,7 +75,7 @@ describe('Sophia Live Avatar Component Suite (Anam Video Stream)', () => {
     defaultTakeawayScript: 'I enjoyed reconnecting over coffee.',
   };
 
-  it('renders dedicated HTML5 Anam video stream container with muted audio and active badge', () => {
+  it('renders dedicated HTML5 Anam video stream container with active badge and unmuted audio', () => {
     const presentation = getSophiaPresentationForScenario(mockInterviewScenario);
 
     const html = renderToString(
@@ -91,10 +91,27 @@ describe('Sophia Live Avatar Component Suite (Anam Video Stream)', () => {
     expect(html).toContain('data-testid="sophia-live-avatar"');
     expect(html).toContain('data-testid="anam-avatar-video"');
     expect(html).toContain('id="anam-avatar-video"');
-    expect(html).toContain('muted=""'); // HTML5 video muted attribute
+    expect(html).not.toContain('muted=""'); // WebRTC audio track is enabled natively
     expect(html).toContain('Active');
     expect(html).toContain('Professional Business Attire');
     expect(html).toContain('Office Background');
+  });
+
+  it('renders video with muted attribute when isMuted is true', () => {
+    const presentation = getSophiaPresentationForScenario(mockInterviewScenario);
+
+    const html = renderToString(
+      React.createElement(SophiaLiveAvatar, {
+        presentation,
+        partnerState: 'listening',
+        isSpeakingAudio: false,
+        isMuted: true,
+        sessionState: 'active',
+      }),
+    );
+
+    expect(html).toContain('data-testid="anam-avatar-video"');
+    expect(html).toContain('muted=""');
   });
 
   it('renders scenario-specific presentation metadata for coffee shop archetype', () => {
