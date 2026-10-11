@@ -18,8 +18,6 @@
 
 import React, { useState } from 'react';
 import { playCozySound } from '../utils/cozyAudio';
-import { EvaPresentationView } from './EvaPresentationView';
-import { EVA_PRESENTATION_CONFIGS } from '../../domain/entities/EvaScenarioPresentation';
 
 export interface UserPreferences {
   interests: string[];
@@ -207,31 +205,49 @@ export const WelcomeOnboarding: React.FC<WelcomeOnboardingProps> = ({
             </p>
           </div>
 
-          {/* Right: Practice Partner Preview (Eva) */}
+          {/* Right: Live Practice Partner (Eva) Feature Card */}
           <div className="md:col-span-5 flex flex-col items-center justify-center">
-            <div className="w-full max-w-sm rounded-3xl bg-canvas-surface border border-canvas-border p-4 shadow-sm relative overflow-hidden">
-              <div className="absolute top-4 left-4 z-10">
-                <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-canvas-subtle border border-canvas-border text-ink-secondary">
-                  Practice Partner • Eva
+            <div className="w-full max-w-sm rounded-3xl bg-canvas-surface border border-canvas-border p-5 shadow-sm relative overflow-hidden flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-950/80 text-emerald-300 border border-emerald-500/40 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  Eva Live Avatar
+                </span>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-900 text-slate-200 border border-slate-700">
+                  Simli WebRTC • 16kHz
                 </span>
               </div>
-              
-              {/* Eva Presentation Preview */}
-              <div className="w-full rounded-2xl overflow-hidden mt-6 mb-2">
-                <EvaPresentationView
-                  presentation={{
-                    scenarioId: 'welcome-preview',
-                    ...EVA_PRESENTATION_CONFIGS['everyday-casual'],
-                  }}
-                  partnerState="receptive"
-                  partnerName="Eva"
-                  partnerRole="Practice Partner"
-                />
+
+              {/* Realistic Scene Preview Container */}
+              <div className="w-full aspect-[4/3] rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 border border-white/10 p-4 flex flex-col justify-between text-white shadow-inner relative overflow-hidden">
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-teal-500/10 via-transparent to-transparent pointer-events-none" />
+
+                <div className="relative z-10 flex items-center justify-between">
+                  <span className="text-[11px] font-mono text-teal-300 bg-black/60 px-2 py-0.5 rounded-md border border-white/10">
+                    Live Video Stage
+                  </span>
+                  <span className="text-[11px] text-white/70">Alexandra Voice</span>
+                </div>
+
+                <div className="relative z-10 space-y-1.5 bg-black/70 backdrop-blur-md p-3 rounded-xl border border-white/15">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-teal-400" />
+                    <span className="text-xs font-semibold text-white">Scenario-Adaptive Presence</span>
+                  </div>
+                  <p className="text-[11px] text-slate-300 leading-snug">
+                    Eva adapts attire and setting to your scenario (Interview business attire, coffee chat turtleneck, quiet study, clinical office).
+                  </p>
+                </div>
+
+                <div className="relative z-10 flex items-center justify-between text-[10px] text-slate-400 pt-1">
+                  <span>Lip-synced Speech-to-Video</span>
+                  <span>Sensory text mode toggle</span>
+                </div>
               </div>
 
-              <div className="text-center pt-2 pb-1">
+              <div className="text-center">
                 <p className="text-xs text-ink-muted">
-                  Warm, expressive partner with visible nonverbal cues
+                  Warm, realistic conversational AI partner with visible nonverbal cues
                 </p>
               </div>
             </div>

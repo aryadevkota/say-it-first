@@ -177,6 +177,14 @@ export class VoicePipelineQueue {
       }
     }
 
+    if (typeof window !== 'undefined') {
+      try {
+        window.dispatchEvent(new CustomEvent('simli:clear'));
+      } catch {
+        // ignore
+      }
+    }
+
     this.notify({
       isPlaying: false,
       voiceStatus: 'idle',

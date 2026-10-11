@@ -47,8 +47,8 @@ export const EvaLiveAvatar: React.FC<EvaLiveAvatarProps> = ({
   initialError = null,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
-  const dataChannelRef = useRef<RTCDataChannel | null>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const simliClientRef = useRef<any>(null);
 
   const [sessionStatus, setSessionStatus] = useState<
     'idle' | 'connecting' | 'connected' | 'error'
@@ -62,24 +62,15 @@ export const EvaLiveAvatar: React.FC<EvaLiveAvatarProps> = ({
   );
   const [showSceneDetails, setShowSceneDetails] = useState<boolean>(false);
 
-  // Clean up any existing WebRTC peer connections
+  // Clean up any existing Simli client and media streams
   const cleanupWebRtc = useCallback(() => {
-    if (dataChannelRef.current) {
+    if (simliClientRef.current) {
       try {
-        dataChannelRef.current.close();
+        simliClientRef.current.stop();
       } catch {
         // ignore
       }
-      dataChannelRef.current = null;
-    }
-
-    if (peerConnectionRef.current) {
-      try {
-        peerConnectionRef.current.close();
-      } catch {
-        // ignore
-      }
-      peerConnectionRef.current = null;
+      simliClientRef.current = null;
     }
 
     if (videoRef.current && videoRef.current.srcObject) {
@@ -88,10 +79,16 @@ export const EvaLiveAvatar: React.FC<EvaLiveAvatarProps> = ({
       videoRef.current.srcObject = null;
     }
 
+    if (audioRef.current && audioRef.current.srcObject) {
+      const stream = audioRef.current.srcObject as MediaStream;
+      stream.getTracks().forEach((track) => track.stop());
+      audioRef.current.srcObject = null;
+    }
+
     setHasWebRtcStream(false);
   }, []);
 
-  // Initialize Simli WebRTC Session Handshake
+  // Initialize Simli WebRTC Session Handshake via SimliClient
   const startSession = useCallback(async (signal?: AbortSignal) => {
     cleanupWebRtc();
     setSessionStatus('connecting');
@@ -126,60 +123,83 @@ export const EvaLiveAvatar: React.FC<EvaLiveAvatarProps> = ({
 
       setSessionId(data.session_id);
 
-      // Establish client WebRTC connection if in browser environment
-      if (typeof window !== 'undefined' && 'RTCPeerConnection' in window) {
-        const iceServers = data.ice_servers || [
-          { urls: 'stun:stun.l.google.com:19302' },
-          { urls: 'stun:stun1.l.google.com:19302' },
-        ];
-
-        const pc = new RTCPeerConnection({ iceServers });
-        peerConnectionRef.current = pc;
-
-        // Remote Video Track Listener
-        pc.ontrack = (event) => {
-          if (videoRef.current && event.streams[0]) {
-            videoRef.current.srcObject = event.streams[0];
-            setHasWebRtcStream(true);
-            videoRef.current.play().catch(() => {
-              // Handled: Autoplay policy may require user interaction
-            });
-          }
-        };
-
-        // Create DataChannel for 16kHz PCM audio chunk transmission
+      // Establish real WebRTC Speech-to-Video streaming via SimliClient in browser
+      if (typeof window !== 'undefined' && videoRef.current && audioRef.current) {
         try {
-          const dc = pc.createDataChannel('simli-audio', { ordered: true });
-          dataChannelRef.current = dc;
-        } catch (dcErr) {
-          console.warn('[EvaLiveAvatar] Data channel creation notice:', dcErr);
-        }
+          const { SimliClient, LogLevel } = await import('simli-client');
 
-        // Connection State Change Monitoring
-        pc.onconnectionstatechange = () => {
-          if (pc.connectionState === 'connected') {
+          const token = data.session_token || data.session_id;
+          if (!token) {
+            throw new Error('No session token returned from Simli session gateway.');
+          }
+
+          const client = new SimliClient(
+            token,
+            videoRef.current,
+            audioRef.current,
+            null, // Ice servers are managed via LiveKit transport mode
+            LogLevel.DEBUG,
+            'livekit',
+          );
+          simliClientRef.current = client;
+
+          client.on('start', () => {
+            console.log('[EvaLiveAvatar] Simli WebRTC avatar video stream connected');
             setSessionStatus('connected');
-          } else if (
-            pc.connectionState === 'failed' ||
-            pc.connectionState === 'disconnected'
-          ) {
+            setHasWebRtcStream(true);
+
+            // Establish audio data pipeline with initial silence buffer as per Simli specification
+            try {
+              const initialAudioBuffer = new Uint8Array(6000).fill(0);
+              client.sendAudioData(initialAudioBuffer);
+            } catch (initErr) {
+              console.warn('[EvaLiveAvatar] Notice establishing initial audio buffer:', initErr);
+            }
+          });
+
+          client.on('stop', () => {
+            console.log('[EvaLiveAvatar] Simli WebRTC stream stopped');
+            setSessionStatus('idle');
+            setHasWebRtcStream(false);
+          });
+
+          client.on('error', (streamErr: any) => {
+            console.error('[EvaLiveAvatar] Simli stream error:', streamErr);
             setSessionStatus('error');
             setErrorMessage({
-              code: 'WEBRTC_CONNECTION_DROPPED',
+              code: 'SIMLI_STREAM_ERROR',
               message:
-                'WebRTC peer connection to Simli video streaming servers was lost.',
+                typeof streamErr === 'string'
+                  ? streamErr
+                  : 'Simli video streaming encountered an error.',
             });
-          }
-        };
+          });
 
-        // Create WebRTC Offer
-        const offer = await pc.createOffer({
-          offerToReceiveVideo: true,
-          offerToReceiveAudio: true,
-        });
-        await pc.setLocalDescription(offer);
+          client.on('startup_error', (startErr: any) => {
+            console.error('[EvaLiveAvatar] Simli startup error:', startErr);
+            setSessionStatus('error');
+            setErrorMessage({
+              code: 'SIMLI_STARTUP_ERROR',
+              message:
+                typeof startErr === 'string'
+                  ? startErr
+                  : 'Failed to negotiate live video stream with Simli servers.',
+            });
+          });
 
-        setSessionStatus('connected');
+          await client.start();
+        } catch (webrtcInitErr: any) {
+          if (signal?.aborted) return;
+          console.error('[EvaLiveAvatar] Failed to start SimliClient:', webrtcInitErr);
+          setSessionStatus('error');
+          setErrorMessage({
+            code: 'SIMLI_CLIENT_INIT_FAILED',
+            message:
+              webrtcInitErr instanceof Error
+                ? webrtcInitErr.message
+                : 'Could not initialize Simli WebRTC client.',
+          });
+        }
       } else {
         setSessionStatus('connected');
       }
@@ -211,6 +231,37 @@ export const EvaLiveAvatar: React.FC<EvaLiveAvatarProps> = ({
     };
   }, [cleanupWebRtc, initialStatus, startSession]);
 
+  // Audio Chunk Pipeline for Simli Lip-Sync Animation
+  useEffect(() => {
+    const handleAudioData = (event: any) => {
+      if (simliClientRef.current && event.detail) {
+        try {
+          simliClientRef.current.sendAudioData(event.detail);
+        } catch (err) {
+          console.warn('[EvaLiveAvatar] sendAudioData notice:', err);
+        }
+      }
+    };
+
+    const handleAudioClear = () => {
+      if (simliClientRef.current) {
+        try {
+          simliClientRef.current.ClearBuffer();
+        } catch {
+          // ignore
+        }
+      }
+    };
+
+    window.addEventListener('simli:audio', handleAudioData);
+    window.addEventListener('simli:clear', handleAudioClear);
+
+    return () => {
+      window.removeEventListener('simli:audio', handleAudioData);
+      window.removeEventListener('simli:clear', handleAudioClear);
+    };
+  }, []);
+
   const badgeText =
     presentation.badgeText ||
     presentation.visualSummary ||
@@ -234,6 +285,8 @@ export const EvaLiveAvatar: React.FC<EvaLiveAvatarProps> = ({
           aria-label="Eva Simli Live Stream Video"
           className="w-full h-full object-cover relative z-10"
         />
+        {/* Dedicated Audio Element for Simli LiveKit Audio Track */}
+        <audio ref={audioRef} autoPlay muted={isMuted} className="hidden" />
 
         {/* Video Loading / Connecting Overlay */}
         {sessionStatus === 'connecting' && (
