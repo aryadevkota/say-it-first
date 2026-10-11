@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { TavusSessionCoordinator } from './coordinator';
 
 export const runtime = 'nodejs';
 
@@ -27,6 +28,7 @@ export async function POST(request: Request) {
     if (body.action === 'end' || (body.conversationId && !body.scenarioId)) {
       if (body.conversationId && isKeyConfigured(tavusApiKey)) {
         console.log('[Tavus] Immediate tab close termination:', body.conversationId);
+        TavusSessionCoordinator.clearActiveSession(body.conversationId);
         await fetch(`https://tavusapi.com/v2/conversations/${body.conversationId}/end`, {
           method: 'POST',
           headers: { 'x-api-key': tavusApiKey! }
@@ -39,6 +41,47 @@ export async function POST(request: Request) {
     // 1. Tavus CVI Integration Path
     // -------------------------------------------------------------
     if (isKeyConfigured(tavusApiKey)) {
+      const scenarioId = body.scenarioId || 'default-scenario';
+
+      // (A) If a reusable active session already exists for this scenario, return it immediately
+      const reusable = TavusSessionCoordinator.getReusableSession(scenarioId);
+      if (reusable) {
+        return NextResponse.json({
+          provider: 'tavus',
+          conversation_id: reusable.conversationId,
+          conversation_url: reusable.conversationUrl,
+          reused: true,
+        }, { status: 200 });
+      }
+
+      // (B) If a creation request is already in-flight (e.g. Strict Mode double-invoke or rapid click), await it
+      const inFlight = TavusSessionCoordinator.getInFlightPromise();
+      if (inFlight) {
+        console.log(`[Tavus] Awaiting existing in-flight session creation for scenario: ${scenarioId}`);
+        try {
+          const result = await inFlight;
+          return NextResponse.json({
+            provider: 'tavus',
+            conversation_id: result.conversationId,
+            conversation_url: result.conversationUrl,
+            deduplicated: true,
+          }, { status: 200 });
+        } catch (err: any) {
+          return NextResponse.json(
+            { error: { message: err?.message || 'Failed to create Tavus conversation' } },
+            { status: 500 }
+          );
+        }
+      }
+
+      // (C) If a termination is currently ongoing, wait for it before attempting to create
+      const ongoingTermination = TavusSessionCoordinator.getTerminationPromise();
+      if (ongoingTermination) {
+        console.log('[Tavus] Waiting for ongoing termination to settle before creation...');
+        await ongoingTermination.catch(() => {});
+      }
+
+      // (D) Single-flight lock around Tavus creation
       const partnerName = body.partnerName || "Sophia";
       const partnerRole = body.partnerRole || "conversational practice partner";
       const userGoal = body.userGoal || "Practice difficult and meaningful conversations safely.";
@@ -61,68 +104,86 @@ Stay in character, respond naturally, empathetically, and constructively. Keep y
         }
       };
 
-      const sendCreate = async () => {
-        return fetch('https://tavusapi.com/v2/conversations', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': tavusApiKey!,
-          },
-          body: JSON.stringify(createPayload)
-        });
-      };
+      const executeCreate = async () => {
+        const sendCreate = async () => {
+          return fetch('https://tavusapi.com/v2/conversations', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-api-key': tavusApiKey!,
+            },
+            body: JSON.stringify(createPayload)
+          });
+        };
 
-      let tavusRes = await sendCreate();
+        let tavusRes = await sendCreate();
 
-      // If concurrency limit is reached, auto-end lingering active conversations and retry
-      if (!tavusRes.ok && tavusRes.status === 400) {
-        const errJson = await tavusRes.clone().json().catch(() => ({}));
-        if (errJson.message?.includes('maximum concurrent conversations')) {
-          console.warn('[Tavus] Concurrency limit hit. Cleaning up lingering active sessions...');
-          try {
-            const listRes = await fetch('https://tavusapi.com/v2/conversations', {
-              headers: { 'x-api-key': tavusApiKey! }
-            });
-            if (listRes.ok) {
-              const listData = await listRes.json();
-              const activeSessions = (listData.data || []).filter(
-                (c: any) => c.status === 'active' || c.status === 'created'
-              );
-              await Promise.all(
-                activeSessions.map((c: any) =>
-                  fetch(`https://tavusapi.com/v2/conversations/${c.conversation_id}/end`, {
-                    method: 'POST',
-                    headers: { 'x-api-key': tavusApiKey! }
-                  }).catch(() => {})
-                )
-              );
-              // Small delay to allow webhook / session termination to register
-              await new Promise((resolve) => setTimeout(resolve, 1000));
-              tavusRes = await sendCreate();
+        // If concurrency limit is reached, auto-end lingering active conversations and retry
+        if (!tavusRes.ok && tavusRes.status === 400) {
+          const errJson = await tavusRes.clone().json().catch(() => ({}));
+          if (errJson.message?.includes('maximum concurrent conversations')) {
+            console.warn('[Tavus] Concurrency limit hit. Cleaning up lingering active sessions...');
+            try {
+              const listRes = await fetch('https://tavusapi.com/v2/conversations', {
+                headers: { 'x-api-key': tavusApiKey! }
+              });
+              if (listRes.ok) {
+                const listData = await listRes.json();
+                const activeSessions = (listData.data || []).filter(
+                  (c: any) => c.status === 'active' || c.status === 'created'
+                );
+                await Promise.all(
+                  activeSessions.map((c: any) =>
+                    fetch(`https://tavusapi.com/v2/conversations/${c.conversation_id}/end`, {
+                      method: 'POST',
+                      headers: { 'x-api-key': tavusApiKey! }
+                    }).catch(() => {})
+                  )
+                );
+                // Serialized wait for webhook / session termination to register
+                await new Promise((resolve) => setTimeout(resolve, 1500));
+                tavusRes = await sendCreate();
+              }
+            } catch (cleanErr) {
+              console.warn('[Tavus] Cleanup of lingering sessions failed:', cleanErr);
             }
-          } catch (cleanErr) {
-            console.warn('[Tavus] Cleanup of lingering sessions failed:', cleanErr);
           }
         }
-      }
 
-      if (!tavusRes.ok) {
-        const errData = await tavusRes.json().catch(() => ({}));
-        console.error('[Tavus] Conversation creation failed:', tavusRes.status, errData);
+        if (!tavusRes.ok) {
+          const errData = await tavusRes.json().catch(() => ({}));
+          console.error('[Tavus] Conversation creation failed:', tavusRes.status, errData);
+          throw new Error(errData.message || errData.error || 'Failed to create Tavus conversation');
+        }
+
+        const tavusData = await tavusRes.json();
+        console.log('[Tavus] Conversation created successfully:', tavusData.conversation_id);
+        TavusSessionCoordinator.setActiveSession(tavusData.conversation_id, tavusData.conversation_url, scenarioId);
+
+        return {
+          conversationId: tavusData.conversation_id,
+          conversationUrl: tavusData.conversation_url,
+        };
+      };
+
+      const creationPromise = executeCreate();
+      TavusSessionCoordinator.setInFlightPromise(creationPromise);
+
+      try {
+        const created = await creationPromise;
+        return NextResponse.json({
+          provider: 'tavus',
+          conversation_id: created.conversationId,
+          conversation_url: created.conversationUrl,
+        }, { status: 200 });
+      } catch (err: any) {
         return NextResponse.json(
-          { error: { message: errData.message || errData.error || 'Failed to create Tavus conversation' } },
-          { status: tavusRes.status }
+          { error: { message: err?.message || 'Failed to create Tavus conversation' } },
+          { status: 400 }
         );
+      } finally {
+        TavusSessionCoordinator.setInFlightPromise(null);
       }
-
-      const tavusData = await tavusRes.json();
-      console.log('[Tavus] Conversation created successfully:', tavusData.conversation_id);
-
-      return NextResponse.json({
-        provider: 'tavus',
-        conversation_id: tavusData.conversation_id,
-        conversation_url: tavusData.conversation_url,
-      }, { status: 200 });
     }
 
     // -------------------------------------------------------------
@@ -287,12 +348,26 @@ export async function DELETE(request: Request) {
     }
 
     console.log('[Tavus] Ending conversation:', conversationId);
-    await fetch(`https://tavusapi.com/v2/conversations/${conversationId}/end`, {
-      method: 'POST',
-      headers: {
-        'x-api-key': tavusApiKey!,
+    TavusSessionCoordinator.clearActiveSession(conversationId);
+
+    const termPromise = (async () => {
+      try {
+        await fetch(`https://tavusapi.com/v2/conversations/${conversationId}/end`, {
+          method: 'POST',
+          headers: {
+            'x-api-key': tavusApiKey!,
+          }
+        });
+        // Brief settling period for Tavus server to record termination state
+        await new Promise((r) => setTimeout(r, 1200));
+      } catch (e) {
+        console.warn('[Tavus] Failed to end conversation:', e);
       }
-    });
+    })();
+
+    TavusSessionCoordinator.setTerminationPromise(termPromise);
+    await termPromise;
+    TavusSessionCoordinator.setTerminationPromise(null);
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (err) {

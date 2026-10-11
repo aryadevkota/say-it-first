@@ -26,6 +26,7 @@ import type { UserPreferences } from './WelcomeOnboarding';
 type AvatarState = 'listening' | 'speaking' | 'thinking' | 'neutral' | 'receptive';
 import type { SavedTakeaway } from './MyProgress';
 import { useLiveAvatarSession } from '../hooks/useLiveAvatarSession';
+import { useAvatarSessionManager } from '../hooks/useAvatarSessionManager';
 import { playCozySound } from '../utils/cozyAudio';
 import { ReportGenerationView } from './ReportGenerationView';
 import { ConversationReportPage } from './ConversationReportPage';
@@ -178,41 +179,26 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
     .find((t) => t.role === 'partner');
 
   const lastSpokenTurnIdRef = useRef<string | null>(null);
-  const [conversationUrl, setConversationUrl] = useState<string | null>(null);
-  const conversationIdRef = useRef<string | null>(null);
 
-  // Fetch session and connect
-  useEffect(() => {
-    let mounted = true;
-    const initSession = async () => {
-      try {
-        const res = await fetch('/api/v1/avatar/session', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            scenarioId: topic.id,
-            partnerName: topic.partner.name,
-            partnerRole: topic.partner.role,
-            userGoal: topic.userGoal,
-            initialDialogue: topic.partner.initialDialogue
-          })
-        });
-        const data = await res.json();
-        if (mounted) {
-          if (data.conversation_url) {
-            setConversationUrl(data.conversation_url);
-            conversationIdRef.current = data.conversation_id || null;
-          } else if (data.session_token) {
-            connect(data.session_token, data.ws_url || 'wss://agent.heygen.com');
-          }
-        }
-      } catch (err) {
-        console.error('Failed to init session', err);
-      }
-    };
-    initSession();
-    return () => { mounted = false; };
-  }, [topic.id, topic.partner.name, topic.partner.role, topic.userGoal, topic.partner.initialDialogue, connect]);
+  // Dedicated Avatar Session Manager (lifecycle state machine & single-flight guard)
+  const {
+    sessionState: avatarSessionState,
+    sessionData: avatarSessionData,
+    errorMessage: avatarSessionError,
+    retrySession: retryAvatarSession,
+    endSession: endAvatarSession,
+  } = useAvatarSessionManager({
+    scenarioId: topic.id,
+    partnerName: topic.partner.name,
+    partnerRole: topic.partner.role,
+    userGoal: topic.userGoal,
+    initialDialogue: topic.partner.initialDialogue,
+    onLiveKitConnect: (token, ws) => {
+      connect(token, ws);
+    },
+  });
+
+  const conversationUrl = avatarSessionData?.conversationUrl || null;
 
   // Cancel any audio & in-flight requests on unmount
   useEffect(() => {
@@ -222,15 +208,6 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
         abortControllerRef.current.abort();
       }
       disconnect();
-
-      // End Tavus conversation if active
-      if (conversationIdRef.current) {
-        fetch('/api/v1/avatar/session', {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ conversationId: conversationIdRef.current })
-        }).catch(() => {});
-      }
     };
   }, [disconnect]);
 
@@ -483,6 +460,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
   const handleFinishPractice = () => {
     playCozySound('tap');
     disconnect();
+    endAvatarSession().catch(() => {});
     activeRequestIdRef.current++;
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -538,6 +516,7 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
   const handleExitStage = () => {
     playCozySound('tap');
     disconnect();
+    endAvatarSession().catch(() => {});
     activeRequestIdRef.current++;
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -693,6 +672,9 @@ export const PracticeStage: React.FC<PracticeStageProps> = ({
               conversationUrl={conversationUrl || undefined}
               videoRef={videoRef}
               audioRef={audioRef}
+              sessionState={avatarSessionState}
+              errorMessage={avatarSessionError}
+              onRetry={retryAvatarSession}
               className="w-full"
             />
           </div>
